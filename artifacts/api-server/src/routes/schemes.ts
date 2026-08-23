@@ -14,6 +14,10 @@ const schemes = [
   { id: "education-loan", name: "Education Loan Scheme", purpose: "Higher education and professional courses", maxLoan: 2000000, interest: 7, moratorium: 12, tenure: 10, applicantType: "Student", tags: ["Higher education", "Moratorium"], isPrototypeData: true },
   { id: "equipment-support", name: "Equipment Support Scheme", purpose: "Productive equipment for an established enterprise", maxLoan: 1000000, interest: 7.25, moratorium: 6, tenure: 5, applicantType: "Entrepreneur", tags: ["Equipment", "Business growth"], isPrototypeData: true },
   { id: "working-capital", name: "Working Capital Scheme", purpose: "Inventory and day-to-day business expenses", maxLoan: 500000, interest: 7.5, moratorium: 3, tenure: 3, applicantType: "Entrepreneur", tags: ["Working capital", "Quick access"], isPrototypeData: true },
+  { id: "women-enterprise", name: "Women Enterprise Starter Scheme", purpose: "Starter finance for women-led micro enterprises and home businesses", maxLoan: 150000, interest: 6.5, moratorium: 3, tenure: 5, applicantType: "Entrepreneur", tags: ["Women-led", "Starter", "Micro enterprise"], isPrototypeData: true },
+  { id: "livelihood-fund", name: "Livelihood Growth Fund", purpose: "Patient capital for livelihood activities in rural and semi-urban communities", maxLoan: 300000, interest: 7, moratorium: 6, tenure: 5, applicantType: "Entrepreneur", tags: ["Livelihood", "Rural", "Community"], isPrototypeData: true },
+  { id: "skill-support", name: "Skill Development Support", purpose: "Education support for vocational training and job-ready certification", maxLoan: 350000, interest: 5.5, moratorium: 12, tenure: 5, applicantType: "Student", tags: ["Skills", "Vocational", "Students"], isPrototypeData: true },
+  { id: "green-equipment", name: "Green Enterprise Equipment Fund", purpose: "Finance for energy-efficient tools and environmentally responsible enterprises", maxLoan: 1200000, interest: 7.25, moratorium: 6, tenure: 7, applicantType: "Entrepreneur", tags: ["Green business", "Equipment"], isPrototypeData: true },
 ];
 
 const partners = [
