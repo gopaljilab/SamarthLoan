@@ -1,22 +1,23 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: SchemeSathi prototype API for scheme matching and application routing
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
-    description: Health operations
+  - name: schemes
+  - name: partners
+  - name: applications
+  - name: analytics
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,13 +25,337 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /schemes:
+    get:
+      operationId: listSchemes
+      tags: [schemes]
+      summary: List prototype schemes
+      responses:
+        "200":
+          description: Scheme list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scheme"
+  /schemes/{id}:
+    get:
+      operationId: getScheme
+      tags: [schemes]
+      summary: Get a scheme
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Scheme
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scheme"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /schemes/recommend:
+    post:
+      operationId: recommendSchemes
+      tags: [schemes]
+      summary: Rank schemes for an applicant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicantProfile"
+      responses:
+        "200":
+          description: Ranked matches
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SchemeMatch"
+  /calculator/emi:
+    post:
+      operationId: calculateEmi
+      tags: [schemes]
+      summary: Calculate an illustrative EMI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EmiInput"
+      responses:
+        "200":
+          description: EMI result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmiResult"
+  /partners:
+    get:
+      operationId: listPartners
+      tags: [partners]
+      summary: List demo channel partners
+      responses:
+        "200":
+          description: Partner list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Partner"
+  /partners/recommend:
+    post:
+      operationId: recommendPartners
+      tags: [partners]
+      summary: Rank channel partners
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PartnerRequest"
+      responses:
+        "200":
+          description: Ranked partner list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PartnerMatch"
+  /applications:
+    post:
+      operationId: createApplication
+      tags: [applications]
+      summary: Create a prototype application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationInput"
+      responses:
+        "201":
+          description: Application created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+  /applications/{id}:
+    get:
+      operationId: getApplication
+      tags: [applications]
+      summary: Get application tracking state
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Application
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /admin/analytics:
+    get:
+      operationId: getAdminAnalytics
+      tags: [analytics]
+      summary: Get prototype dashboard analytics
+      responses:
+        "200":
+          description: Analytics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAnalytics"
 components:
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
   schemas:
     HealthStatus:
       type: object
       properties:
+        status: { type: string }
+      required: [status]
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+      required: [error]
+    Scheme:
+      type: object
+      required: [id, name, purpose, maxLoan, interest, moratorium, tenure, applicantType, tags, isPrototypeData]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        purpose: { type: string }
+        maxLoan: { type: number }
+        interest: { type: number }
+        moratorium: { type: number }
+        tenure: { type: number }
+        applicantType: { type: string }
+        tags:
+          type: array
+          items: { type: string }
+        isPrototypeData: { type: boolean }
+    ApplicantProfile:
+      type: object
+      required: [applicantType, age, category, income, purpose, loanRequired, location]
+      properties:
+        name: { type: string }
+        applicantType: { type: string, enum: [Entrepreneur, Student] }
+        age: { type: number, minimum: 0 }
+        category: { type: string }
+        education: { type: string }
+        employment: { type: string }
+        income: { type: number, minimum: 0 }
+        purpose: { type: string }
+        projectCost: { type: number, minimum: 0 }
+        loanRequired: { type: number, minimum: 0 }
+        location: { type: string }
+    SchemeMatch:
+      allOf:
+        - $ref: "#/components/schemas/Scheme"
+        - type: object
+          required: [score, reasons, breakdown]
+          properties:
+            score: { type: number }
+            reasons:
+              type: array
+              items: { type: string }
+            breakdown:
+              type: object
+              additionalProperties: { type: number }
+    EmiInput:
+      type: object
+      required: [principal, annualRate, tenureYears, moratoriumMonths]
+      properties:
+        principal: { type: number, minimum: 0 }
+        annualRate: { type: number, minimum: 0 }
+        tenureYears: { type: number, minimum: 0 }
+        moratoriumMonths: { type: number, minimum: 0 }
+    EmiResult:
+      type: object
+      required: [emi, principal, totalInterest, totalRepayment]
+      properties:
+        emi: { type: number }
+        principal: { type: number }
+        totalInterest: { type: number }
+        totalRepayment: { type: number }
+    Partner:
+      type: object
+      required: [id, name, type, distance, supportedSchemes, serviceArea, status, processingCapacity, fundingAvailability, address]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        type: { type: string }
+        distance: { type: number }
+        supportedSchemes:
+          type: array
+          items: { type: string }
+        serviceArea: { type: string }
+        status: { type: string }
+        processingCapacity: { type: number }
+        fundingAvailability: { type: number }
+        address: { type: string }
+        latitude: { type: number }
+        longitude: { type: number }
+    PartnerRequest:
+      type: object
+      required: [schemeId, location]
+      properties:
+        schemeId: { type: string }
+        location: { type: string }
+    PartnerMatch:
+      allOf:
+        - $ref: "#/components/schemas/Partner"
+        - type: object
+          required: [score, reasons]
+          properties:
+            score: { type: number }
+            reasons:
+              type: array
+              items: { type: string }
+    ApplicationInput:
+      type: object
+      required: [name, phone, email, address, schemeId, partnerId, income, loanRequired, projectType, projectCost]
+      properties:
+        name: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        address: { type: string }
+        schemeId: { type: string }
+        partnerId: { type: string }
+        income: { type: number }
+        loanRequired: { type: number }
+        projectType: { type: string }
+        projectCost: { type: number }
+        documents:
+          type: array
+          items: { type: string }
+    Application:
+      allOf:
+        - $ref: "#/components/schemas/ApplicationInput"
+        - type: object
+          required: [id, status, createdAt]
+          properties:
+            id: { type: string }
+            status: { type: string }
+            createdAt: { type: string }
+    AdminAnalytics:
+      type: object
+      required: [totalApplications, matchedApplications, routedApplications, assistance, monthly, demand, status, partners]
+      properties:
+        totalApplications: { type: number }
+        matchedApplications: { type: number }
+        routedApplications: { type: number }
+        assistance: { type: number }
+        monthly:
+          type: array
+          items:
+            type: object
+            required: [month, applications]
+            properties:
+              month: { type: string }
+              applications: { type: number }
+        demand:
+          type: array
+          items:
+            type: object
+            required: [name, value]
+            properties:
+              name: { type: string }
+              value: { type: number }
         status:
-          type: string
-      required:
-        - status
-
+          type: array
+          items:
+            type: object
+            required: [name, value]
+            properties:
+              name: { type: string }
+              value: { type: number }
+        partners:
+          type: array
+          items:
+            type: object
+            required: [name, applications]
+            properties:
+              name: { type: string }
+              applications: { type: number }

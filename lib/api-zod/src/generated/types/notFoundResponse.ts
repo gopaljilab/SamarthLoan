@@ -5,7 +5,9 @@
  * SchemeSathi prototype API for scheme matching and application routing
  * OpenAPI spec version: 0.1.0
  */
+import type { Error } from './error';
 
-export interface HealthStatus {
-  status: string;
-}
+/**
+ * Not found
+ */
+export type NotFoundResponse = Error;

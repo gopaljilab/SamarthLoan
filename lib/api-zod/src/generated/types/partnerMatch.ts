@@ -5,7 +5,9 @@
  * SchemeSathi prototype API for scheme matching and application routing
  * OpenAPI spec version: 0.1.0
  */
+import type { Partner } from './partner';
 
-export interface HealthStatus {
-  status: string;
-}
+export type PartnerMatch = Partner & {
+  score: number;
+  reasons: string[];
+};

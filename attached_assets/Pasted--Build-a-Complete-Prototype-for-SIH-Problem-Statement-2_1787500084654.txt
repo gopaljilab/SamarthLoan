@@ -1,0 +1,2173 @@
+# Build a Complete Prototype for SIH Problem Statement 26092
+
+## Project Name
+
+**SchemeSathi**
+
+### Tagline
+
+**"Find the right scheme. Choose the right partner. Move forward with confidence."**
+
+---
+
+# 1. PROJECT OBJECTIVE
+
+Build a polished, production-style full-stack web application prototype for **Smart Scheme Matching for Marginalized Entrepreneurs**, based on SIH Problem Statement **26092** from the **Ministry of Social Justice and Empowerment, Department of Social Justice and Empowerment**.
+
+The platform should help eligible citizens/entrepreneurs:
+
+1. Understand which government financial scheme is suitable for them.
+2. Check basic eligibility.
+3. Get ranked scheme recommendations.
+4. Understand why a scheme was recommended.
+5. Calculate estimated EMI.
+6. Find the most suitable nearby authorized channel partner.
+7. Start a guided application.
+8. Track application progress.
+9. Use the platform in multiple languages.
+
+This is a **hackathon prototype**, not a real government loan processing system.
+
+Use clearly marked **prototype/demo data** wherever real government APIs, live partner data, NPA data, or official integrations are unavailable.
+
+---
+
+# 2. IMPORTANT PRODUCT PRINCIPLE
+
+Do NOT build this as a simple "loan calculator."
+
+The core product is:
+
+**Citizen Need → Eligibility → Intelligent Scheme Matching → Explainable Recommendation → Financial Planning → Partner Routing → Application Tracking**
+
+The main differentiator is that the system should recommend the **right scheme AND the right channel partner**.
+
+---
+
+# 3. TARGET USERS
+
+Create three conceptual user types:
+
+### A. Beneficiary
+
+A citizen/entrepreneur looking for financial assistance.
+
+### B. Channel Partner
+
+A bank/SCA/RRB/NBFC-MFI processing applications.
+
+### C. Administrator
+
+A government/authority-style dashboard for monitoring schemes, partners, applications, and impact.
+
+For the prototype, the beneficiary experience is the primary flow.
+
+---
+
+# 4. TECH STACK
+
+Use this stack unless there is a strong technical reason to change it.
+
+## Frontend
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+* React Router
+* Lucide React icons
+* Recharts
+* React Hook Form
+* Zod
+* TanStack Query
+
+## Backend
+
+* Node.js
+* Express
+* TypeScript
+
+## Database
+
+* PostgreSQL
+
+Use Drizzle ORM if convenient.
+
+## Maps
+
+Use:
+
+* Leaflet
+* OpenStreetMap
+
+Do NOT require a paid Google Maps API key.
+
+## Icons
+
+Use Lucide React.
+
+## Charts
+
+Use Recharts.
+
+## Notifications
+
+Use toast notifications.
+
+## Authentication
+
+For the prototype, implement a simple demo authentication flow.
+
+Do NOT build real Aadhaar authentication.
+
+---
+
+# 5. DESIGN DIRECTION
+
+The application should look like a **modern government/public-service fintech platform**.
+
+Avoid:
+
+* Generic banking dashboard designs
+* Excessive gradients
+* Neon colors
+* Crypto-style UI
+* Excessive glassmorphism
+* Overuse of animations
+* Fake AI gimmicks
+
+Use:
+
+* Clean white/light backgrounds
+* Deep navy/indigo primary color
+* Green accent for positive eligibility/impact
+* Warm neutral backgrounds
+* Rounded cards
+* Strong typography
+* Clear spacing
+* Accessible contrast
+* Professional government-service visual language
+
+The interface should feel:
+
+**Trustworthy + Simple + Modern + Inclusive**
+
+---
+
+# 6. RESPONSIVE DESIGN
+
+The entire application must work on:
+
+* Desktop
+* Laptop
+* Tablet
+* Mobile
+
+Desktop should be the primary hackathon-demo experience.
+
+Mobile should still be usable.
+
+---
+
+# 7. GLOBAL NAVIGATION
+
+Create a persistent navigation bar.
+
+Logo:
+
+**SchemeSathi**
+
+Small tagline:
+
+**Smart access to financial schemes**
+
+Navigation:
+
+* Home
+* Check Eligibility
+* Schemes
+* Calculator
+* Partners
+* Track Application
+
+Right side:
+
+* Language selector
+* Help
+* Login/Profile
+
+---
+
+# 8. LANDING PAGE
+
+Create a visually strong landing page.
+
+## Hero
+
+Headline:
+
+**Find the right government financial scheme for you.**
+
+Subheadline:
+
+"Answer a few simple questions. SchemeSathi checks your basic eligibility, compares available schemes, estimates your repayment, and helps you find a suitable channel partner."
+
+Primary CTA:
+
+**Check My Eligibility**
+
+Secondary CTA:
+
+**Explore Schemes**
+
+Hero visual:
+
+Create an illustration/dashboard-style visual showing:
+
+Citizen Profile → Scheme Match → Partner → Application
+
+Do not use external copyrighted illustrations.
+
+Use CSS/SVG/React components where possible.
+
+---
+
+# 9. TRUST SECTION
+
+Under the hero show:
+
+### Built to simplify access
+
+Cards:
+
+**Scheme Discovery**
+
+Understand which financial product may fit your requirements.
+
+**Explainable Matching**
+
+See why a particular scheme was recommended.
+
+**Financial Planning**
+
+Estimate EMI and repayment before applying.
+
+**Partner Routing**
+
+Find a suitable nearby channel partner.
+
+---
+
+# 10. HOW IT WORKS
+
+Create a 4-step section:
+
+### 01
+
+Tell us about yourself
+
+### 02
+
+Check scheme eligibility
+
+### 03
+
+Compare recommendations
+
+### 04
+
+Connect with the right partner
+
+Use simple icons and visual connectors.
+
+---
+
+# 11. BENEFICIARY ONBOARDING
+
+When user clicks:
+
+**Check My Eligibility**
+
+open a multi-step wizard.
+
+Progress indicator:
+
+Step 1 of 5
+
+Steps:
+
+1. Applicant
+2. Income
+3. Requirement
+4. Location
+5. Review
+
+---
+
+# 12. STEP 1 — APPLICANT PROFILE
+
+Fields:
+
+### Applicant Type
+
+Radio cards:
+
+* Entrepreneur
+* Student
+
+### Age
+
+Number input.
+
+### Social Category
+
+Dropdown:
+
+* SC
+* Other
+
+For the prototype, SC should be selected by default but remain editable.
+
+### Education Status
+
+Options:
+
+* School
+* Undergraduate
+* Graduate
+* Postgraduate
+* Not applicable
+
+### Employment Status
+
+Options:
+
+* Self-employed
+* Salaried
+* Student
+* Unemployed
+
+Validation:
+
+* Age must be >= 18 for entrepreneur flow.
+* Student flow can have appropriate prototype validation.
+
+---
+
+# 13. STEP 2 — FAMILY INCOME
+
+Ask:
+
+### Annual Family Income
+
+Input in INR.
+
+Example placeholder:
+
+₹ 2,80,000
+
+Display a helper message:
+
+"Some schemes may have income-based eligibility limits."
+
+Add an income visual indicator.
+
+Example:
+
+Below ₹5 lakh → Eligible income range for relevant prototype schemes.
+
+Do not claim that every scheme follows exactly the same threshold.
+
+---
+
+# 14. STEP 3 — REQUIREMENT
+
+If entrepreneur:
+
+Ask:
+
+### What do you need funding for?
+
+Cards:
+
+* Small Business
+* Agriculture
+* Service Business
+* Equipment
+* Working Capital
+* Other
+
+### Estimated Project Cost
+
+₹ input.
+
+### Loan Required
+
+₹ input.
+
+If student:
+
+Ask:
+
+### Education Level
+
+### Course Type
+
+### Estimated Education Cost
+
+### Loan Required
+
+Use dynamic fields based on applicant type.
+
+---
+
+# 15. STEP 4 — LOCATION
+
+Allow:
+
+### Enter Location
+
+Search field.
+
+Also provide:
+
+**Use My Location**
+
+For prototype:
+
+* Use browser geolocation if permission is available.
+* Otherwise use Bengaluru as fallback demo location.
+
+Show a small map preview.
+
+---
+
+# 16. STEP 5 — REVIEW
+
+Display all entered information in a summary card.
+
+Example:
+
+Applicant:
+Entrepreneur
+
+Annual Family Income:
+₹2,80,000
+
+Project:
+Small Business
+
+Project Cost:
+₹1,00,000
+
+Loan Required:
+₹90,000
+
+Location:
+Bengaluru
+
+Button:
+
+**Find My Schemes**
+
+On click:
+
+Show a short loading state:
+
+"Checking eligibility..."
+
+Then:
+
+"Comparing available schemes..."
+
+Then:
+
+"Finding suitable channel partners..."
+
+Finally navigate to recommendations.
+
+Do not make the loading excessively long.
+
+---
+
+# 17. SCHEME MATCHING ENGINE
+
+Implement a real rule-based scoring engine.
+
+Do NOT hardcode only one result.
+
+The engine should:
+
+1. Filter clearly incompatible schemes.
+2. Calculate a compatibility score.
+3. Rank eligible schemes.
+4. Generate explanation reasons.
+
+Use a transparent weighted score.
+
+Example:
+
+```text
+Income compatibility: 25%
+Project type compatibility: 25%
+Loan amount compatibility: 20%
+Applicant type compatibility: 15%
+Purpose compatibility: 10%
+Other eligibility: 5%
+```
+
+Normalize score to 0–100.
+
+Example output:
+
+```text
+Micro Finance Scheme
+94% Match
+
+Term Loan Scheme
+78% Match
+
+Educational Loan Scheme
+12% Match
+```
+
+These numbers should be dynamically generated based on user inputs.
+
+---
+
+# 18. SCHEME DATABASE
+
+Create prototype scheme data.
+
+Include at least:
+
+### Micro Finance Scheme
+
+Purpose:
+Small projects/businesses
+
+Maximum Loan:
+₹1,40,000
+
+Interest:
+6.5%
+
+Moratorium:
+3 months
+
+Example tenure:
+5 years
+
+Eligible applicant:
+Entrepreneur
+
+---
+
+### Term Loan Scheme
+
+Purpose:
+Larger business/project requirements
+
+Maximum Loan:
+₹50,00,000
+
+Interest:
+8%
+
+Moratorium:
+6 months
+
+Example tenure:
+7 years
+
+Eligible applicant:
+Entrepreneur
+
+---
+
+### Education Loan Scheme
+
+Purpose:
+Higher education
+
+Maximum Loan:
+₹20,00,000
+
+Interest:
+7%
+
+Moratorium:
+12 months
+
+Example tenure:
+10 years
+
+Eligible applicant:
+Student
+
+---
+
+Create additional prototype schemes if useful.
+
+IMPORTANT:
+
+Add metadata:
+
+```text
+isPrototypeData: true
+```
+
+Display:
+
+**Prototype scheme data — verify current official guidelines before applying.**
+
+Do not present fictional scheme rules as current government policy.
+
+---
+
+# 19. RECOMMENDATION PAGE
+
+Create a beautiful results page.
+
+Header:
+
+**Your Scheme Matches**
+
+Subtext:
+
+"We found schemes that may fit your requirements."
+
+At the top show:
+
+### Best Match
+
+Large highlighted card.
+
+Example:
+
+**Micro Finance Scheme**
+
+94% Match
+
+Tags:
+
+* Suitable for small projects
+* Income compatible
+* Loan amount fits
+
+Button:
+
+**View Scheme**
+
+Secondary:
+
+**Compare**
+
+---
+
+# 20. "WHY THIS MATCH?" FEATURE
+
+This is one of the most important features.
+
+Every recommendation card should have:
+
+**Why this match?**
+
+When clicked, open a side panel/modal.
+
+Show:
+
+### Match Breakdown
+
+Income:
+✓ Compatible
+
+Project type:
+✓ Supported
+
+Loan amount:
+✓ Within scheme limit
+
+Applicant type:
+✓ Compatible
+
+Location:
+✓ Partner available
+
+Then show a visual score breakdown.
+
+Example:
+
+```text
+Income               ███████████████████ 25/25
+Project Type         ███████████████████ 25/25
+Loan Amount          ███████████████     18/20
+Applicant Type       ███████████████     15/15
+Purpose              █████████           8/10
+```
+
+Final:
+
+**Match Score: 91%**
+
+This makes the recommendation explainable.
+
+---
+
+# 21. SCHEME COMPARISON
+
+Create a comparison interface.
+
+Columns:
+
+| Feature | Scheme A | Scheme B | Scheme C |
+
+Rows:
+
+* Purpose
+* Maximum Loan
+* Interest
+* Moratorium
+* Tenure
+* Applicant Type
+* Match Score
+
+Highlight the best match.
+
+---
+
+# 22. SCHEME DETAILS PAGE
+
+Include:
+
+## Overview
+
+What the scheme is for.
+
+## Key Benefits
+
+* Loan limit
+* Interest
+* Repayment
+* Moratorium
+
+## Eligibility
+
+Display requirements.
+
+## Documents
+
+Prototype list:
+
+* Identity proof
+* Address proof
+* Income proof
+* Project/business documents
+* Education documents where applicable
+
+Add:
+
+**Document checklist**
+
+---
+
+# 23. FINANCIAL CALCULATOR
+
+Build a fully interactive EMI calculator.
+
+Inputs:
+
+Loan Amount
+
+Interest Rate
+
+Tenure
+
+Moratorium
+
+Use formula:
+
+EMI = P × r × (1+r)^n / ((1+r)^n − 1)
+
+Where:
+
+P = principal
+
+r = monthly interest rate
+
+n = number of monthly installments
+
+Update EMI instantly.
+
+Display:
+
+### Estimated EMI
+
+₹X,XXX/month
+
+Also show:
+
+* Principal
+* Total interest
+* Total repayment
+
+Create a Recharts donut/bar visualization.
+
+---
+
+# 24. MORATORIUM HANDLING
+
+Allow:
+
+3 months
+6 months
+9 months
+12 months
+
+For the prototype, clearly state:
+
+"Illustrative calculation. Actual repayment treatment depends on scheme and lender guidelines."
+
+Do not pretend this is a final sanction calculation.
+
+---
+
+# 25. PARTNER ROUTER
+
+After selecting a scheme, show:
+
+**Find the right channel partner**
+
+Create prototype partner data.
+
+Fields:
+
+```text
+id
+name
+type
+latitude
+longitude
+supportedSchemes
+serviceArea
+status
+processingCapacity
+fundingAvailability
+```
+
+Types:
+
+* SCA
+* PSB
+* RRB
+* NBFC-MFI
+
+---
+
+# 26. PARTNER SCORING
+
+Do not simply sort partners by distance.
+
+Create:
+
+```text
+Partner Score =
+Scheme Compatibility
++ Availability
++ Processing Capacity
++ Distance
+```
+
+Example weights:
+
+Scheme compatibility: 40%
+
+Availability: 25%
+
+Processing capacity: 20%
+
+Distance: 15%
+
+Normalize to 100.
+
+Display:
+
+### Recommended Partner
+
+Partner name
+
+92 Partner Score
+
+2.4 km away
+
+✓ Scheme supported
+
+✓ Currently accepting applications
+
+✓ Suitable processing capacity
+
+---
+
+# 27. PARTNER MAP
+
+Use Leaflet + OpenStreetMap.
+
+Show:
+
+* User location
+* Partner markers
+* Selected partner
+
+Clicking marker opens a card.
+
+Use fictional/demo partner locations around Bengaluru.
+
+Clearly label:
+
+**Demo partner locations**
+
+Do not claim these are real-time authorized government partner locations.
+
+---
+
+# 28. PARTNER DETAILS
+
+Display:
+
+Partner name
+
+Partner type
+
+Distance
+
+Supported schemes
+
+Current prototype status
+
+Estimated processing category
+
+Address
+
+Button:
+
+**Select Partner**
+
+Button:
+
+**View Route**
+
+For route, provide a basic map direction visualization or external map-style interaction without requiring paid APIs.
+
+---
+
+# 29. APPLICATION FLOW
+
+After selecting partner:
+
+Show confirmation page:
+
+### Ready to apply?
+
+Scheme:
+Micro Finance Scheme
+
+Partner:
+Demo Partner
+
+Loan Required:
+₹90,000
+
+Estimated EMI:
+₹1,761/month
+
+Button:
+
+**Start Application**
+
+---
+
+# 30. APPLICATION FORM
+
+Create sections:
+
+### Personal Information
+
+Name
+
+Phone
+
+Email
+
+Address
+
+### Financial Information
+
+Income
+
+Loan requirement
+
+### Project Information
+
+Project type
+
+Project cost
+
+Purpose
+
+### Documents
+
+Use upload UI.
+
+For prototype:
+
+* Allow selecting files.
+* Store only locally or mock the upload.
+* Show uploaded document names.
+
+Do not build actual government document verification.
+
+---
+
+# 31. APPLICATION SUBMISSION
+
+On submit:
+
+Generate a prototype application ID.
+
+Format:
+
+`SS-26092-XXXX`
+
+Example:
+
+`SS-26092-4812`
+
+Show success screen:
+
+# Application Submitted
+
+Your application has been routed to:
+
+**Demo Channel Partner**
+
+Application ID:
+
+**SS-26092-4812**
+
+---
+
+# 32. APPLICATION TRACKING
+
+Create:
+
+`/track`
+
+Allow entering application ID.
+
+Display timeline:
+
+```text
+✓ Profile Submitted
+
+✓ Eligibility Checked
+
+✓ Scheme Matched
+
+✓ Partner Selected
+
+● Application Submitted
+
+○ Partner Review
+
+○ Approval
+
+○ Disbursement
+```
+
+Use different states visually.
+
+---
+
+# 33. BENEFICIARY DASHBOARD
+
+Create `/dashboard`.
+
+Cards:
+
+### Recommended Scheme
+
+Micro Finance Scheme
+
+94% match
+
+### Application
+
+SS-26092-4812
+
+Partner Review
+
+### Financial Plan
+
+₹90,000 loan
+
+₹1,761 estimated EMI
+
+### Nearby Partner
+
+2.4 km
+
+---
+
+# 34. MULTILINGUAL SUPPORT
+
+Implement a simple translation system.
+
+Languages:
+
+* English
+* Hindi
+* Kannada
+
+Create translation JSON files.
+
+At minimum translate:
+
+* Navigation
+* Main headings
+* Buttons
+* Eligibility questions
+* Scheme recommendation labels
+* Calculator labels
+* Application status
+
+Language switch should work instantly without page reload.
+
+---
+
+# 35. ACCESSIBILITY
+
+Implement:
+
+* Keyboard navigation
+* Proper labels
+* Semantic HTML
+* Good contrast
+* Focus states
+* Accessible buttons
+* Responsive font sizes
+
+Avoid relying solely on colors to indicate status.
+
+Use icons + labels.
+
+---
+
+# 36. ADMIN DASHBOARD
+
+Create `/admin`.
+
+This is a prototype government/authority dashboard.
+
+Show:
+
+### Total Applications
+
+1,284
+
+### Matched Applications
+
+1,042
+
+### Partner Routed
+
+936
+
+### Estimated Assistance
+
+₹4.8 Cr
+
+Use prototype data.
+
+---
+
+# 37. ADMIN CHARTS
+
+Use Recharts.
+
+Charts:
+
+### Applications by Month
+
+Line chart.
+
+### Scheme Demand
+
+Bar chart.
+
+Example:
+
+Micro Finance — 420
+
+Term Loan — 280
+
+Education — 210
+
+Other — 132
+
+### Application Status
+
+Donut chart.
+
+### Partner Performance
+
+Bar chart.
+
+---
+
+# 38. ADMIN PARTNER TABLE
+
+Columns:
+
+Partner
+
+Type
+
+Applications
+
+Processing Capacity
+
+Status
+
+Score
+
+Example statuses:
+
+* Accepting
+* Limited
+* Temporarily unavailable
+
+Use prototype data.
+
+---
+
+# 39. ADMIN SCHEME MANAGEMENT
+
+Create a simple scheme table.
+
+Columns:
+
+Scheme
+
+Type
+
+Loan Limit
+
+Interest
+
+Active
+
+Actions
+
+Allow prototype actions:
+
+* View
+* Edit
+* Enable/Disable
+
+No need for actual government publishing.
+
+---
+
+# 40. IMPACT DASHBOARD
+
+Create an impact section.
+
+Show:
+
+### Potential Outcomes
+
+* Faster scheme discovery
+* Better partner routing
+* Reduced misrouted applications
+* Improved financial awareness
+* Increased visibility of concessional schemes
+
+Do NOT make unsupported claims like:
+
+"Reduced processing time by 80%"
+
+unless clearly labeled as a future target or hypothetical estimate.
+
+---
+
+# 41. AI EXPLANATION
+
+Add an optional AI-style explanation layer.
+
+If no external AI API key exists:
+
+Use a deterministic explanation generator based on the matching engine.
+
+Example:
+
+"Micro Finance Scheme was ranked highest because your requested loan amount is within the scheme's prototype limit, your applicant type matches, and your income falls within the configured eligibility range."
+
+This is preferable to a fake chatbot.
+
+If an API key is available, AI can rewrite the explanation in simple language.
+
+Do not make the core application dependent on an external AI API.
+
+---
+
+# 42. OPTIONAL ASSISTANT
+
+Create a small "Scheme Assistant" button.
+
+The assistant should answer only questions related to:
+
+* Scheme eligibility
+* Loan amount
+* EMI
+* Documents
+* Application process
+* Partner selection
+
+Use the application's own scheme data.
+
+Do not hallucinate government policies.
+
+If uncertain, say:
+
+"I don't have enough verified information. Please check the official scheme guidelines."
+
+---
+
+# 43. DATA SAFETY
+
+Add a footer disclaimer:
+
+"SchemeSathi is a prototype developed for demonstration under SIH Problem Statement 26092. Scheme rules, rates, eligibility, partner availability and financial calculations shown here are illustrative unless explicitly verified from official sources."
+
+Do not collect sensitive real identity information.
+
+Use demo/sample data.
+
+---
+
+# 44. DEMO MODE
+
+Create a **Demo Mode**.
+
+Add button:
+
+**Load Demo Applicant**
+
+When clicked, populate:
+
+Name:
+Rahul Kumar
+
+Applicant Type:
+Entrepreneur
+
+Income:
+₹2,80,000
+
+Project:
+Small Business
+
+Project Cost:
+₹1,00,000
+
+Loan Required:
+₹90,000
+
+Location:
+Bengaluru
+
+This allows judges to experience the complete workflow quickly.
+
+Also create another demo:
+
+### Student Demo
+
+Applicant:
+Priya
+
+Type:
+Student
+
+Education:
+Undergraduate
+
+Income:
+₹3,50,000
+
+Education Cost:
+₹8,00,000
+
+Loan:
+₹6,00,000
+
+This demonstrates that the engine handles different applicant types.
+
+---
+
+# 45. DEMO SCENARIO
+
+Make sure the following exact demo works smoothly:
+
+### Demo Applicant
+
+Rahul Kumar
+
+Annual Family Income:
+₹2,80,000
+
+Applicant:
+Entrepreneur
+
+Project:
+Small Business
+
+Project Cost:
+₹1,00,000
+
+Loan:
+₹90,000
+
+Location:
+Bengaluru
+
+Then:
+
+1. Click Check Eligibility.
+2. Complete/reveal profile.
+3. Click Find My Schemes.
+4. Show Micro Finance Scheme as best match.
+5. Click Why this match?
+6. Show score breakdown.
+7. Click View Details.
+8. Open EMI Calculator.
+9. Show estimated EMI.
+10. Click Find Partner.
+11. Show map.
+12. Show recommended partner.
+13. Select partner.
+14. Start application.
+15. Submit application.
+16. Generate application ID.
+17. Open dashboard.
+18. Show application timeline.
+
+This complete flow is the main hackathon demonstration.
+
+---
+
+# 46. DATABASE SEEDING
+
+Create seed data.
+
+## Schemes
+
+At least 5 schemes.
+
+## Partners
+
+At least 10 demo partners around Bengaluru.
+
+## Applications
+
+At least 15 demo applications.
+
+## Users
+
+At least 5 demo users.
+
+Use realistic but clearly fictional data.
+
+---
+
+# 47. API STRUCTURE
+
+Create REST APIs.
+
+### Authentication
+
+```text
+POST /api/auth/login
+POST /api/auth/register
+```
+
+### Eligibility
+
+```text
+POST /api/eligibility/check
+```
+
+### Schemes
+
+```text
+GET /api/schemes
+GET /api/schemes/:id
+POST /api/schemes/recommend
+```
+
+### Calculator
+
+```text
+POST /api/calculator/emi
+```
+
+### Partners
+
+```text
+GET /api/partners
+GET /api/partners/nearby
+POST /api/partners/recommend
+```
+
+### Applications
+
+```text
+POST /api/applications
+GET /api/applications/:id
+PATCH /api/applications/:id/status
+```
+
+### Admin
+
+```text
+GET /api/admin/analytics
+GET /api/admin/applications
+GET /api/admin/partners
+GET /api/admin/schemes
+```
+
+Use Zod validation.
+
+Return clean JSON responses.
+
+---
+
+# 48. ERROR HANDLING
+
+Implement:
+
+* API error middleware
+* Form validation
+* Empty states
+* Loading states
+* Error states
+* Toast notifications
+
+Never show raw stack traces to users.
+
+---
+
+# 49. PROJECT STRUCTURE
+
+Use a clean structure similar to:
+
+```text
+/client
+  /src
+    /components
+    /pages
+    /layouts
+    /hooks
+    /lib
+    /services
+    /store
+    /types
+    /i18n
+    /data
+
+/server
+  /routes
+  /controllers
+  /services
+  /middleware
+  /db
+  /utils
+
+/shared
+  /types
+  /schemas
+```
+
+Keep frontend and backend code cleanly separated.
+
+---
+
+# 50. IMPORTANT COMPONENTS
+
+Create reusable components:
+
+* Navbar
+* Footer
+* Button
+* Card
+* Badge
+* Modal
+* Drawer
+* Input
+* Select
+* ProgressBar
+* Stepper
+* SchemeCard
+* MatchScore
+* EligibilityBadge
+* EMIResult
+* PartnerCard
+* PartnerMap
+* ApplicationTimeline
+* LanguageSwitcher
+* StatCard
+* ChartCard
+* EmptyState
+* LoadingState
+
+Avoid duplicating UI code.
+
+---
+
+# 51. ROUTES
+
+Create:
+
+```text
+/
+ /eligibility
+ /recommendations
+ /schemes
+ /schemes/:id
+ /calculator
+ /partners
+ /application
+ /application/success
+ /track
+ /dashboard
+ /admin
+ /admin/applications
+ /admin/partners
+ /admin/schemes
+ /admin/analytics
+```
+
+---
+
+# 52. HOME PAGE COPY
+
+Use clear, simple language.
+
+Hero:
+
+**Find the right financial scheme.**
+
+Supporting text:
+
+"SchemeSathi helps eligible citizens discover suitable government financial assistance, understand repayment, and connect with the right channel partner."
+
+CTA:
+
+**Check My Eligibility**
+
+---
+
+# 53. NO EXCESSIVE "AI" BRANDING
+
+Do not put "AI" in every heading.
+
+Avoid:
+
+"AI-Powered AI Smart AI Engine"
+
+Instead use:
+
+**Smart Scheme Matching**
+
+Then explain that the matching engine combines eligibility rules and scoring.
+
+This will sound more credible to judges.
+
+---
+
+# 54. PROTOTYPE DISCLOSURE
+
+Wherever prototype data is used, show subtle labels:
+
+**Demo Data**
+
+or
+
+**Prototype**
+
+For example:
+
+Partner page:
+
+"Demo partner locations"
+
+Scheme page:
+
+"Illustrative scheme configuration"
+
+Admin dashboard:
+
+"Prototype analytics"
+
+This protects the credibility of the presentation.
+
+---
+
+# 55. PERFORMANCE
+
+Keep the app fast.
+
+Avoid unnecessarily large dependencies.
+
+Lazy-load admin pages if useful.
+
+Do not use huge images.
+
+Use SVG/CSS illustrations where possible.
+
+---
+
+# 56. POLISH
+
+Add subtle animations:
+
+* Page transitions
+* Card hover
+* Progress animation
+* Score animation
+* Number count-up
+* Modal transitions
+
+But keep them professional.
+
+Use Framer Motion only where useful.
+
+---
+
+# 57. EMPTY STATES
+
+Every major page should have an appropriate empty state.
+
+Examples:
+
+No recommendations:
+
+"Try adjusting your requirements."
+
+No partner:
+
+"No suitable demo partner found for this scheme."
+
+No application:
+
+"You don't have an active application yet."
+
+---
+
+# 58. FINAL DEMO DASHBOARD
+
+Make the beneficiary dashboard visually impressive.
+
+Top:
+
+**Good morning, Rahul 👋**
+
+Then:
+
+### Your best match
+
+Micro Finance Scheme
+
+94%
+
+### Estimated EMI
+
+₹1,761/month
+
+### Recommended Partner
+
+Demo Partner A
+
+2.4 km
+
+### Application
+
+SS-26092-4812
+
+Partner Review
+
+Then:
+
+**Your Journey**
+
+Profile → Match → Calculate → Partner → Apply
+
+---
+
+# 59. FINAL FOOTER
+
+Footer sections:
+
+### SchemeSathi
+
+Smart access to financial schemes.
+
+### Explore
+
+Schemes
+
+Calculator
+
+Partners
+
+Track Application
+
+### Support
+
+Help
+
+FAQs
+
+Contact
+
+### Disclaimer
+
+"Prototype for SIH Problem Statement 26092. Information shown is for demonstration and must be verified against official guidelines before real-world use."
+
+---
+
+# 60. README
+
+Create a complete README.md containing:
+
+## Project
+
+SchemeSathi
+
+## Problem Statement
+
+SIH 26092
+
+## Organization
+
+Ministry of Social Justice and Empowerment
+
+## Problem
+
+Citizens face difficulty identifying suitable schemes and finding the correct channel partner.
+
+## Solution
+
+Explain the complete workflow.
+
+## Features
+
+List all major features.
+
+## Architecture
+
+Include an ASCII architecture diagram.
+
+## Tech Stack
+
+List frontend/backend/database/maps.
+
+## Matching Algorithm
+
+Explain the scoring model.
+
+## Financial Calculator
+
+Explain the EMI calculation.
+
+## Partner Routing
+
+Explain partner scoring.
+
+## Demo Credentials
+
+Provide prototype credentials.
+
+## Running Locally
+
+Include exact commands.
+
+Example:
+
+```bash
+npm install
+npm run dev
+```
+
+If using separate client/server:
+
+```bash
+npm run dev:client
+npm run dev:server
+```
+
+Adjust according to the generated project.
+
+---
+
+# 61. ENVIRONMENT VARIABLES
+
+Create `.env.example`.
+
+Possible values:
+
+```text
+DATABASE_URL=
+
+SESSION_SECRET=
+
+MAP_PROVIDER=
+
+AI_API_KEY=
+```
+
+The app MUST still run without AI_API_KEY.
+
+Do not expose secrets in frontend code.
+
+---
+
+# 62. SECURITY
+
+Implement basic prototype security:
+
+* Validate all API input
+* Sanitize user input
+* Avoid SQL injection through ORM/parameterized queries
+* Don't expose database credentials
+* Don't store unnecessary sensitive information
+* Use environment variables
+* Protect admin routes in prototype authentication
+
+---
+
+# 63. TESTING
+
+Create basic tests for:
+
+### Matching engine
+
+Test:
+
+* Eligible entrepreneur
+* Ineligible entrepreneur
+* Student
+* Loan above scheme limit
+* Income above threshold
+
+### EMI
+
+Test:
+
+* Standard loan
+* Zero/invalid input
+* Different tenure
+
+### Partner router
+
+Test:
+
+* Scheme compatibility
+* Distance
+* Partner unavailable
+
+---
+
+# 64. CRITICAL REQUIREMENT
+
+Do NOT merely create static pages.
+
+The prototype must have a **functional end-to-end flow**.
+
+The following must actually work:
+
+```text
+User Input
+   ↓
+Eligibility Engine
+   ↓
+Recommendation Engine
+   ↓
+Match Score
+   ↓
+Scheme Details
+   ↓
+EMI Calculation
+   ↓
+Partner Recommendation
+   ↓
+Application
+   ↓
+Application ID
+   ↓
+Tracking
+```
+
+All values should update dynamically based on the selected user data.
+
+---
+
+# 65. FINAL UI QUALITY BAR
+
+Before finishing, inspect every page.
+
+Fix:
+
+* Broken layouts
+* Overflow
+* Mobile issues
+* Missing loading states
+* Broken links
+* Console errors
+* API errors
+* TypeScript errors
+* Incorrect calculations
+* Inconsistent spacing
+* Inconsistent button styles
+
+Make the application feel like a **real product demo**, not a generated template.
+
+---
+
+# 66. REPLIT EXECUTION INSTRUCTIONS
+
+Start by creating the project structure.
+
+Then:
+
+1. Install dependencies.
+2. Configure Vite.
+3. Configure Tailwind.
+4. Configure Express.
+5. Configure PostgreSQL/Drizzle.
+6. Create database schema.
+7. Seed prototype data.
+8. Build backend APIs.
+9. Build frontend components.
+10. Build beneficiary flow.
+11. Build recommendation engine.
+12. Build EMI calculator.
+13. Build partner routing.
+14. Build map.
+15. Build application flow.
+16. Build dashboard.
+17. Build admin dashboard.
+18. Add multilingual support.
+19. Add demo mode.
+20. Test the complete flow.
+21. Fix all errors.
+22. Run the application.
+
+Do not stop after creating the UI.
+
+The final result must be a runnable full-stack prototype.
+
+---
+
+# 67. FINAL ACCEPTANCE CRITERIA
+
+The project is complete only when:
+
+* Landing page works.
+* Eligibility wizard works.
+* Demo applicant can be loaded.
+* Scheme recommendations are dynamically generated.
+* Match scores are calculated.
+* "Why this match?" works.
+* Scheme comparison works.
+* Scheme details work.
+* EMI calculator works.
+* Partner map works.
+* Partner ranking works.
+* Application form works.
+* Application ID is generated.
+* Application tracking works.
+* Beneficiary dashboard works.
+* Admin dashboard works.
+* English/Hindi/Kannada switching works.
+* Responsive design works.
+* No major console errors exist.
+* No broken routes exist.
+* No API endpoint returns unexpected errors.
+* Demo data is clearly marked as prototype data.
+* README is complete.
+
+---
+
+# 68. HACKATHON DEMO PRIORITY
+
+If time is limited, prioritize in this order:
+
+### P0 — MUST WORK
+
+1. Eligibility
+2. Scheme matching
+3. Explainable match score
+4. EMI calculator
+5. Partner recommendation
+6. Application flow
+
+### P1 — IMPORTANT
+
+7. Map
+8. Dashboard
+9. Multilingual UI
+10. Admin analytics
+
+### P2 — NICE TO HAVE
+
+11. Assistant
+12. Advanced animations
+13. Advanced analytics
+14. Additional schemes
+15. Advanced authentication
+
+Do not sacrifice the P0 flow for decorative features.
+
+---
+
+# 69. FINAL PRODUCT EXPERIENCE
+
+The final experience should make a judge understand the idea within 30 seconds.
+
+The judge should be able to see:
+
+**"I have a financial requirement."**
+
+↓
+
+**"The system understands my situation."**
+
+↓
+
+**"It tells me which scheme fits me and why."**
+
+↓
+
+**"It tells me what the repayment could look like."**
+
+↓
+
+**"It finds the appropriate channel partner."**
+
+↓
+
+**"I can start and track my application."**
+
+That is the complete prototype story for **SIH 26092**.
+
+Build the application now and make the experience polished, functional, responsive, and presentation-ready.

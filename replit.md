@@ -1,6 +1,6 @@
-# [Project name]
+# SchemeSathi
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+SchemeSathi helps citizens discover suitable prototype financial schemes, understand repayment, find a channel partner, and track an application.
 
 ## Run & Operate
 
@@ -22,15 +22,23 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/schemesathi` — responsive React + Vite application and route-level UI.
+- `artifacts/api-server/src/routes/schemes.ts` — in-memory prototype scheme matching, EMI, partner routing, applications, and analytics API.
+- `lib/api-spec/openapi.yaml` — source-of-truth API contract; generated clients live under `lib/api-client-react` and `lib/api-zod`.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The first build uses clearly labeled in-memory demo data so the complete hackathon story works without requiring a real identity system or live government integrations.
+- Scheme and partner ranking are deterministic weighted rules, with the scoring breakdown returned to the UI for explainability.
+- The beneficiary flow is the primary product surface; admin routes are included as a prototype authority dashboard.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Multi-step eligibility intake with Rahul Kumar and student demo presets.
+- Ranked scheme recommendations with “why this match” explanations.
+- Illustrative EMI calculator, partner routing, application submission, tracking, and beneficiary dashboard.
+- Prototype admin analytics with charts and partner/scheme views.
+- Instant English, Hindi, and Kannada UI switching.
 
 ## User preferences
 
@@ -38,7 +46,8 @@ _Populate as you build — explicit user instructions worth remembering across s
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- All scheme, partner, analytics, and calculation content is illustrative prototype data and must be verified against official guidelines.
+- OpenAPI integer fields are represented as numeric fields because this workspace currently generates against Zod 3, which does not expose `z.int()`.
 
 ## Pointers
 

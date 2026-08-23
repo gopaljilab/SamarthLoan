@@ -5,7 +5,10 @@
  * SchemeSathi prototype API for scheme matching and application routing
  * OpenAPI spec version: 0.1.0
  */
+import type { ApplicationInput } from './applicationInput';
 
-export interface HealthStatus {
+export type Application = ApplicationInput & {
+  id: string;
   status: string;
-}
+  createdAt: string;
+};

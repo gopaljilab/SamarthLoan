@@ -1,0 +1,1 @@
+- [OpenAPI/Zod compatibility](openapi-zod-version.md) — current generated validation uses Zod 3, so integer contract fields need a compatible numeric representation.
