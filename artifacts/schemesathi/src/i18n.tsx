@@ -1,87 +1,48 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
 
-export type Language = 'English' | 'हिन्दी' | 'ಕನ್ನಡ';
+export type Language = 'en' | 'hi' | 'kn';
 
-const phrases: Record<Language, Record<string, string>> = {
-  English: {},
-  'हिन्दी': {
-    'A short conversation': 'एक छोटी बातचीत', 'Let’s find what fits your next move.': 'आपके अगले कदम के लिए सही विकल्प खोजें।',
-    'Your shortlist': 'आपकी चुनी हुई योजनाएँ', 'A match you can understand.': 'ऐसा मिलान जिसे आप समझ सकें।',
-    'Scheme library': 'योजना पुस्तकालय', 'Browse support, without the fine print fog.': 'सहायता योजनाएँ आसानी से देखें।',
-    'Make repayment legible': 'भुगतान को आसान भाषा में समझें', 'A monthly number you can plan around.': 'ऐसी मासिक राशि जिसे आप योजना में शामिल कर सकें।',
-    'Choose your route': 'अपना रास्ता चुनें', 'A nearby partner, with a reason.': 'कारण सहित नज़दीकी साझेदार।',
-    'A clear next step': 'एक स्पष्ट अगला कदम', 'Start your application, without the overwhelm.': 'बिना परेशानी अपना आवेदन शुरू करें।',
-    'Keep moving': 'आगे बढ़ते रहें', 'Track your application, one step at a time.': 'अपने आवेदन को एक-एक कदम ट्रैक करें।',
-    'Your Sathi dashboard': 'आपका साथी डैशबोर्ड', 'Your next steps': 'आपके अगले कदम',
-    'Prototype data': 'प्रोटोटाइप डेटा', 'Best fit': 'सबसे सही विकल्प', 'fit score': 'मिलान स्कोर',
-  },
-  'ಕನ್ನಡ': {
-    'A short conversation': 'ಒಂದು ಚಿಕ್ಕ ಸಂಭಾಷಣೆ', 'Let’s find what fits your next move.': 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆಗೆ ಸೂಕ್ತ ಆಯ್ಕೆ ಹುಡುಕೋಣ.',
-    'Your shortlist': 'ನಿಮ್ಮ ಆಯ್ಕೆಗಳು', 'A match you can understand.': 'ನೀವು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಬಹುದಾದ ಹೊಂದಾಣಿಕೆ.',
-    'Scheme library': 'ಯೋಜನೆಗಳ ಗ್ರಂಥಾಲಯ', 'Browse support, without the fine print fog.': 'ಸಹಾಯ ಯೋಜನೆಗಳನ್ನು ಸುಲಭವಾಗಿ ನೋಡಿ.',
-    'Make repayment legible': 'ಮರುಪಾವತಿಯನ್ನು ಸರಳವಾಗಿ ತಿಳಿಯಿರಿ', 'A monthly number you can plan around.': 'ಯೋಜಿಸಬಹುದಾದ ಮಾಸಿಕ ಮೊತ್ತ.',
-    'Choose your route': 'ನಿಮ್ಮ ದಾರಿ ಆಯ್ಕೆಮಾಡಿ', 'A nearby partner, with a reason.': 'ಕಾರಣದೊಂದಿಗೆ ಹತ್ತಿರದ ಪಾಲುದಾರ.',
-    'A clear next step': 'ಸ್ಪಷ್ಟ ಮುಂದಿನ ಹೆಜ್ಜೆ', 'Start your application, without the overwhelm.': 'ಗೊಂದಲವಿಲ್ಲದೆ ಅರ್ಜಿ ಪ್ರಾರಂಭಿಸಿ.',
-    'Keep moving': 'ಮುಂದುವರಿಯಿರಿ', 'Track your application, one step at a time.': 'ನಿಮ್ಮ ಅರ್ಜಿಯನ್ನು ಹಂತ ಹಂತವಾಗಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.',
-    'Your Sathi dashboard': 'ನಿಮ್ಮ ಸಾಥಿ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', 'Your next steps': 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆಗಳು',
-    'Prototype data': 'ಮಾದರಿ ಡೇಟಾ', 'Best fit': 'ಅತ್ಯುತ್ತಮ ಹೊಂದಾಣಿಕೆ', 'fit score': 'ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್',
-  },
+export const languageOptions: Array<{ code: Language; label: string }> = [
+  { code: 'en', label: 'English' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'kn', label: 'ಕನ್ನಡ' },
+];
+
+type Dictionary = Record<string, string>;
+
+const english: Dictionary = {
+  explore: 'Explore', manage: 'Manage', home: 'Home', find: 'Find my scheme', browse: 'Browse schemes', calculator: 'EMI calculator', track: 'Track application', overview: 'Overview', applications: 'Applications', partners: 'Partners', schemes: 'Schemes', analytics: 'Analytics', start: 'Start an application', public: 'A public-service companion', authority: 'Authority workspace', language: 'Language', findCta: 'Find my scheme', trackCta: 'I have an application', finance: 'Finance, made human', forPeople: 'For entrepreneurs & students', heroTitle: 'Your next step', heroAccent: 'starts here.', heroBody: 'SarthakLoan turns a confusing financial need into a clear path: understand your need, find a fit, meet the right partner, and keep moving.', tell: 'Tell us about you', tellBody: 'A few simple questions about your work, study and need.', why: 'See the why', whyBody: 'Compare scheme matches with plain-language reasons, not black boxes.', route: 'Choose your route', routeBody: 'Get connected to a partner who serves your area and scheme.', eligibilityTitle: "Let's find what fits your next move.", continue: 'Continue', back: 'Back', backHome: 'Back home', showMatches: 'Show my matches', finding: 'Finding your fit...', browseTitle: 'Browse support, without the fine print fog.', calculatorTitle: 'A monthly number you can plan around.', calculate: 'Calculate my EMI', prototype: 'Prototype data', needHelp: 'Need a hand?', helpBody: 'A local facilitator can help you understand the next step.', talkToSathi: 'Talk to a Sathi', aboutYou: 'About you', situation: 'Your situation', yourNeed: 'Your need', yourPlace: 'Your place', stepPath: 'Which path sounds like yours?', stepSituation: 'Help us understand your starting point.', stepNeed: 'What would this support make possible?', stepPlace: 'Where should your support start?', entrepreneur: 'Entrepreneur', student: 'Student', entrepreneurBody: 'I want to start or grow a livelihood', studentBody: 'I need support for education', yourName: 'Your name', age: 'Age', socialCategory: 'Social category', monthlyIncome: 'Monthly household income', educationSkill: 'Education or skill', workSituation: 'Work situation', purpose: 'Purpose in your own words', projectCost: 'Estimated project cost', loanAmount: 'Loan amount you need', cityLocation: 'City, district or state', required: 'Required field', noIdentity: 'No identity documents are needed for this first step. We are simply helping you compare options.', editAnswers: 'Edit answers', yourShortlist: 'Your shortlist', bestFit: 'Best fit', fitScore: 'fit score', noMatches: 'No matches yet', completeEligibility: 'Complete the short eligibility conversation to see explainable matches.', startEligibility: 'Start eligibility', understandScheme: 'Understand this scheme', schemeLibrary: 'Scheme library', searchSchemes: 'Search by need, purpose or tag', maxLoan: 'Max loan', interest: 'Interest', tenure: 'Tenure', years: 'yrs', understandThisScheme: 'Understand this scheme', atAGlance: 'At a glance', illustrativeMaximum: 'Illustrative maximum', subjectToPartner: 'Subject to partner assessment', useThisScheme: 'Use this scheme', interestRate: 'Interest rate', loanTenure: 'Loan tenure', moratorium: 'Moratorium', calculateMyEmi: 'Calculate my EMI', monthlyEmi: 'Monthly EMI', totalInterest: 'Total interest', totalRepayment: 'Total repayment', estimated: 'Estimated', illustrativeNote: 'This is an illustrative estimate. A moratorium may defer repayment, but the partner will explain the final schedule.', partnerLocator: 'SarthakLoan Partner Locator', findEligible: 'Find Your Nearest Eligible Partner', locatorSubtitle: 'SarthakLoan matches you with a suitable channel partner based on scheme eligibility, partner health, capacity and location.', enterPin: 'Enter PIN Code', findPartners: 'Find Partners', currentLocation: 'Use My Current Location', startLocation: 'Start with your location', locationBody: 'Use your current location or enter a PIN code to compare nearby partners. Eligibility is checked before distance ranking.', recommendedPartner: 'Recommended Partner', eligiblePartners: 'Eligible Partners', canReceive: 'can receive applications', getDirections: 'Get Directions', applyHere: 'Apply Here', eligible: 'ELIGIBLE', limited: 'LIMITED', unavailable: 'UNAVAILABLE', viewUnavailable: 'View unavailable partners for transparency', fundUtilization: 'Fund utilization', npa: 'NPA', available: 'available', mapNote: 'Map tiles: OpenStreetMap. Distances are straight-line estimates until a road-routing provider is connected.', clearNext: 'A clear next step', applicationTitle: 'Start your application, without the overwhelm.', sendEnquiry: 'Send enquiry', sending: 'Sending...', applicationReceived: 'Application received', applicationId: 'Application ID', status: 'Status', trackTitle: 'Track your application, one step at a time.', findApplication: 'Find application', dashboard: 'Your Sathi dashboard', nextSteps: 'Your next steps',
 };
 
-const copy: Record<Language, Record<string, string>> = {
-  English: {
-    explore: 'Explore', manage: 'Manage', home: 'Home', find: 'Find my scheme', browse: 'Browse schemes',
-    calculator: 'EMI calculator', track: 'Track application', overview: 'Overview', applications: 'Applications',
-    partners: 'Partners', schemes: 'Schemes', analytics: 'Analytics', start: 'Start an application',
-    public: 'A public-service companion', authority: 'Authority workspace', language: 'English',
-    findCta: 'Find my scheme', trackCta: 'I have an application', finance: 'Finance, made human',
-    forPeople: 'For entrepreneurs & students', heroTitle: 'Your next step', heroAccent: 'starts here.',
-    heroBody: 'SchemeSathi turns a confusing financial need into a clear path: understand your need, find a fit, meet the right partner, and keep moving.',
-    tell: 'Tell us about you', tellBody: 'A few simple questions about your work, study and need.',
-    why: 'See the why', whyBody: 'Compare scheme matches with plain-language reasons, not black boxes.',
-    route: 'Choose your route', routeBody: 'Get connected to a partner who serves your area and scheme.',
-    eligibilityTitle: 'Let’s find what fits your next move.', continue: 'Continue', back: 'Back', backHome: 'Back home',
-    showMatches: 'Show my matches', finding: 'Finding your fit…', browseTitle: 'Browse support, without the fine print fog.',
-    calculatorTitle: 'A monthly number you can plan around.', calculate: 'Calculate my EMI', prototype: 'Prototype data',
-  },
-  'हिन्दी': {
-    explore: 'देखें', manage: 'प्रबंधन', home: 'होम', find: 'मेरी योजना खोजें', browse: 'योजनाएँ देखें',
-    calculator: 'ईएमआई कैलकुलेटर', track: 'आवेदन ट्रैक करें', overview: 'सारांश', applications: 'आवेदन',
-    partners: 'साझेदार', schemes: 'योजनाएँ', analytics: 'विश्लेषण', start: 'आवेदन शुरू करें',
-    public: 'जन सेवा सहायक', authority: 'प्राधिकरण कार्यक्षेत्र', language: 'हिन्दी',
-    findCta: 'मेरी योजना खोजें', trackCta: 'मेरा आवेदन है', finance: 'वित्तीय सहायता, सरल भाषा में',
-    forPeople: 'उद्यमियों और विद्यार्थियों के लिए', heroTitle: 'आपका अगला कदम', heroAccent: 'यहाँ से शुरू होता है।',
-    heroBody: 'SchemeSathi आपकी वित्तीय ज़रूरत को एक स्पष्ट रास्ते में बदलता है: ज़रूरत समझें, सही योजना चुनें और सही साझेदार से जुड़ें।',
-    tell: 'अपने बारे में बताएँ', tellBody: 'आपके काम, पढ़ाई और ज़रूरत के बारे में कुछ आसान सवाल।',
-    why: 'कारण समझें', whyBody: 'योजना मिलान को सरल भाषा में समझें, किसी बंद डिब्बे की तरह नहीं।',
-    route: 'अपना रास्ता चुनें', routeBody: 'अपने क्षेत्र और योजना के लिए सही साझेदार से जुड़ें।',
-    eligibilityTitle: 'आपके अगले कदम के लिए सही विकल्प खोजें।', continue: 'आगे बढ़ें', back: 'पीछे', backHome: 'होम पर जाएँ',
-    showMatches: 'मेरी योजनाएँ दिखाएँ', finding: 'आपके लिए सही योजना खोज रहे हैं…', browseTitle: 'सहायता योजनाएँ आसानी से देखें।',
-    calculatorTitle: 'ऐसी मासिक राशि जिसे आप योजना में शामिल कर सकें।', calculate: 'ईएमआई निकालें', prototype: 'प्रोटोटाइप डेटा',
-  },
-  'ಕನ್ನಡ': {
-    explore: 'ಅನ್ವೇಷಿಸಿ', manage: 'ನಿರ್ವಹಣೆ', home: 'ಮುಖಪುಟ', find: 'ನನ್ನ ಯೋಜನೆ ಹುಡುಕಿ', browse: 'ಯೋಜನೆಗಳನ್ನು ನೋಡಿ',
-    calculator: 'EMI ಕ್ಯಾಲ್ಕುಲೇಟರ್', track: 'ಅರ್ಜಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ', overview: 'ಅವಲೋಕನ', applications: 'ಅರ್ಜಿಗಳು',
-    partners: 'ಪಾಲುದಾರರು', schemes: 'ಯೋಜನೆಗಳು', analytics: 'ವಿಶ್ಲೇಷಣೆ', start: 'ಅರ್ಜಿ ಪ್ರಾರಂಭಿಸಿ',
-    public: 'ಸಾರ್ವಜನಿಕ ಸೇವಾ ಸಹಾಯಕ', authority: 'ಪ್ರಾಧಿಕಾರ ಕಾರ್ಯಕ್ಷೇತ್ರ', language: 'ಕನ್ನಡ',
-    findCta: 'ನನ್ನ ಯೋಜನೆ ಹುಡುಕಿ', trackCta: 'ನನ್ನಲ್ಲಿ ಅರ್ಜಿ ಇದೆ', finance: 'ಹಣಕಾಸು ನೆರವು, ಸರಳವಾಗಿ',
-    forPeople: 'ಉದ್ಯಮಿಗಳು ಮತ್ತು ವಿದ್ಯಾರ್ಥಿಗಳಿಗಾಗಿ', heroTitle: 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆ', heroAccent: 'ಇಲ್ಲಿಂದ ಆರಂಭ.',
-    heroBody: 'SchemeSathi ನಿಮ್ಮ ಹಣಕಾಸಿನ ಅಗತ್ಯವನ್ನು ಸ್ಪಷ್ಟ ದಾರಿಯನ್ನಾಗಿ ಮಾಡುತ್ತದೆ: ಅಗತ್ಯ ತಿಳಿದು, ಸೂಕ್ತ ಯೋಜನೆ ಮತ್ತು ಪಾಲುದಾರರನ್ನು ಹುಡುಕಿ.',
-    tell: 'ನಿಮ್ಮ ಬಗ್ಗೆ ತಿಳಿಸಿ', tellBody: 'ನಿಮ್ಮ ಕೆಲಸ, ವಿದ್ಯಾಭ್ಯಾಸ ಮತ್ತು ಅಗತ್ಯದ ಕುರಿತು ಕೆಲವು ಸರಳ ಪ್ರಶ್ನೆಗಳು.',
-    why: 'ಕಾರಣ ತಿಳಿಯಿರಿ', whyBody: 'ಯೋಜನೆ ಹೊಂದಾಣಿಕೆಯನ್ನು ಸರಳ ಭಾಷೆಯಲ್ಲಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.',
-    route: 'ನಿಮ್ಮ ದಾರಿ ಆಯ್ಕೆಮಾಡಿ', routeBody: 'ನಿಮ್ಮ ಪ್ರದೇಶ ಮತ್ತು ಯೋಜನೆಗೆ ಸೂಕ್ತ ಪಾಲುದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ.',
-    eligibilityTitle: 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆಗೆ ಸೂಕ್ತ ಆಯ್ಕೆಯನ್ನು ಹುಡುಕೋಣ.', continue: 'ಮುಂದುವರಿಸಿ', back: 'ಹಿಂದೆ', backHome: 'ಮುಖಪುಟಕ್ಕೆ',
-    showMatches: 'ನನ್ನ ಹೊಂದಾಣಿಕೆಗಳನ್ನು ತೋರಿಸಿ', finding: 'ನಿಮಗಾಗಿ ಹುಡುಕಲಾಗುತ್ತಿದೆ…', browseTitle: 'ಸಹಾಯ ಯೋಜನೆಗಳನ್ನು ಸುಲಭವಾಗಿ ನೋಡಿ.',
-    calculatorTitle: 'ಯೋಜಿಸಬಹುದಾದ ಮಾಸಿಕ ಮೊತ್ತ.', calculate: 'ನನ್ನ EMI ಲೆಕ್ಕಿಸಿ', prototype: 'ಮಾದರಿ ಡೇಟಾ',
-  },
+const hindi: Dictionary = {
+  explore: 'देखें', manage: 'प्रबंधन', home: 'होम', find: 'मेरी योजना खोजें', browse: 'योजनाएँ देखें', calculator: 'ईएमआई कैलकुलेटर', track: 'आवेदन ट्रैक करें', overview: 'सारांश', applications: 'आवेदन', partners: 'साझेदार', schemes: 'योजनाएँ', analytics: 'विश्लेषण', start: 'आवेदन शुरू करें', public: 'जन सेवा सहायक', authority: 'प्राधिकरण कार्यक्षेत्र', language: 'भाषा', findCta: 'मेरी योजना खोजें', trackCta: 'मेरा आवेदन है', finance: 'वित्तीय सहायता, सरल भाषा में', forPeople: 'उद्यमियों और विद्यार्थियों के लिए', heroTitle: 'आपका अगला कदम', heroAccent: 'यहाँ से शुरू होता है।', heroBody: 'SarthakLoan आपकी वित्तीय ज़रूरत को एक स्पष्ट रास्ते में बदलता है: ज़रूरत समझें, सही योजना चुनें और सही साझेदार से जुड़ें।', tell: 'अपने बारे में बताएँ', tellBody: 'आपके काम, पढ़ाई और ज़रूरत के बारे में कुछ आसान सवाल।', why: 'कारण समझें', whyBody: 'योजना मिलान को सरल भाषा में समझें, किसी बंद डिब्बे की तरह नहीं।', route: 'अपना रास्ता चुनें', routeBody: 'अपने क्षेत्र और योजना के लिए सही साझेदार से जुड़ें।', eligibilityTitle: 'आपके अगले कदम के लिए सही विकल्प खोजें।', continue: 'आगे बढ़ें', back: 'पीछे', backHome: 'होम पर जाएँ', showMatches: 'मेरी योजनाएँ दिखाएँ', finding: 'आपके लिए सही योजना खोज रहे हैं...', browseTitle: 'सहायता योजनाएँ आसानी से देखें।', calculatorTitle: 'ऐसी मासिक राशि जिसे आप योजना में शामिल कर सकें।', calculate: 'ईएमआई निकालें', prototype: 'प्रोटोटाइप डेटा', needHelp: 'मदद चाहिए?', helpBody: 'एक स्थानीय सहायक अगला कदम समझने में आपकी मदद कर सकता है।', talkToSathi: 'साथी से बात करें', aboutYou: 'आपके बारे में', situation: 'आपकी स्थिति', yourNeed: 'आपकी ज़रूरत', yourPlace: 'आपका स्थान', stepPath: 'आपके लिए कौन सा रास्ता सही है?', stepSituation: 'आपकी शुरुआती स्थिति समझने में हमारी मदद करें।', stepNeed: 'इस सहायता से क्या संभव होगा?', stepPlace: 'आपकी सहायता कहाँ से शुरू होनी चाहिए?', entrepreneur: 'उद्यमी', student: 'विद्यार्थी', entrepreneurBody: 'मैं आजीविका शुरू या बढ़ाना चाहता हूँ', studentBody: 'मुझे शिक्षा के लिए सहायता चाहिए', yourName: 'आपका नाम', age: 'आयु', socialCategory: 'सामाजिक श्रेणी', monthlyIncome: 'मासिक पारिवारिक आय', educationSkill: 'शिक्षा या कौशल', workSituation: 'काम की स्थिति', purpose: 'अपने शब्दों में उद्देश्य', projectCost: 'अनुमानित परियोजना लागत', loanAmount: 'आपको कितनी ऋण राशि चाहिए', cityLocation: 'शहर, जिला या राज्य', required: 'आवश्यक जानकारी', noIdentity: 'इस पहले चरण में पहचान दस्तावेज़ की आवश्यकता नहीं है। हम केवल विकल्पों की तुलना करने में आपकी मदद कर रहे हैं।', editAnswers: 'उत्तर बदलें', yourShortlist: 'आपकी चुनी योजनाएँ', bestFit: 'सबसे सही विकल्प', fitScore: 'मिलान स्कोर', noMatches: 'अभी कोई मिलान नहीं', completeEligibility: 'समझने योग्य मिलान देखने के लिए पात्रता बातचीत पूरी करें।', startEligibility: 'पात्रता शुरू करें', understandScheme: 'इस योजना को समझें', schemeLibrary: 'योजना पुस्तकालय', searchSchemes: 'ज़रूरत, उद्देश्य या टैग से खोजें', maxLoan: 'अधिकतम ऋण', interest: 'ब्याज', tenure: 'अवधि', years: 'वर्ष', understandThisScheme: 'इस योजना को समझें', atAGlance: 'एक नज़र में', illustrativeMaximum: 'उदाहरणात्मक अधिकतम', subjectToPartner: 'साझेदार के आकलन के अधीन', useThisScheme: 'इस योजना का उपयोग करें', interestRate: 'ब्याज दर', loanTenure: 'ऋण अवधि', moratorium: 'स्थगन अवधि', calculateMyEmi: 'मेरी ईएमआई निकालें', monthlyEmi: 'मासिक ईएमआई', totalInterest: 'कुल ब्याज', totalRepayment: 'कुल भुगतान', estimated: 'अनुमानित', illustrativeNote: 'यह एक उदाहरणात्मक अनुमान है। स्थगन अवधि भुगतान को टाल सकती है, लेकिन अंतिम अनुसूची साझेदार समझाएगा।', partnerLocator: 'SarthakLoan साझेदार खोज', findEligible: 'अपने निकटतम पात्र साझेदार को खोजें', locatorSubtitle: 'SarthakLoan योजना पात्रता, साझेदार की स्थिति, क्षमता और स्थान के आधार पर उपयुक्त साझेदार से जोड़ता है।', enterPin: 'पिन कोड दर्ज करें', findPartners: 'साझेदार खोजें', currentLocation: 'मेरे वर्तमान स्थान का उपयोग करें', startLocation: 'अपने स्थान से शुरू करें', locationBody: 'पास के साझेदारों की तुलना करने के लिए वर्तमान स्थान का उपयोग करें या पिन कोड दर्ज करें। दूरी के आधार पर रैंकिंग से पहले पात्रता जाँची जाती है।', recommendedPartner: 'अनुशंसित साझेदार', eligiblePartners: 'पात्र साझेदार', canReceive: 'आवेदन स्वीकार कर सकते हैं', getDirections: 'दिशा-निर्देश', applyHere: 'यहाँ आवेदन करें', eligible: 'पात्र', limited: 'सीमित', unavailable: 'उपलब्ध नहीं', viewUnavailable: 'पारदर्शिता के लिए अनुपलब्ध साझेदार देखें', fundUtilization: 'फंड उपयोग', npa: 'एनपीए', available: 'उपलब्ध', mapNote: 'मानचित्र: OpenStreetMap। सड़क मार्ग सेवा जुड़ने तक दूरी सीधी रेखा का अनुमान है।', clearNext: 'एक स्पष्ट अगला कदम', applicationTitle: 'बिना परेशानी अपना आवेदन शुरू करें।', sendEnquiry: 'पूछताछ भेजें', sending: 'भेजा जा रहा है...', applicationReceived: 'आवेदन प्राप्त हुआ', applicationId: 'आवेदन आईडी', status: 'स्थिति', trackTitle: 'अपने आवेदन को एक-एक कदम ट्रैक करें।', findApplication: 'आवेदन खोजें', dashboard: 'आपका साथी डैशबोर्ड', nextSteps: 'आपके अगले कदम',
 };
 
+const kannada: Dictionary = {
+  explore: 'ಅನ್ವೇಷಿಸಿ', manage: 'ನಿರ್ವಹಣೆ', home: 'ಮುಖಪುಟ', find: 'ನನ್ನ ಯೋಜನೆ ಹುಡುಕಿ', browse: 'ಯೋಜನೆಗಳನ್ನು ನೋಡಿ', calculator: 'EMI ಕ್ಯಾಲ್ಕುಲೇಟರ್', track: 'ಅರ್ಜಿಯನ್ನು ಟ್ರ್ಯಾಕ್ ಮಾಡಿ', overview: 'ಅವಲೋಕನ', applications: 'ಅರ್ಜಿಗಳು', partners: 'ಪಾಲುದಾರರು', schemes: 'ಯೋಜನೆಗಳು', analytics: 'ವಿಶ್ಲೇಷಣೆ', start: 'ಅರ್ಜಿ ಪ್ರಾರಂಭಿಸಿ', public: 'ಸಾರ್ವಜನಿಕ ಸೇವಾ ಸಹಾಯಕ', authority: 'ಪ್ರಾಧಿಕಾರ ಕಾರ್ಯಕ್ಷೇತ್ರ', language: 'ಭಾಷೆ', findCta: 'ನನ್ನ ಯೋಜನೆ ಹುಡುಕಿ', trackCta: 'ನನ್ನಲ್ಲಿ ಅರ್ಜಿ ಇದೆ', finance: 'ಹಣಕಾಸು ನೆರವು, ಸರಳವಾಗಿ', forPeople: 'ಉದ್ಯಮಿಗಳು ಮತ್ತು ವಿದ್ಯಾರ್ಥಿಗಳಿಗಾಗಿ', heroTitle: 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆ', heroAccent: 'ಇಲ್ಲಿಂದ ಆರಂಭ.', heroBody: 'SarthakLoan ನಿಮ್ಮ ಹಣಕಾಸಿನ ಅಗತ್ಯವನ್ನು ಸ್ಪಷ್ಟ ದಾರಿಯನ್ನಾಗಿ ಮಾಡುತ್ತದೆ: ಅಗತ್ಯ ತಿಳಿದು, ಸೂಕ್ತ ಯೋಜನೆ ಮತ್ತು ಪಾಲುದಾರರನ್ನು ಹುಡುಕಿ.', tell: 'ನಿಮ್ಮ ಬಗ್ಗೆ ತಿಳಿಸಿ', tellBody: 'ನಿಮ್ಮ ಕೆಲಸ, ವಿದ್ಯಾಭ್ಯಾಸ ಮತ್ತು ಅಗತ್ಯದ ಕುರಿತು ಕೆಲವು ಸರಳ ಪ್ರಶ್ನೆಗಳು.', why: 'ಕಾರಣ ತಿಳಿಯಿರಿ', whyBody: 'ಯೋಜನೆ ಹೊಂದಾಣಿಕೆಯನ್ನು ಸರಳ ಭಾಷೆಯಲ್ಲಿ ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ.', route: 'ನಿಮ್ಮ ದಾರಿ ಆಯ್ಕೆಮಾಡಿ', routeBody: 'ನಿಮ್ಮ ಪ್ರದೇಶ ಮತ್ತು ಯೋಜನೆಗೆ ಸೂಕ್ತ ಪಾಲುದಾರರನ್ನು ಸಂಪರ್ಕಿಸಿ.', eligibilityTitle: 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆಗೆ ಸೂಕ್ತ ಆಯ್ಕೆಯನ್ನು ಹುಡುಕೋಣ.', continue: 'ಮುಂದುವರಿಸಿ', back: 'ಹಿಂದೆ', backHome: 'ಮುಖಪುಟಕ್ಕೆ', showMatches: 'ನನ್ನ ಹೊಂದಾಣಿಕೆಗಳನ್ನು ತೋರಿಸಿ', finding: 'ನಿಮಗಾಗಿ ಹುಡುಕಲಾಗುತ್ತಿದೆ...', browseTitle: 'ಸಹಾಯ ಯೋಜನೆಗಳನ್ನು ಸುಲಭವಾಗಿ ನೋಡಿ.', calculatorTitle: 'ಯೋಜಿಸಬಹುದಾದ ಮಾಸಿಕ ಮೊತ್ತ.', calculate: 'ನನ್ನ EMI ಲೆಕ್ಕಿಸಿ', prototype: 'ಮಾದರಿ ಡೇಟಾ', needHelp: 'ಸಹಾಯ ಬೇಕೇ?', helpBody: 'ಸ್ಥಳೀಯ ಸಹಾಯಕರು ಮುಂದಿನ ಹಂತವನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸಹಾಯ ಮಾಡುತ್ತಾರೆ.', talkToSathi: 'ಸಾಥಿಯೊಂದಿಗೆ ಮಾತನಾಡಿ', aboutYou: 'ನಿಮ್ಮ ಬಗ್ಗೆ', situation: 'ನಿಮ್ಮ ಪರಿಸ್ಥಿತಿ', yourNeed: 'ನಿಮ್ಮ ಅಗತ್ಯ', yourPlace: 'ನಿಮ್ಮ ಸ್ಥಳ', stepPath: 'ನಿಮಗೆ ಯಾವ ದಾರಿ ಸೂಕ್ತ?', stepSituation: 'ನಿಮ್ಮ ಆರಂಭಿಕ ಪರಿಸ್ಥಿತಿಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಲು ಸಹಾಯ ಮಾಡಿ.', stepNeed: 'ಈ ನೆರವಿನಿಂದ ಏನು ಸಾಧ್ಯವಾಗುತ್ತದೆ?', stepPlace: 'ನಿಮ್ಮ ನೆರವು ಎಲ್ಲಿಂದ ಆರಂಭವಾಗಬೇಕು?', entrepreneur: 'ಉದ್ಯಮಿ', student: 'ವಿದ್ಯಾರ್ಥಿ', entrepreneurBody: 'ನಾನು ಜೀವನೋಪಾಯ ಆರಂಭಿಸಲು ಅಥವಾ ಬೆಳೆಸಲು ಬಯಸುತ್ತೇನೆ', studentBody: 'ಶಿಕ್ಷಣಕ್ಕಾಗಿ ನನಗೆ ನೆರವು ಬೇಕು', yourName: 'ನಿಮ್ಮ ಹೆಸರು', age: 'ವಯಸ್ಸು', socialCategory: 'ಸಾಮಾಜಿಕ ವರ್ಗ', monthlyIncome: 'ಮಾಸಿಕ ಕುಟುಂಬ ಆದಾಯ', educationSkill: 'ಶಿಕ್ಷಣ ಅಥವಾ ಕೌಶಲ್ಯ', workSituation: 'ಕೆಲಸದ ಪರಿಸ್ಥಿತಿ', purpose: 'ನಿಮ್ಮ ಮಾತಿನಲ್ಲಿ ಉದ್ದೇಶ', projectCost: 'ಅಂದಾಜು ಯೋಜನಾ ವೆಚ್ಚ', loanAmount: 'ನಿಮಗೆ ಬೇಕಾದ ಸಾಲದ ಮೊತ್ತ', cityLocation: 'ನಗರ, ಜಿಲ್ಲೆ ಅಥವಾ ರಾಜ್ಯ', required: 'ಅಗತ್ಯ ಮಾಹಿತಿ', noIdentity: 'ಈ ಮೊದಲ ಹಂತದಲ್ಲಿ ಗುರುತಿನ ದಾಖಲೆಗಳ ಅಗತ್ಯವಿಲ್ಲ. ಆಯ್ಕೆಗಳನ್ನು ಹೋಲಿಸಲು ನಾವು ಸಹಾಯ ಮಾಡುತ್ತಿದ್ದೇವೆ.', editAnswers: 'ಉತ್ತರಗಳನ್ನು ಬದಲಿಸಿ', yourShortlist: 'ನಿಮ್ಮ ಆಯ್ಕೆಗಳು', bestFit: 'ಅತ್ಯುತ್ತಮ ಹೊಂದಾಣಿಕೆ', fitScore: 'ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್', noMatches: 'ಇನ್ನೂ ಹೊಂದಾಣಿಕೆಗಳಿಲ್ಲ', completeEligibility: 'ಅರ್ಥವಾಗುವ ಹೊಂದಾಣಿಕೆಗಳನ್ನು ನೋಡಲು ಅರ್ಹತಾ ಸಂಭಾಷಣೆಯನ್ನು ಪೂರ್ಣಗೊಳಿಸಿ.', startEligibility: 'ಅರ್ಹತೆ ಪ್ರಾರಂಭಿಸಿ', understandScheme: 'ಈ ಯೋಜನೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ', schemeLibrary: 'ಯೋಜನೆಗಳ ಗ್ರಂಥಾಲಯ', searchSchemes: 'ಅಗತ್ಯ, ಉದ್ದೇಶ ಅಥವಾ ಟ್ಯಾಗ್ ಮೂಲಕ ಹುಡುಕಿ', maxLoan: 'ಗರಿಷ್ಠ ಸಾಲ', interest: 'ಬಡ್ಡಿ', tenure: 'ಅವಧಿ', years: 'ವರ್ಷ', understandThisScheme: 'ಈ ಯೋಜನೆಯನ್ನು ಅರ್ಥಮಾಡಿಕೊಳ್ಳಿ', atAGlance: 'ಒಂದು ನೋಟದಲ್ಲಿ', illustrativeMaximum: 'ಅಂದಾಜು ಗರಿಷ್ಠ', subjectToPartner: 'ಪಾಲುದಾರರ ಮೌಲ್ಯಮಾಪನಕ್ಕೆ ಒಳಪಟ್ಟಿದೆ', useThisScheme: 'ಈ ಯೋಜನೆಯನ್ನು ಬಳಸಿ', interestRate: 'ಬಡ್ಡಿ ದರ', loanTenure: 'ಸಾಲದ ಅವಧಿ', moratorium: 'ಮುಂದೂಡಿಕೆ ಅವಧಿ', calculateMyEmi: 'ನನ್ನ EMI ಲೆಕ್ಕಿಸಿ', monthlyEmi: 'ಮಾಸಿಕ EMI', totalInterest: 'ಒಟ್ಟು ಬಡ್ಡಿ', totalRepayment: 'ಒಟ್ಟು ಮರುಪಾವತಿ', estimated: 'ಅಂದಾಜು', illustrativeNote: 'ಇದು ಅಂದಾಜು ಲೆಕ್ಕಾಚಾರ. ಮುಂದೂಡಿಕೆ ಅವಧಿಯು ಪಾವತಿಯನ್ನು ಮುಂದೂಡಬಹುದು, ಆದರೆ ಅಂತಿಮ ವೇಳಾಪಟ್ಟಿಯನ್ನು ಪಾಲುದಾರರು ವಿವರಿಸುತ್ತಾರೆ.', partnerLocator: 'SarthakLoan ಪಾಲುದಾರ ಹುಡುಕಾಟ', findEligible: 'ನಿಮ್ಮ ಹತ್ತಿರದ ಅರ್ಹ ಪಾಲುದಾರರನ್ನು ಹುಡುಕಿ', locatorSubtitle: 'SarthakLoan ಯೋಜನೆಯ ಅರ್ಹತೆ, ಪಾಲುದಾರರ ಸ್ಥಿತಿ, ಸಾಮರ್ಥ್ಯ ಮತ್ತು ಸ್ಥಳದ ಆಧಾರದ ಮೇಲೆ ಸೂಕ್ತ ಪಾಲುದಾರರನ್ನು ಹೊಂದಿಸುತ್ತದೆ.', enterPin: 'ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ', findPartners: 'ಪಾಲುದಾರರನ್ನು ಹುಡುಕಿ', currentLocation: 'ನನ್ನ ಪ್ರಸ್ತುತ ಸ್ಥಳ ಬಳಸಿ', startLocation: 'ನಿಮ್ಮ ಸ್ಥಳದಿಂದ ಪ್ರಾರಂಭಿಸಿ', locationBody: 'ಹತ್ತಿರದ ಪಾಲುದಾರರನ್ನು ಹೋಲಿಸಲು ಪ್ರಸ್ತುತ ಸ್ಥಳ ಬಳಸಿ ಅಥವಾ ಪಿನ್ ಕೋಡ್ ನಮೂದಿಸಿ. ದೂರದ ಆಧಾರದ ರ‍್ಯಾಂಕಿಂಗ್‌ಗೂ ಮೊದಲು ಅರ್ಹತೆಯನ್ನು ಪರಿಶೀಲಿಸಲಾಗುತ್ತದೆ.', recommendedPartner: 'ಶಿಫಾರಸು ಮಾಡಿದ ಪಾಲುದಾರ', eligiblePartners: 'ಅರ್ಹ ಪಾಲುದಾರರು', canReceive: 'ಅರ್ಜಿಗಳನ್ನು ಸ್ವೀಕರಿಸಬಹುದು', getDirections: 'ದಿಕ್ಕುಗಳನ್ನು ಪಡೆಯಿರಿ', applyHere: 'ಇಲ್ಲಿ ಅರ್ಜಿ ಸಲ್ಲಿಸಿ', eligible: 'ಅರ್ಹ', limited: 'ಸೀಮಿತ', unavailable: 'ಲಭ್ಯವಿಲ್ಲ', viewUnavailable: 'ಪಾರದರ್ಶಕತೆಗಾಗಿ ಲಭ್ಯವಿಲ್ಲದ ಪಾಲುದಾರರನ್ನು ನೋಡಿ', fundUtilization: 'ನಿಧಿ ಬಳಕೆ', npa: 'NPA', available: 'ಲಭ್ಯವಿದೆ', mapNote: 'ನಕ್ಷೆ: OpenStreetMap. ರಸ್ತೆ ಮಾರ್ಗ ಸೇವೆ ಸಂಪರ್ಕಿಸುವವರೆಗೆ ದೂರವು ನೇರ ರೇಖೆಯ ಅಂದಾಜಾಗಿದೆ.', clearNext: 'ಸ್ಪಷ್ಟ ಮುಂದಿನ ಹೆಜ್ಜೆ', applicationTitle: 'ಗೊಂದಲವಿಲ್ಲದೆ ಅರ್ಜಿ ಪ್ರಾರಂಭಿಸಿ.', sendEnquiry: 'ವಿಚಾರಣೆ ಕಳುಹಿಸಿ', sending: 'ಕಳುಹಿಸಲಾಗುತ್ತಿದೆ...', applicationReceived: 'ಅರ್ಜಿ ಸ್ವೀಕರಿಸಲಾಗಿದೆ', applicationId: 'ಅರ್ಜಿ ಐಡಿ', status: 'ಸ್ಥಿತಿ', trackTitle: 'ನಿಮ್ಮ ಅರ್ಜಿಯನ್ನು ಹಂತ ಹಂತವಾಗಿ ಟ್ರ್ಯಾಕ್ ಮಾಡಿ.', findApplication: 'ಅರ್ಜಿಯನ್ನು ಹುಡುಕಿ', dashboard: 'ನಿಮ್ಮ ಸಾಥಿ ಡ್ಯಾಶ್‌ಬೋರ್ಡ್', nextSteps: 'ನಿಮ್ಮ ಮುಂದಿನ ಹೆಜ್ಜೆಗಳು',
+};
+
+const dictionaries: Record<Language, Dictionary> = { en: english, hi: hindi, kn: kannada };
+const legacyLanguageMap: Record<string, Language> = { English: 'en', 'हिन्दी': 'hi', 'ಕನ್ನಡ': 'kn' };
+const phraseAliases: Record<string, string> = {
+  'A short conversation': 'aboutYou', 'Your shortlist': 'yourShortlist', 'A match you can understand.': 'yourShortlist',
+  'Scheme library': 'schemeLibrary', 'Browse support, without the fine print fog.': 'browseTitle',
+  'Make repayment legible': 'calculator', 'A monthly number you can plan around.': 'calculatorTitle',
+  'Choose your route': 'route', 'A nearby partner, with a reason.': 'findEligible',
+  'A clear next step': 'clearNext', 'Start your application, without the overwhelm.': 'applicationTitle',
+  'Keep moving': 'track', 'Track your application, one step at a time.': 'trackTitle',
+  'Your Sathi dashboard': 'dashboard', 'Your next steps': 'nextSteps', 'Prototype data': 'prototype', 'Best fit': 'bestFit', 'fit score': 'fitScore',
+};
 const LanguageContext = createContext<{ lang: Language; setLang: (lang: Language) => void; t: (key: string) => string } | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Language>(() => (localStorage.getItem('ss_lang') as Language) || 'English');
+  const [lang, setLang] = useState<Language>(() => {
+    const stored = localStorage.getItem('ss_lang') || '';
+    const candidate = legacyLanguageMap[stored] || stored;
+    return candidate === 'hi' || candidate === 'kn' ? candidate : 'en';
+  });
   const change = (next: Language) => { setLang(next); localStorage.setItem('ss_lang', next); };
-  const value = useMemo(() => ({ lang, setLang: change, t: (key: string) => copy[lang][key] || copy.English[key] || key }), [lang]);
+  const value = useMemo(() => ({ lang, setLang: change, t: (key: string) => dictionaries[lang]?.[key] || english[key] || key }), [lang]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
 
@@ -92,5 +53,6 @@ export function useLanguage() {
 }
 
 export function translatePhrase(lang: Language, text: string) {
-  return phrases[lang][text] || text;
+  const key = phraseAliases[text] || text;
+  return dictionaries[lang]?.[key] || english[key] || text;
 }
