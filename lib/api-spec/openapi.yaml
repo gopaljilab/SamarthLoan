@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: Api
   version: 0.1.0
-  description: SchemeSathi prototype API for scheme matching and application routing
+  description: SarthakLoan prototype API for scheme matching and application routing
 servers:
   - url: /api
     description: Base API path
@@ -127,6 +127,34 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/PartnerMatch"
+  /partners/eligible:
+    get:
+      operationId: getEligiblePartners
+      tags: [partners]
+      summary: Filter and rank partners by scheme, location, and operational eligibility
+      parameters:
+        - name: schemeId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: latitude
+          in: query
+          schema: { type: number, minimum: -90, maximum: 90 }
+        - name: longitude
+          in: query
+          schema: { type: number, minimum: -180, maximum: 180 }
+        - name: pincode
+          in: query
+          schema: { type: string, pattern: '^[1-9][0-9]{5}$' }
+      responses:
+        "200":
+          description: Geospatially ranked partner results with eligibility explanations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EligiblePartnerResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
   /applications:
     post:
       operationId: createApplication
@@ -182,6 +210,12 @@ components:
       schema:
         type: string
   responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
     NotFound:
       description: Not found
       content:
@@ -293,6 +327,23 @@ components:
             reasons:
               type: array
               items: { type: string }
+    EligiblePartnerResponse:
+      type: object
+      required: [userLocation, schemeId, recommendedPartnerId, partners]
+      properties:
+        userLocation:
+          type: object
+          required: [latitude, longitude]
+          properties:
+            latitude: { type: number }
+            longitude: { type: number }
+            source: { type: string }
+        schemeId: { type: string }
+        recommendedPartnerId: { type: [string, 'null'] }
+        partners:
+          type: array
+          items:
+            $ref: "#/components/schemas/PartnerMatch"
     ApplicationInput:
       type: object
       required: [name, phone, email, address, schemeId, partnerId, income, loanRequired, projectType, projectCost]

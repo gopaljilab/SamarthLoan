@@ -5,6 +5,7 @@ import {
   RecommendPartnersBody,
   CreateApplicationBody,
 } from "@workspace/api-zod";
+import { getEligiblePartners, partners, partnerPolicy, resolvePincode, type UserLocation } from "../services/partner-routing";
 
 const router: IRouter = Router();
 
@@ -18,14 +19,6 @@ const schemes = [
   { id: "livelihood-fund", name: "Livelihood Growth Fund", purpose: "Patient capital for livelihood activities in rural and semi-urban communities", maxLoan: 300000, interest: 7, moratorium: 6, tenure: 5, applicantType: "Entrepreneur", tags: ["Livelihood", "Rural", "Community"], isPrototypeData: true },
   { id: "skill-support", name: "Skill Development Support", purpose: "Education support for vocational training and job-ready certification", maxLoan: 350000, interest: 5.5, moratorium: 12, tenure: 5, applicantType: "Student", tags: ["Skills", "Vocational", "Students"], isPrototypeData: true },
   { id: "green-equipment", name: "Green Enterprise Equipment Fund", purpose: "Finance for energy-efficient tools and environmentally responsible enterprises", maxLoan: 1200000, interest: 7.25, moratorium: 6, tenure: 7, applicantType: "Entrepreneur", tags: ["Green business", "Equipment"], isPrototypeData: true },
-];
-
-const partners = [
-  { id: "p1", name: "Bengaluru Enterprise Support Centre", type: "SCA", distance: 2.4, supportedSchemes: ["micro-finance", "term-loan"], serviceArea: "Central Bengaluru", status: "Accepting", processingCapacity: 86, fundingAvailability: 92, address: "14 Residency Road, Bengaluru", latitude: 12.9716, longitude: 77.5946 },
-  { id: "p2", name: "Karnataka Gramin Bank — Indiranagar", type: "RRB", distance: 4.1, supportedSchemes: ["micro-finance", "term-loan", "equipment-support"], serviceArea: "East Bengaluru", status: "Accepting", processingCapacity: 78, fundingAvailability: 84, address: "100 Feet Road, Indiranagar", latitude: 12.9784, longitude: 77.6408 },
-  { id: "p3", name: "Udyam MFI — Jayanagar", type: "NBFC-MFI", distance: 5.6, supportedSchemes: ["micro-finance", "working-capital"], serviceArea: "South Bengaluru", status: "Limited", processingCapacity: 68, fundingAvailability: 74, address: "4th Block, Jayanagar", latitude: 12.925, longitude: 77.5938 },
-  { id: "p4", name: "People's Development Finance", type: "SCA", distance: 7.2, supportedSchemes: ["micro-finance", "education-loan"], serviceArea: "North Bengaluru", status: "Accepting", processingCapacity: 72, fundingAvailability: 88, address: "Yeshwanthpur, Bengaluru", latitude: 13.028, longitude: 77.54 },
-  { id: "p5", name: "National Public Bank — Koramangala", type: "PSB", distance: 6.8, supportedSchemes: ["term-loan", "education-loan", "equipment-support"], serviceArea: "South-East Bengaluru", status: "Accepting", processingCapacity: 91, fundingAvailability: 95, address: "80 Feet Road, Koramangala", latitude: 12.9352, longitude: 77.6245 },
 ];
 
 const applications = new Map<string, Record<string, unknown>>();
@@ -64,28 +57,47 @@ router.post("/schemes/recommend", (req, res) => {
 router.post("/calculator/emi", (req, res) => {
   const input = CalculateEmiBody.parse(req.body);
   const principal = Number(input.principal);
-  const months = Math.max(1, Number(input.tenureYears) * 12);
+  const totalMonths = Math.max(1, Number(input.tenureYears) * 12);
+  const moratoriumMonths = Math.min(Math.max(0, Number(input.moratoriumMonths)), Math.max(totalMonths - 1, 1));
+  const repaymentMonths = Math.max(1, totalMonths - moratoriumMonths);
   const rate = Number(input.annualRate) / 1200;
-  const emi = rate === 0 ? principal / months : principal * rate * Math.pow(1 + rate, months) / (Math.pow(1 + rate, months) - 1);
-  const totalRepayment = emi * months;
+  const balanceAfterMoratorium = rate === 0 ? principal : principal * Math.pow(1 + rate, moratoriumMonths);
+  const emi = rate === 0 ? balanceAfterMoratorium / repaymentMonths : balanceAfterMoratorium * rate * Math.pow(1 + rate, repaymentMonths) / (Math.pow(1 + rate, repaymentMonths) - 1);
+  const totalRepayment = emi * repaymentMonths;
   res.json({ emi: Math.round(emi), principal, totalInterest: Math.round(totalRepayment - principal), totalRepayment: Math.round(totalRepayment) });
 });
-router.get("/partners", (_req, res) => res.json(partners));
+router.get("/partners", (_req, res) => res.json(partners.map((partner) => ({
+  ...partner, distance: 0, status: partner.acceptingApplications ? "Accepting" : "Unavailable",
+  fundingAvailability: 100 - partner.fundUtilizationPercent,
+}))));
+router.get("/partners/eligible", (req, res) => {
+  const schemeId = String(req.query.schemeId || "");
+  const latitude = Number(req.query.latitude);
+  const longitude = Number(req.query.longitude);
+  const pincode = String(req.query.pincode || "");
+  if (!schemeId) return res.status(400).json({ error: "schemeId is required" });
+  const location: UserLocation | null = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
+    ? { latitude, longitude, source: "browser" }
+    : resolvePincode(pincode);
+  if (!location) return res.status(400).json({ error: "Provide valid coordinates or a supported Indian PIN code" });
+  const ranked = getEligiblePartners(schemeId, location);
+  const eligible = ranked.filter((partner) => partner.eligible);
+  return res.json({ userLocation: location, schemeId, recommendedPartnerId: eligible[0]?.id ?? null, policy: partnerPolicy, partners: ranked });
+});
 router.post("/partners/recommend", (req, res) => {
-  const { schemeId } = RecommendPartnersBody.parse(req.body);
-  const ranked = partners.map((partner) => {
-    const compatible = partner.supportedSchemes.includes(schemeId);
-    const score = Math.round((compatible ? 40 : 0) + partner.fundingAvailability * 0.25 + partner.processingCapacity * 0.2 + Math.max(0, 15 - partner.distance));
-    return { ...partner, score, reasons: [compatible ? "Scheme supported" : "May support related schemes", partner.status === "Accepting" ? "Currently accepting applications" : "Limited capacity", "Suitable processing capacity"] };
-  }).filter((partner) => partner.supportedSchemes.includes(schemeId)).sort((a, b) => b.score - a.score);
+  const { schemeId, location } = RecommendPartnersBody.parse(req.body);
+  const resolved = resolvePincode(location.replace(/\D/g, "")) ?? { latitude: 12.9716, longitude: 77.5946, source: "pincode" as const };
+  const ranked = getEligiblePartners(schemeId, resolved);
   res.json(ranked);
 });
 router.post("/applications", (req, res) => {
   const input = CreateApplicationBody.parse(req.body);
+  const existing = [...applications.values()].find((application) => application.name === input.name && application.schemeId === input.schemeId && application.partnerId === input.partnerId);
+  if (existing) return res.status(200).json(existing);
   const id = `SS-26092-${Math.floor(1000 + Math.random() * 8999)}`;
   const application = { ...input, id, status: "Partner Review", createdAt: new Date().toISOString() };
   applications.set(id, application);
-  res.status(201).json(application);
+  return res.status(201).json(application);
 });
 router.get("/applications/:id", (req, res) => {
   const application = applications.get(req.params.id);
