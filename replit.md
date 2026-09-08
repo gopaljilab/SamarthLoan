@@ -1,6 +1,6 @@
-# SchemeSathi
+# SarthakLoan
 
-SchemeSathi helps citizens discover suitable prototype financial schemes, understand repayment, find a channel partner, and track an application.
+SarthakLoan helps citizens discover suitable prototype financial schemes, understand repayment, find a channel partner, and track an application.
 
 ## Run & Operate
 

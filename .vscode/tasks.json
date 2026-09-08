@@ -1,0 +1,19 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start SarthakLoan frontend",
+			"type": "shell",
+			"command": "pnpm",
+			"args": [
+				"--filter",
+				"@workspace/sarthakloan",
+				"run",
+				"dev"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"group": "build"
+		}
+	]
+}
