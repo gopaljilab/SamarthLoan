@@ -1,0 +1,8 @@
+[build]
+  command = "pnpm --filter @workspace/sarthakloan build"
+  publish = "artifacts/schemesathi/dist/public"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
