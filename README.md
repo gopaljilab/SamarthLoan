@@ -1,100 +1,190 @@
 # SarthakLoan
 
-**Smart Credit & Scheme Navigator**
+> Smart Credit & Scheme Navigator for marginalized entrepreneurs and students.
 
-SarthakLoan is a smart credit and scheme navigation platform designed to help eligible beneficiaries identify suitable government-backed financial schemes, estimate loan repayments, and connect with an eligible channel partner.
+SarthakLoan is an end-to-end prototype that helps a beneficiary discover relevant government-backed credit schemes, understand why they qualify, estimate repayments, find an operationally eligible channel partner, and create a trackable application. It was developed for **SIH Problem Statement 26092** (Ministry of Social Justice and Empowerment).
 
-## Problem statement
+> **Prototype notice:** Scheme rules, interest rates, eligibility results, partner records, capacity indicators, analytics, and calculations are illustrative unless independently verified from an official source. This project is not a loan-sanctioning system.
 
-Smart Scheme Matching for Marginalized Entrepreneurs — SIH Problem Statement 26092, Ministry of Social Justice and Empowerment.
-
-## Solution
+## What it does
 
 ```text
-User Profile
-    ↓
-Scheme Recommendation
-    ↓
-EMI Calculation
-    ↓
-Eligible Partner Matching
-    ↓
-Geo-Spatial Partner Locator
-    ↓
-Application
+Applicant profile
+      ↓
+Explainable scheme recommendations
+      ↓
+Illustrative EMI estimate
+      ↓
+Eligible partner routing by scheme + location
+      ↓
+Prototype application and status tracking
 ```
 
-SarthakLoan turns a citizen's financial need into a clear, explainable path: capture a small applicant profile, rank compatible prototype schemes, explain the score, estimate repayment, route to a suitable demo channel partner, and create a trackable application.
+- Guides beneficiaries through eligibility and scheme discovery
+- Ranks compatible schemes with a visible, deterministic score breakdown
+- Calculates illustrative reducing-balance EMI, repayment total, and moratorium inputs
+- Filters and ranks partners by authorization, availability, capacity, risk signals, and distance
+- Supports PIN-code or browser-geolocation partner lookup with an OpenStreetMap-based map view
+- Creates a prototype application ID and timeline
+- Provides English, Hindi, and Kannada interfaces
+- Includes a prototype authority dashboard and demo profiles for walkthroughs
 
-## Features
+## Technology
 
-- Responsive beneficiary home, eligibility wizard, recommendations, scheme details, and dashboard
-- Deterministic weighted scheme matching with visible score breakdowns
-- EMI calculator with illustrative moratorium input and repayment totals
-- Partner ranking using compatibility, availability, capacity, and distance
-- Demo partner map-style experience and application routing
-- Application ID generation and timeline tracking
-- English, Hindi, and Kannada language switching
-- Prototype authority dashboard with application, scheme, and partner analytics
-- Geo-spatial eligible partner locator with PIN/geolocation fallback, OpenStreetMap area map, and explainable operational filtering
-- Rahul Kumar and student demo presets for a fast hackathon walkthrough
+| Area | Stack |
+| --- | --- |
+| Web app | React 19, TypeScript, Vite, Tailwind CSS, Wouter |
+| Data fetching | TanStack React Query, generated OpenAPI client |
+| API | Express 5, Zod validation, Pino logging |
+| API contract | OpenAPI 3.1, Orval-generated React client and Zod schemas |
+| Data layer | Drizzle ORM and PostgreSQL-ready database package |
+| UI | Radix UI, Lucide, Recharts, Framer Motion |
+| Package manager | pnpm workspaces |
 
-## Architecture
+## Repository layout
 
 ```text
-React + Vite frontend
-        |
-Typed OpenAPI client + React Query
-        |
-Express API server (/api)
-        |
-Deterministic prototype services
+artifacts/
+├── schemesathi/       # SarthakLoan React frontend
+├── api-server/        # Express API and prototype routing services
+└── mockup-sandbox/    # Isolated UI/mockup workspace
+lib/
+├── api-spec/          # OpenAPI contract and Orval configuration
+├── api-zod/           # Generated request/response schemas
+├── api-client-react/  # Generated React Query client
+└── db/                # Drizzle database package and schema
+scripts/               # Workspace utility scripts
+attached_assets/       # Static assets used by the frontend
 ```
 
-## Tech stack
+## Quick start
 
-- React, TypeScript, Vite, Tailwind CSS, Wouter
-- Express 5, Zod-generated request validation
-- Recharts and Lucide React
-- OpenAPI + Orval-generated client and schemas
+### Prerequisites
 
-## Matching algorithm
+- Node.js 20 or later
+- pnpm 9 or later
 
-Scheme scores combine income compatibility (25%), project type (25%), loan amount (20%), applicant type (15%), purpose (10%), and other eligibility (5%). Clearly incompatible applicant types and loan amounts are filtered before ranking.
-
-Partner scores combine scheme compatibility (40%), availability (25%), processing capacity (20%), and distance (15%).
-
-## Geo-spatial partner locator
-
-The partner flow is deliberately ordered as:
-
-```text
-User location -> selected scheme -> authorization and operational eligibility
--> Haversine distance -> configurable ranking -> partner details -> application
-```
-
-`GET /api/partners/eligible` accepts `schemeId` plus either `latitude`/`longitude` or a supported Indian PIN code. It removes unauthorized, inactive, unsupported, non-accepting, over-utilized, high-NPA, high-overdue, and capacity-constrained partners before ranking. Ranking weights and thresholds live in `artifacts/api-server/src/services/partner-routing.ts` so they can later move to verified policy or partner data.
-
-The map uses real OpenStreetMap tiles. Partner records and financial/operational indicators are simulated prototype data, clearly surfaced as such in the application. Distances use Haversine straight-line calculations; a future road-routing provider can replace that service without changing the frontend contract.
-
-## Financial calculator
-
-The calculator uses the standard reducing-balance EMI formula with monthly interest and monthly installments. Results are illustrative and not a sanction quote; actual repayment treatment depends on scheme and lender guidelines.
-
-## Running locally
+The repository intentionally requires pnpm. Do not use npm or Yarn for installation.
 
 ```bash
+corepack enable
 pnpm install
-pnpm --filter @workspace/api-server run dev
-pnpm --filter @workspace/sarthakloan run dev
 ```
 
-For the managed preview, use the configured workflows. Validate with:
+### Run locally
+
+The API and frontend run separately. Open two terminals from the repository root.
+
+**Terminal 1 — API (`http://localhost:3000`)**
 
 ```bash
-pnpm run typecheck
+PORT=3000 pnpm --filter @workspace/api-server dev
 ```
 
-## Prototype disclosure
+**Terminal 2 — frontend (`http://localhost:5173`)**
 
-SarthakLoan is a prototype developed for demonstration under SIH Problem Statement 26092. Scheme rules, rates, eligibility, partner availability, analytics, and financial calculations shown here are illustrative unless explicitly verified from official sources. No Aadhaar, bank credentials, or sensitive identity verification is collected.
+```bash
+PORT=5173 BASE_PATH=/ API_URL=http://localhost:3000 \
+  pnpm --filter @workspace/sarthakloan dev
+```
+
+The Vite frontend proxies `/api` requests to `API_URL`; it defaults to `http://localhost:3000` when `API_URL` is omitted.
+
+### Verify and build
+
+```bash
+# Type-check libraries, apps, and scripts
+pnpm typecheck
+
+# Type-check and build every workspace package that exposes a build script
+pnpm build
+
+# Build only the frontend
+pnpm --filter @workspace/sarthakloan build
+
+# Build only the API
+pnpm --filter @workspace/api-server build
+```
+
+## API overview
+
+All API paths are mounted under `/api`. The source of truth is [lib/api-spec/openapi.yaml](lib/api-spec/openapi.yaml).
+
+| Method | Endpoint | Purpose |
+| --- | --- | --- |
+| `GET` | `/api/healthz` | Health check |
+| `GET` | `/api/schemes` | List prototype schemes |
+| `GET` | `/api/schemes/:id` | Read a scheme |
+| `POST` | `/api/schemes/recommend` | Rank schemes for an applicant profile |
+| `POST` | `/api/calculator/emi` | Calculate an illustrative EMI |
+| `GET` | `/api/partners` | List demo channel partners |
+| `GET` | `/api/partners/eligible` | Filter and rank eligible partners |
+| `POST` | `/api/partners/recommend` | Rank partner matches |
+| `POST` | `/api/applications` | Create a prototype application |
+| `GET` | `/api/applications/:id` | Retrieve application tracking state |
+| `GET` | `/api/admin/analytics` | Read prototype dashboard analytics |
+
+Example partner lookup:
+
+```bash
+curl 'http://localhost:3000/api/partners/eligible?schemeId=scheme-id&pincode=560001'
+```
+
+`/api/partners/eligible` requires `schemeId` and accepts either `latitude`/`longitude` or a six-digit Indian `pincode`.
+
+## How recommendations work
+
+SarthakLoan’s matching is intentionally deterministic and explainable:
+
+| Recommendation | Scoring factors |
+| --- | --- |
+| Scheme match | Income compatibility (25%), project type (25%), loan amount (20%), applicant type (15%), purpose (10%), other eligibility (5%) |
+| Partner match | Scheme compatibility (40%), availability (25%), processing capacity (20%), distance (15%) |
+
+Incompatible applicant types and loan amounts are excluded before scheme ranking. The eligible-partner flow applies authorization, active status, supported scheme, application acceptance, utilization, NPA/overdue, and capacity checks before using Haversine straight-line distance to rank the remaining partners. Its configurable thresholds and weights are in `artifacts/api-server/src/services/partner-routing.ts`.
+
+The financial calculator uses the standard reducing-balance EMI formula with monthly interest and installments. Its result is illustrative and is not a loan offer or sanction quote.
+
+## API contract and generated code
+
+When changing API shapes, update the OpenAPI definition first, then regenerate the client and schemas:
+
+```bash
+pnpm --filter @workspace/api-spec codegen
+pnpm typecheck
+```
+
+Generated outputs are consumed by the frontend from `@workspace/api-client-react` and by the API from `@workspace/api-zod`. Keeping the contract first prevents client/server drift.
+
+## Database
+
+The `@workspace/db` package is prepared for Drizzle and PostgreSQL-backed persistence. Current scheme, partner, and analytics records support the prototype experience and should be treated as demo data.
+
+```bash
+# Apply schema changes after configuring the database connection
+pnpm --filter @workspace/db push
+
+# Upsert the prototype scheme catalogue and partner records
+pnpm --filter @workspace/db seed
+```
+
+Set `DATABASE_URL` in your shell or deployment secret store before running either command. The seed is idempotent: it updates the current prototype IDs rather than creating duplicates. Do not run the force variant of the schema command against an environment containing data you need to retain.
+
+## Contributing
+
+1. Create a branch from `main`.
+2. Make the smallest focused change.
+3. If the API changes, update `lib/api-spec/openapi.yaml` and regenerate code.
+4. Run `pnpm typecheck` and the relevant build command.
+5. Clearly identify any non-production demo data or assumptions in the pull request.
+
+### Data and privacy guidance
+
+- Do not commit credentials, Aadhaar numbers, bank details, or other sensitive personal information.
+- Keep all sample beneficiary and partner data clearly marked as simulated.
+- Treat eligibility results and EMI output as guidance only until rules and rates are verified with the relevant authorities and lenders.
+- Validate any production integration, consent flow, identity verification, and data-retention policy before deployment.
+
+## License
+
+MIT. See the root `package.json` for the declared license.
