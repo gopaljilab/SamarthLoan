@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm --filter @workspace/sarthakloan build"
+  command = "pnpm --filter @workspace/samarthloan build"
   publish = "artifacts/schemesathi/dist/public"
 
 [[redirects]]
