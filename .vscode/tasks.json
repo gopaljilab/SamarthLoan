@@ -2,12 +2,12 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "Start SarthakLoan frontend",
+			"label": "Start SamarthLoan frontend",
 			"type": "shell",
 			"command": "pnpm",
 			"args": [
 				"--filter",
-				"@workspace/sarthakloan",
+				"@workspace/samarthloan",
 				"run",
 				"dev"
 			],

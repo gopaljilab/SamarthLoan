@@ -1,9 +1,9 @@
 kind = "web"
 previewPath = "/"
-title = "SarthakLoan"
+title = "SamarthLoan"
 description = "A trustworthy public-service platform that helps marginalized entrepreneurs and students discover suitable financial schemes, understand repayment, find channel partners, and track applications using clearly labeled prototype data."
 version = "1.0.0"
-id = "artifacts/sarthakloan"
+id = "artifacts/samarthloan"
 router = "path"
 
 [[services]]
@@ -12,10 +12,10 @@ paths = [ "/" ]
 localPort = 21401
 
 [services.development]
-run = "pnpm --filter @workspace/sarthakloan run dev"
+run = "pnpm --filter @workspace/samarthloan run dev"
 
 [services.production]
-build = [ "pnpm", "--filter", "@workspace/sarthakloan", "run", "build" ]
+build = [ "pnpm", "--filter", "@workspace/samarthloan", "run", "build" ]
 serve = "static"
 publicDir = "artifacts/schemesathi/dist/public"
 

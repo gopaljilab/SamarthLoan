@@ -93,7 +93,7 @@ function Shell({ children }: { children: ReactNode }) {
       </aside>
       <main className="min-w-0 flex-1">{children}</main>
     </div>
-     <footer className="mx-auto flex max-w-[1280px] flex-col gap-3 border-t border-[hsl(var(--border))] px-5 py-7 text-xs text-[hsl(var(--muted-foreground))] sm:flex-row sm:items-center sm:justify-between lg:px-8"><span>SarthakLoan prototype · Built for clearer public finance</span><span>Information is illustrative. Final approval rests with the partner.</span></footer>
+     <footer className="mx-auto flex max-w-[1280px] flex-col gap-3 border-t border-[hsl(var(--border))] px-5 py-7 text-xs text-[hsl(var(--muted-foreground))] sm:flex-row sm:items-center sm:justify-between lg:px-8"><span>SamarthLoan prototype · Built for clearer public finance</span><span>Information is illustrative. Final approval rests with the partner.</span></footer>
   </div>;
 }
 
@@ -101,13 +101,13 @@ function DocumentTitle() {
   const [route] = useLocation();
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'SarthakLoan — Smart Credit & Scheme Navigator',
-      '/recommendations': 'SarthakLoan — Scheme Recommendation',
-      '/calculator': 'SarthakLoan — EMI Calculator',
-      '/partners': 'SarthakLoan — Find Eligible Partner',
-      '/find-partner': 'SarthakLoan — Find Eligible Partner',
+      '/': 'SamarthLoan — Smart Credit & Scheme Navigator',
+      '/recommendations': 'SamarthLoan — Scheme Recommendation',
+      '/calculator': 'SamarthLoan — EMI Calculator',
+      '/partners': 'SamarthLoan — Find Eligible Partner',
+      '/find-partner': 'SamarthLoan — Find Eligible Partner',
     };
-    document.title = titles[route] || 'SarthakLoan — Smart Credit & Scheme Navigator';
+    document.title = titles[route] || 'SamarthLoan — Smart Credit & Scheme Navigator';
   }, [route]);
   return null;
 }

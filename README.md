@@ -1,8 +1,8 @@
-# SarthakLoan
+# SamarthLoan
 
 > Smart Credit & Scheme Navigator for marginalized entrepreneurs and students.
 
-SarthakLoan is an end-to-end prototype that helps a beneficiary discover relevant government-backed credit schemes, understand why they qualify, estimate repayments, find an operationally eligible channel partner, and create a trackable application. It was developed for **SIH Problem Statement 26092** (Ministry of Social Justice and Empowerment).
+SamarthLoan is an end-to-end prototype that helps a beneficiary discover relevant government-backed credit schemes, understand why they qualify, estimate repayments, find an operationally eligible channel partner, and create a trackable application. It was developed for **SIH Problem Statement 26092** (Ministry of Social Justice and Empowerment).
 
 > **Prototype notice:** Scheme rules, interest rates, eligibility results, partner records, capacity indicators, analytics, and calculations are illustrative unless independently verified from an official source. This project is not a loan-sanctioning system.
 
@@ -45,7 +45,7 @@ Prototype application and status tracking
 
 ```text
 artifacts/
-├── schemesathi/       # SarthakLoan React frontend
+├── schemesathi/       # SamarthLoan React frontend
 ├── api-server/        # Express API and prototype routing services
 └── mockup-sandbox/    # Isolated UI/mockup workspace
 lib/
@@ -85,7 +85,7 @@ PORT=3000 pnpm --filter @workspace/api-server dev
 
 ```bash
 PORT=5173 BASE_PATH=/ API_URL=http://localhost:3000 \
-  pnpm --filter @workspace/sarthakloan dev
+  pnpm --filter @workspace/samarthloan dev
 ```
 
 The Vite frontend proxies `/api` requests to `API_URL`; it defaults to `http://localhost:3000` when `API_URL` is omitted.
@@ -100,7 +100,7 @@ pnpm typecheck
 pnpm build
 
 # Build only the frontend
-pnpm --filter @workspace/sarthakloan build
+pnpm --filter @workspace/samarthloan build
 
 # Build only the API
 pnpm --filter @workspace/api-server build
@@ -134,7 +134,7 @@ curl 'http://localhost:3000/api/partners/eligible?schemeId=scheme-id&pincode=560
 
 ## How recommendations work
 
-SarthakLoan’s matching is intentionally deterministic and explainable:
+SamarthLoan’s matching is intentionally deterministic and explainable:
 
 | Recommendation | Scoring factors |
 | --- | --- |
