@@ -27,8 +27,8 @@ export function PartnerMap({ latitude, longitude, partners, selectedId, onSelect
       <iframe title="OpenStreetMap partner area" src={mapUrl} className="absolute inset-0 h-full w-full border-0" loading="lazy" />
       <div className="absolute left-3 top-3 rounded-xl bg-[hsl(var(--card)/.94)] px-3 py-2 text-xs font-bold shadow-sm"><MapPin size={14} className="mr-1 inline text-[hsl(var(--primary))]" />Your location</div>
       <div className="absolute bottom-3 left-3 right-3 flex flex-wrap gap-2" aria-label="Partner map markers">
-        {markerPartners.map((partner) => <button key={partner.id} type="button" onClick={() => onSelect(partner.id)} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold shadow-sm transition-transform hover:-translate-y-0.5 ${selectedId === partner.id ? 'border-[hsl(var(--accent))] bg-[hsl(var(--accent))]' : 'border-[hsl(var(--card))] bg-[hsl(var(--card)/.94)]'}`} aria-label={`Select ${partner.name}`}>
-          <Navigation size={12} className={partner.status === 'UNAVAILABLE' ? 'text-[hsl(var(--destructive))]' : partner.status === 'LIMITED' ? 'text-[hsl(var(--accent-foreground))]' : 'text-[hsl(var(--primary))]'} /> {partner.name} · {partner.distanceKm ?? '-'} km
+        {markerPartners.map((partner) => <button key={partner.id} type="button" onClick={() => onSelect(partner.id)} className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-bold shadow-sm transition-transform hover:-translate-y-0.5 ${selectedId === partner.id ? 'border-[hsl(var(--primary))] bg-[hsl(var(--accent))]' : 'border-[hsl(var(--card))] bg-[hsl(var(--card)/.94)]'}`} aria-label={`Select ${partner.name}`}>
+          <Navigation size={12} className={partner.status === 'UNAVAILABLE' ? 'text-[hsl(var(--destructive))]' : partner.status === 'LIMITED' ? 'text-[hsl(var(--warning))]' : 'text-[hsl(var(--success))]'} /> {partner.name} · {partner.distanceKm ?? '-'} km
         </button>)}
       </div>
     </div>
