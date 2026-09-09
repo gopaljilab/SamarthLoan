@@ -59,9 +59,13 @@ const getStored = <T,>(key: string, fallback: T): T => {
 const store = (key: string, value: unknown) => localStorage.setItem(key, JSON.stringify(value));
 
 function Logo() {
+  const { t } = useLanguage();
   return <Link href="/" className="flex items-center gap-2.5 group" data-testid="link-logo">
     <span className="grid h-9 w-9 place-items-center rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-sm group-hover:-rotate-3 transition-transform"><Landmark size={19} strokeWidth={2.4} /></span>
-    <span className="font-display text-[1.15rem] font-bold tracking-[-.04em]">Sarthak<span className="text-[hsl(var(--accent))]">Loan</span></span>
+    <span className="flex flex-col">
+      <span className="font-display text-[1.15rem] font-bold tracking-[-.04em]">Samarth<span className="text-[hsl(var(--accent))]">Loan</span></span>
+      <span className="hidden text-[9px] font-semibold leading-3 text-[hsl(var(--muted-foreground))] lg:block">{t('brandTagline')}</span>
+    </span>
   </Link>;
 }
 
