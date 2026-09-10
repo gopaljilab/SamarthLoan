@@ -37,11 +37,11 @@ const LanguageContext = createContext<{ lang: Language; setLang: (lang: Language
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [lang, setLang] = useState<Language>(() => {
-    const stored = localStorage.getItem('ss_lang') || '';
+    const stored = localStorage.getItem('samarthloan_language') || localStorage.getItem('ss_lang') || '';
     const candidate = legacyLanguageMap[stored] || stored;
     return candidate === 'hi' || candidate === 'kn' ? candidate : 'en';
   });
-  const change = (next: Language) => { setLang(next); localStorage.setItem('ss_lang', next); };
+  const change = (next: Language) => { setLang(next); localStorage.setItem('ss_lang', next); localStorage.setItem('samarthloan_language', next); };
   const value = useMemo(() => ({ lang, setLang: change, t: (key: string) => dictionaries[lang]?.[key] || english[key] || key }), [lang]);
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }
