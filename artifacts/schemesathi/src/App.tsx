@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+﻿import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "@/components/ui/toaster";
@@ -77,6 +77,7 @@ import {
   LanguageProvider,
   languageOptions,
   useLanguage,
+  translateMatchReason,
   translatePhrase,
   translateScheme,
   type Language,
@@ -1291,24 +1292,24 @@ function Recommendations() {
     <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
         <PageTitle
-          eyebrow="Your shortlist"
-          title="A match you can understand."
-          body={`Based on ${profile.name || "your answers"}’s stated need. Scores are guidance, not a promise of approval.`}
+          eyebrow={t("yourShortlist")}
+          title={t("yourShortlist")}
+          body={t("recommendationBody").replace("{name}", profile.name || t("yourAnswers"))}
         />
         <Link
           href="/eligibility"
           className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
           data-testid="link-edit-profile"
         >
-          <PencilLine size={15} /> Edit answers
+          <PencilLine size={15} /> {t("editAnswersLink")}
         </Link>
       </div>
       <div className="mb-7 flex flex-wrap items-center gap-3">
         <span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">
-          {profile.applicantType} · {profile.location}
+          {profile.applicantType === "Entrepreneur" ? t("entrepreneur") : t("student")} · {profile.location}
         </span>
         <span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">
-          {formatMoney(profile.loanRequired)} needed
+          {formatMoney(profile.loanRequired)} {t("neededLabel")}
         </span>
         <PrototypeBadge />
       </div>
@@ -1319,15 +1320,15 @@ function Recommendations() {
       </div>
       {!matches.length && (
         <EmptyState
-          title="No matches yet"
-          body="Complete the short eligibility conversation to see explainable matches."
+          title={t("noMatches")}
+          body={t("completeEligibility")}
           action={
             <Link
               href="/eligibility"
               className="inline-flex rounded-xl bg-[hsl(var(--primary))] px-4 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]"
               data-testid="link-complete-eligibility"
             >
-              Start eligibility
+              {t("startEligibility")}
             </Link>
           }
         />
@@ -1337,8 +1338,9 @@ function Recommendations() {
 }
 
 function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [open, setOpen] = useState(rank === 1);
+  const localizedMatch = translateScheme(lang, match);
   return (
     <article
       className={`rounded-2xl border bg-[hsl(var(--card))] p-5 transition-shadow md:p-6 ${rank === 1 ? "border-[hsl(var(--primary)/.4)] card-shadow" : "border-[hsl(var(--card-border))]"}`}
@@ -1351,19 +1353,19 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h2 className="font-display text-xl font-bold tracking-[-.03em]">
-              {match.name}
+              {localizedMatch.name}
             </h2>
             {rank === 1 && (
               <span className="rounded-full bg-[hsl(var(--accent))] px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
-                Best fit
+                {t("bestFitBadge")}
               </span>
             )}
           </div>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-[hsl(var(--muted-foreground))]">
-            {match.purpose}
+            {localizedMatch.purpose}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            {match.tags.slice(0, 3).map((tag) => (
+            {localizedMatch.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
                 className="rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-[11px] font-semibold"
@@ -1383,28 +1385,28 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
             </span>
           </div>
           <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
-            fit score
+            {t("fitScoreLabel")}
           </span>
         </div>
       </div>
       <div className="mt-5 grid gap-3 border-t border-[hsl(var(--border))] pt-5 sm:grid-cols-3">
         <div>
-          <p className="text-xs text-[hsl(var(--muted-foreground))]">Up to</p>
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">{t("upToLabel")}</p>
           <p className="mt-1 font-display font-bold">
             {formatMoney(match.maxLoan)}
           </p>
         </div>
         <div>
           <p className="text-xs text-[hsl(var(--muted-foreground))]">
-            Illustrative interest
+            {t("illustrativeInterestLabel")}
           </p>
-          <p className="mt-1 font-display font-bold">{match.interest}% p.a.</p>
+          <p className="mt-1 font-display font-bold">{match.interest}% {t("perYear")}</p>
         </div>
         <div>
           <p className="text-xs text-[hsl(var(--muted-foreground))]">
-            Repayment window
+            {t("repaymentWindowLabel")}
           </p>
-          <p className="mt-1 font-display font-bold">{match.tenure} years</p>
+          <p className="mt-1 font-display font-bold">{match.tenure} {t("years")}</p>
         </div>
       </div>
       <button
@@ -1422,13 +1424,13 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
       </button>
       {open && (
         <div className="mt-4 grid gap-3 rounded-xl bg-[hsl(var(--secondary)/.65)] p-4 sm:grid-cols-2">
-          {match.reasons.map((reason, i) => (
+          {match.reasons.map((reason) => (
             <div key={reason} className="flex gap-2 text-xs leading-5">
               <Check
                 size={14}
                 className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
               />
-              {reason}
+              {translateMatchReason(lang, reason)}
             </div>
           ))}
         </div>
@@ -1439,14 +1441,14 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
           className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-4 py-2.5 text-xs font-bold text-[hsl(var(--primary-foreground))]"
           data-testid={`link-view-scheme-${match.id}`}
         >
-          View scheme <ArrowRight size={14} />
+          {t("viewScheme")} <ArrowRight size={14} />
         </Link>
         <Link
           href={`/calculator?scheme=${match.id}`}
           className="inline-flex items-center gap-2 rounded-xl border border-[hsl(var(--border))] px-4 py-2.5 text-xs font-bold"
           data-testid={`link-calculate-${match.id}`}
         >
-          <Calculator size={14} /> Estimate EMI
+          <Calculator size={14} /> {t("estimateEMI")}
         </Link>
       </div>
     </article>
@@ -2197,7 +2199,7 @@ function Track() {
     getStored<Application | null>("ss_application", null)?.id || "",
   );
   const [searched, setSearched] = useState(false);
-  const query = useGetApplication(id, { query: { enabled: searched && Boolean(id) } });
+  const query = useGetApplication(id, { query: { enabled: searched && Boolean(id) } as any });
   const stored = getStored<Application | null>("ss_application", null);
   const app = (searched && query.data) || stored;
   const stages = [
