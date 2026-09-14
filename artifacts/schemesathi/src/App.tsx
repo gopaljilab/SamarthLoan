@@ -236,6 +236,14 @@ const partnersFallback: Partner[] = [
   },
 ];
 
+function getSchemeList(data: unknown): Scheme[] {
+  return Array.isArray(data) ? (data as Scheme[]) : schemesFallback;
+}
+
+function getPartnerList(data: unknown): Partner[] {
+  return Array.isArray(data) ? (data as Partner[]) : partnersFallback;
+}
+
 const demoApplicant: ApplicantProfile = {
   name: "Asha Kumari",
   applicantType: "Entrepreneur",
@@ -703,7 +711,7 @@ function Field({
 function Home() {
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
-  const schemes = useListSchemes().data || schemesFallback;
+  const schemes = getSchemeList(useListSchemes().data);
   const [matcherOpen, setMatcherOpen] = useState(false);
   const [matcherStep, setMatcherStep] = useState(0);
   const [goal, setGoal] = useState("business");
@@ -1457,7 +1465,7 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
 
 function Schemes() {
   const query = useListSchemes();
-  const schemes = query.data?.length ? query.data : schemesFallback;
+  const schemes = getSchemeList(query.data);
   const [search, setSearch] = useState("");
   const { lang, t } = useLanguage();
   const filtered = schemes.filter((scheme) => {
@@ -1855,7 +1863,7 @@ function CalculatorPage() {
 
 function LegacyPartnersOld() {
   const query = useListPartners();
-  const partners = query.data || partnersFallback;
+  const partners = getPartnerList(query.data);
   const profile = getStored("ss_profile", demoApplicant);
   const matches = partners.map(
     (p, i) =>
