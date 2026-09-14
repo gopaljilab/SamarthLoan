@@ -6,6 +6,8 @@ import {
   CreateApplicationBody,
 } from "@workspace/api-zod";
 import { getEligiblePartners, partners, partnerPolicy, resolvePincode, type UserLocation } from "../services/partner-routing";
+import { db, applications, emiCalculations, schemeRecommendations } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
 const router: IRouter = Router();
 
@@ -20,8 +22,6 @@ const schemes = [
   { id: "skill-support", name: "Skill Development Support", purpose: "Education support for vocational training and job-ready certification", maxLoan: 350000, interest: 5.5, moratorium: 12, tenure: 5, applicantType: "Student", tags: ["Skills", "Vocational", "Students"], isPrototypeData: true },
   { id: "green-equipment", name: "Green Enterprise Equipment Fund", purpose: "Finance for energy-efficient tools and environmentally responsible enterprises", maxLoan: 1200000, interest: 7.25, moratorium: 6, tenure: 7, applicantType: "Entrepreneur", tags: ["Green business", "Equipment"], isPrototypeData: true },
 ];
-
-const applications = new Map<string, Record<string, unknown>>();
 
 function scoreScheme(input: Record<string, unknown>, scheme: (typeof schemes)[number]) {
   const applicantType = String(input.applicantType);
@@ -52,6 +52,10 @@ router.get("/schemes/:id", (req, res) => {
 router.post("/schemes/recommend", (req, res) => {
   const input = RecommendSchemesBody.parse(req.body) as Record<string, unknown>;
   const matches = schemes.map((scheme) => scoreScheme(input, scheme)).filter(Boolean).sort((a, b) => (b?.score ?? 0) - (a?.score ?? 0));
+  const now = new Date().toISOString();
+  for (const match of matches) {
+    if (match) db.insert(schemeRecommendations).values({ id: crypto.randomUUID(), schemeId: match.id, matchScore: match.score, reasons: match.reasons, breakdown: match.breakdown, createdAt: now }).run();
+  }
   res.json(matches);
 });
 router.post("/calculator/emi", (req, res) => {
@@ -64,7 +68,9 @@ router.post("/calculator/emi", (req, res) => {
   const balanceAfterMoratorium = rate === 0 ? principal : principal * Math.pow(1 + rate, moratoriumMonths);
   const emi = rate === 0 ? balanceAfterMoratorium / repaymentMonths : balanceAfterMoratorium * rate * Math.pow(1 + rate, repaymentMonths) / (Math.pow(1 + rate, repaymentMonths) - 1);
   const totalRepayment = emi * repaymentMonths;
-  res.json({ emi: Math.round(emi), principal, totalInterest: Math.round(totalRepayment - principal), totalRepayment: Math.round(totalRepayment) });
+  const result = { emi: Math.round(emi), principal, totalInterest: Math.round(totalRepayment - principal), totalRepayment: Math.round(totalRepayment) };
+  db.insert(emiCalculations).values({ id: crypto.randomUUID(), ...input, emi: result.emi, totalInterest: result.totalInterest, totalRepayment: result.totalRepayment, createdAt: new Date().toISOString() }).run();
+  res.json(result);
 });
 router.get("/partners", (_req, res) => res.json(partners.map((partner) => ({
   ...partner, distance: 0, status: partner.acceptingApplications ? "Accepting" : "Unavailable",
@@ -92,15 +98,15 @@ router.post("/partners/recommend", (req, res) => {
 });
 router.post("/applications", (req, res) => {
   const input = CreateApplicationBody.parse(req.body);
-  const existing = [...applications.values()].find((application) => application.name === input.name && application.schemeId === input.schemeId && application.partnerId === input.partnerId);
+  const existing = db.select().from(applications).all().find((application) => application.name === input.name && application.schemeId === input.schemeId && application.partnerId === input.partnerId);
   if (existing) return res.status(200).json(existing);
   const id = `SS-26092-${Math.floor(1000 + Math.random() * 8999)}`;
-  const application = { ...input, id, status: "Partner Review", createdAt: new Date().toISOString() };
-  applications.set(id, application);
+  const application = { ...input, id, documents: input.documents ?? [], status: "Partner Review", createdAt: new Date().toISOString() };
+  db.insert(applications).values(application).run();
   return res.status(201).json(application);
 });
 router.get("/applications/:id", (req, res) => {
-  const application = applications.get(req.params.id);
+  const application = db.select().from(applications).where(eq(applications.id, req.params.id)).get();
   application ? res.json(application) : res.status(404).json({ error: "Application not found" });
 });
 router.get("/admin/analytics", (_req, res) => res.json({
