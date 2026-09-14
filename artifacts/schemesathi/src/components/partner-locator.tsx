@@ -12,10 +12,33 @@ type LocatedPartner = {
 };
 type LocatorResponse = { userLocation: { latitude: number; longitude: number }; recommendedPartnerId: string | null; partners: LocatedPartner[] };
 
+const prototypePartnerResponse = (): LocatorResponse => ({
+  userLocation: { latitude: 12.9716, longitude: 77.5946 },
+  recommendedPartnerId: 'p1',
+  partners: [
+    {
+      id: 'p1', name: 'Bengaluru Enterprise Support Centre', type: 'SCA',
+      latitude: 12.9716, longitude: 77.5946, distanceKm: 0, score: 89,
+      eligible: true, status: 'ELIGIBLE', fundUtilizationPercent: 72,
+      npaStatus: 'WITHIN_THRESHOLD', processingCapacityStatus: 'AVAILABLE',
+      eligibilityReasons: [],
+      reasons: ['Supports your selected scheme', 'Authorized channel partner', 'Fund utilization is within the configured threshold', 'NPA and overdue rates are within thresholds', 'Currently accepting applications', '0 km from your location', 'Processing capacity is available'],
+    },
+    {
+      id: 'p2', name: 'Karnataka Gramin Bank - Indiranagar', type: 'RRB',
+      latitude: 12.9784, longitude: 77.6408, distanceKm: 5.1, score: 78,
+      eligible: true, status: 'LIMITED', fundUtilizationPercent: 82,
+      npaStatus: 'WITHIN_THRESHOLD', processingCapacityStatus: 'AVAILABLE',
+      eligibilityReasons: [],
+      reasons: ['Supports your selected scheme', 'Authorized channel partner', 'Currently accepting applications', 'Processing capacity is available'],
+    },
+  ],
+});
+
 export default function PartnerLocator() {
   const { lang, t } = useLanguage();
   const [pincode, setPincode] = useState('560001');
-  const [data, setData] = useState<LocatorResponse | null>(null);
+  const [data, setData] = useState<LocatorResponse | null>(() => prototypePartnerResponse());
   const [selectedId, setSelectedId] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -29,8 +52,13 @@ export default function PartnerLocator() {
       const response = await fetch(`/api/partners/eligible?schemeId=${encodeURIComponent(schemeId)}&${query}`);
       if (!response.ok) throw new Error('Partner search failed');
       const result = await response.json() as LocatorResponse;
+      if (!Array.isArray(result.partners)) throw new Error('Partner search returned an invalid response');
       setData(result); setSelectedId(result.recommendedPartnerId || undefined);
-    } catch { setMessage('We could not load partner availability. Please try again.'); }
+    } catch {
+      const fallback = prototypePartnerResponse();
+      setData(fallback); setSelectedId(fallback.recommendedPartnerId || undefined);
+      setMessage('Live availability is unavailable. Showing prototype partner options.');
+    }
     finally { setLoading(false); }
   };
   const useCurrentLocation = () => {
