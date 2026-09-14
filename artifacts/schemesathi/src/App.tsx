@@ -1,222 +1,2757 @@
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import {
-  ArrowRight, ArrowUpRight, Banknote, BarChart3, BriefcaseBusiness, Calculator, Check,
-  ChevronDown, ChevronLeft, CircleHelp, Clock3, FileCheck2, FileText, Gauge, GraduationCap,
-  HandCoins, Languages, Landmark, LayoutDashboard, Lightbulb, LocateFixed, MapPin, Menu,
-  MessageCircle, Navigation, PanelLeft, PencilLine, Percent, Phone, Search, ShieldCheck,
-  Sparkles, UserRound, UsersRound, WalletCards, X, type LucideIcon
-} from 'lucide-react';
+  ArrowRight,
+  ArrowUpRight,
+  Banknote,
+  BarChart3,
+  BriefcaseBusiness,
+  Calculator,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  CircleHelp,
+  Clock3,
+  FileCheck2,
+  FileText,
+  Gauge,
+  GraduationCap,
+  HandCoins,
+  Languages,
+  Landmark,
+  LayoutDashboard,
+  Lightbulb,
+  LocateFixed,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Navigation,
+  PanelLeft,
+  PencilLine,
+  Percent,
+  Phone,
+  Search,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+  UsersRound,
+  WalletCards,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import {
-  useCalculateEmi, useCreateApplication, useGetAdminAnalytics, useGetApplication, useGetScheme,
-  useListPartners, useListSchemes, useRecommendPartners, useRecommendSchemes
-} from '@workspace/api-client-react';
+  useCalculateEmi,
+  useCreateApplication,
+  useGetAdminAnalytics,
+  useGetApplication,
+  useGetScheme,
+  useListPartners,
+  useListSchemes,
+  useRecommendPartners,
+  useRecommendSchemes,
+} from "@workspace/api-client-react";
 import type {
-  AdminAnalytics, ApplicantProfile, Application, EmiResult, Partner, PartnerMatch, Scheme, SchemeMatch
-} from '@workspace/api-client-react';
-import { Link, Route, Switch, useLocation, useParams, Router as WouterRouter } from 'wouter';
-import NotFound from '@/pages/not-found';
-import { default as LegacyPartners } from '@/components/partner-locator';
-import { LanguageProvider, languageOptions, useLanguage, translatePhrase, type Language } from './i18n';
+  AdminAnalytics,
+  ApplicantProfile,
+  Application,
+  EmiResult,
+  Partner,
+  PartnerMatch,
+  Scheme,
+  SchemeMatch,
+} from "@workspace/api-client-react";
+import {
+  Link,
+  Route,
+  Switch,
+  useLocation,
+  useParams,
+  Router as WouterRouter,
+} from "wouter";
+import NotFound from "@/pages/not-found";
+import { default as LegacyPartners } from "@/components/partner-locator";
+import {
+  LanguageProvider,
+  languageOptions,
+  useLanguage,
+  translatePhrase,
+  translateScheme,
+  type Language,
+} from "./i18n";
 
 const queryClient = new QueryClient();
 
 const schemesFallback: Scheme[] = [
-  { id: 'udyam-sakhi', name: 'Udyam Sakhi Starter Loan', purpose: 'For women building a first enterprise or growing a home-based business.', maxLoan: 150000, interest: 6.5, moratorium: 3, tenure: 5, applicantType: 'Entrepreneur', tags: ['Women-led', 'Micro enterprise', 'Starter'], isPrototypeData: true },
-  { id: 'vidya-vikas', name: 'Vidya Vikas Education Support', purpose: 'Flexible support for students investing in vocational or higher education.', maxLoan: 250000, interest: 4.5, moratorium: 12, tenure: 7, applicantType: 'Student', tags: ['Students', 'Education', 'Low interest'], isPrototypeData: true },
-  { id: 'kaushal-udyam', name: 'Kaushal Udyam Growth Credit', purpose: 'Working capital for skilled trades, local services and small production units.', maxLoan: 500000, interest: 8.25, moratorium: 6, tenure: 6, applicantType: 'Entrepreneur', tags: ['Skilled trade', 'Working capital', 'Growth'], isPrototypeData: true },
-  { id: 'jan-aajeevika', name: 'Jan Aajeevika Livelihood Fund', purpose: 'Patient capital for livelihood activities in rural and semi-urban communities.', maxLoan: 300000, interest: 7, moratorium: 6, tenure: 5, applicantType: 'Entrepreneur', tags: ['Livelihood', 'Rural', 'Community'], isPrototypeData: true },
-  { id: 'swasthya-seva', name: 'Swasthya Seva Enterprise Support', purpose: 'Capital for community health, care and wellness services.', maxLoan: 750000, interest: 7.75, moratorium: 6, tenure: 6, applicantType: 'Entrepreneur', tags: ['Health services', 'Enterprise'], isPrototypeData: true },
-  { id: 'digital-disha', name: 'Digital Disha Business Credit', purpose: 'Support for digital tools, devices and technology-led micro businesses.', maxLoan: 400000, interest: 8, moratorium: 3, tenure: 4, applicantType: 'Entrepreneur', tags: ['Digital', 'Technology', 'Micro business'], isPrototypeData: true },
-  { id: 'skill-shiksha', name: 'Skill Shiksha Course Support', purpose: 'Education support for vocational training and job-ready certification.', maxLoan: 350000, interest: 5.5, moratorium: 12, tenure: 5, applicantType: 'Student', tags: ['Skills', 'Vocational', 'Students'], isPrototypeData: true },
-  { id: 'green-udyam', name: 'Green Udyam Equipment Fund', purpose: 'Finance for energy-efficient tools and environmentally responsible enterprises.', maxLoan: 1200000, interest: 7.25, moratorium: 6, tenure: 7, applicantType: 'Entrepreneur', tags: ['Green business', 'Equipment'], isPrototypeData: true },
+  {
+    id: "udyam-sakhi",
+    name: "Udyam Sakhi Starter Loan",
+    purpose:
+      "For women building a first enterprise or growing a home-based business.",
+    maxLoan: 150000,
+    interest: 6.5,
+    moratorium: 3,
+    tenure: 5,
+    applicantType: "Entrepreneur",
+    tags: ["Women-led", "Micro enterprise", "Starter"],
+    isPrototypeData: true,
+  },
+  {
+    id: "vidya-vikas",
+    name: "Vidya Vikas Education Support",
+    purpose:
+      "Flexible support for students investing in vocational or higher education.",
+    maxLoan: 250000,
+    interest: 4.5,
+    moratorium: 12,
+    tenure: 7,
+    applicantType: "Student",
+    tags: ["Students", "Education", "Low interest"],
+    isPrototypeData: true,
+  },
+  {
+    id: "kaushal-udyam",
+    name: "Kaushal Udyam Growth Credit",
+    purpose:
+      "Working capital for skilled trades, local services and small production units.",
+    maxLoan: 500000,
+    interest: 8.25,
+    moratorium: 6,
+    tenure: 6,
+    applicantType: "Entrepreneur",
+    tags: ["Skilled trade", "Working capital", "Growth"],
+    isPrototypeData: true,
+  },
+  {
+    id: "jan-aajeevika",
+    name: "Jan Aajeevika Livelihood Fund",
+    purpose:
+      "Patient capital for livelihood activities in rural and semi-urban communities.",
+    maxLoan: 300000,
+    interest: 7,
+    moratorium: 6,
+    tenure: 5,
+    applicantType: "Entrepreneur",
+    tags: ["Livelihood", "Rural", "Community"],
+    isPrototypeData: true,
+  },
+  {
+    id: "swasthya-seva",
+    name: "Swasthya Seva Enterprise Support",
+    purpose: "Capital for community health, care and wellness services.",
+    maxLoan: 750000,
+    interest: 7.75,
+    moratorium: 6,
+    tenure: 6,
+    applicantType: "Entrepreneur",
+    tags: ["Health services", "Enterprise"],
+    isPrototypeData: true,
+  },
+  {
+    id: "digital-disha",
+    name: "Digital Disha Business Credit",
+    purpose:
+      "Support for digital tools, devices and technology-led micro businesses.",
+    maxLoan: 400000,
+    interest: 8,
+    moratorium: 3,
+    tenure: 4,
+    applicantType: "Entrepreneur",
+    tags: ["Digital", "Technology", "Micro business"],
+    isPrototypeData: true,
+  },
+  {
+    id: "skill-shiksha",
+    name: "Skill Shiksha Course Support",
+    purpose:
+      "Education support for vocational training and job-ready certification.",
+    maxLoan: 350000,
+    interest: 5.5,
+    moratorium: 12,
+    tenure: 5,
+    applicantType: "Student",
+    tags: ["Skills", "Vocational", "Students"],
+    isPrototypeData: true,
+  },
+  {
+    id: "green-udyam",
+    name: "Green Udyam Equipment Fund",
+    purpose:
+      "Finance for energy-efficient tools and environmentally responsible enterprises.",
+    maxLoan: 1200000,
+    interest: 7.25,
+    moratorium: 6,
+    tenure: 7,
+    applicantType: "Entrepreneur",
+    tags: ["Green business", "Equipment"],
+    isPrototypeData: true,
+  },
 ];
 
 const partnersFallback: Partner[] = [
-  { id: 'sahayata-hub', name: 'Sahayata Finance Hub', type: 'Community finance partner', distance: 2.4, supportedSchemes: ['udyam-sakhi', 'jan-aajeevika'], serviceArea: 'Bengaluru Urban', status: 'Open for intake', processingCapacity: 78, fundingAvailability: 63, address: '14, 2nd Cross, Jayanagar, Bengaluru', latitude: 12.93, longitude: 77.58 },
-  { id: 'pragati-kendra', name: 'Pragati Seva Kendra', type: 'District facilitation centre', distance: 5.8, supportedSchemes: ['udyam-sakhi', 'kaushal-udyam', 'jan-aajeevika'], serviceArea: 'Bengaluru & Ramanagara', status: 'Open for intake', processingCapacity: 61, fundingAvailability: 82, address: 'Near Taluk Office, Kengeri, Bengaluru', latitude: 12.91, longitude: 77.48 },
-  { id: 'vidya-setu', name: 'Vidya Setu Student Desk', type: 'Education finance desk', distance: 3.1, supportedSchemes: ['vidya-vikas'], serviceArea: 'Bengaluru Urban', status: 'Open for intake', processingCapacity: 88, fundingAvailability: 71, address: '6, Residency Road, Bengaluru', latitude: 12.97, longitude: 77.60 },
+  {
+    id: "sahayata-hub",
+    name: "Sahayata Finance Hub",
+    type: "Community finance partner",
+    distance: 2.4,
+    supportedSchemes: ["udyam-sakhi", "jan-aajeevika"],
+    serviceArea: "Bengaluru Urban",
+    status: "Open for intake",
+    processingCapacity: 78,
+    fundingAvailability: 63,
+    address: "14, 2nd Cross, Jayanagar, Bengaluru",
+    latitude: 12.93,
+    longitude: 77.58,
+  },
+  {
+    id: "pragati-kendra",
+    name: "Pragati Seva Kendra",
+    type: "District facilitation centre",
+    distance: 5.8,
+    supportedSchemes: ["udyam-sakhi", "kaushal-udyam", "jan-aajeevika"],
+    serviceArea: "Bengaluru & Ramanagara",
+    status: "Open for intake",
+    processingCapacity: 61,
+    fundingAvailability: 82,
+    address: "Near Taluk Office, Kengeri, Bengaluru",
+    latitude: 12.91,
+    longitude: 77.48,
+  },
+  {
+    id: "vidya-setu",
+    name: "Vidya Setu Student Desk",
+    type: "Education finance desk",
+    distance: 3.1,
+    supportedSchemes: ["vidya-vikas"],
+    serviceArea: "Bengaluru Urban",
+    status: "Open for intake",
+    processingCapacity: 88,
+    fundingAvailability: 71,
+    address: "6, Residency Road, Bengaluru",
+    latitude: 12.97,
+    longitude: 77.6,
+  },
 ];
 
-const demoApplicant: ApplicantProfile = { name: 'Asha Kumari', applicantType: 'Entrepreneur', age: 29, category: 'OBC', education: 'Diploma in tailoring', employment: 'Self-employed', income: 18000, purpose: 'Expand my tailoring studio', projectCost: 120000, loanRequired: 90000, location: 'Bengaluru, Karnataka' };
-const applicantChoices: [string, LucideIcon, string][] = [['Entrepreneur', BriefcaseBusiness, 'I want to start or grow a livelihood'], ['Student', GraduationCap, 'I need support for education']];
+const demoApplicant: ApplicantProfile = {
+  name: "Asha Kumari",
+  applicantType: "Entrepreneur",
+  age: 29,
+  category: "OBC",
+  education: "Diploma in tailoring",
+  employment: "Self-employed",
+  income: 18000,
+  purpose: "Expand my tailoring studio",
+  projectCost: 120000,
+  loanRequired: 90000,
+  location: "Bengaluru, Karnataka",
+};
+const applicantChoices: [string, LucideIcon, string][] = [
+  ["Entrepreneur", BriefcaseBusiness, "I want to start or grow a livelihood"],
+  ["Student", GraduationCap, "I need support for education"],
+];
 
 const fallbackAnalytics: AdminAnalytics = {
-  totalApplications: 248, matchedApplications: 221, routedApplications: 189, assistance: 18400000,
-  monthly: [{ month: 'Sep', applications: 24 }, { month: 'Oct', applications: 36 }, { month: 'Nov', applications: 43 }, { month: 'Dec', applications: 38 }, { month: 'Jan', applications: 52 }, { month: 'Feb', applications: 55 }],
-  demand: [{ name: 'Micro enterprise', value: 92 }, { name: 'Education', value: 61 }, { name: 'Livelihood', value: 48 }, { name: 'Skilled trade', value: 32 }],
-  status: [{ name: 'Routed', value: 189 }, { name: 'Matched', value: 32 }, { name: 'Review', value: 19 }, { name: 'Draft', value: 8 }],
-  partners: [{ name: 'Sahayata', applications: 78 }, { name: 'Pragati', applications: 59 }, { name: 'Vidya Setu', applications: 35 }, { name: 'Jan Saathi', applications: 17 }],
+  totalApplications: 248,
+  matchedApplications: 221,
+  routedApplications: 189,
+  assistance: 18400000,
+  monthly: [
+    { month: "Sep", applications: 24 },
+    { month: "Oct", applications: 36 },
+    { month: "Nov", applications: 43 },
+    { month: "Dec", applications: 38 },
+    { month: "Jan", applications: 52 },
+    { month: "Feb", applications: 55 },
+  ],
+  demand: [
+    { name: "Micro enterprise", value: 92 },
+    { name: "Education", value: 61 },
+    { name: "Livelihood", value: 48 },
+    { name: "Skilled trade", value: 32 },
+  ],
+  status: [
+    { name: "Routed", value: 189 },
+    { name: "Matched", value: 32 },
+    { name: "Review", value: 19 },
+    { name: "Draft", value: 8 },
+  ],
+  partners: [
+    { name: "Sahayata", applications: 78 },
+    { name: "Pragati", applications: 59 },
+    { name: "Vidya Setu", applications: 35 },
+    { name: "Jan Saathi", applications: 17 },
+  ],
 };
 
-const formatMoney = (value = 0) => `₹${Math.round(value).toLocaleString('en-IN')}`;
+const formatMoney = (value = 0) =>
+  `₹${Math.round(value).toLocaleString("en-IN")}`;
 const getStored = <T,>(key: string, fallback: T): T => {
-  try { return JSON.parse(localStorage.getItem(key) || '') as T; } catch { return fallback; }
+  try {
+    return JSON.parse(localStorage.getItem(key) || "") as T;
+  } catch {
+    return fallback;
+  }
 };
-const store = (key: string, value: unknown) => localStorage.setItem(key, JSON.stringify(value));
+const store = (key: string, value: unknown) =>
+  localStorage.setItem(key, JSON.stringify(value));
 
 function Logo() {
   const { t } = useLanguage();
-  return <Link href="/" className="flex items-center gap-2.5 group" data-testid="link-logo">
-    <span className="grid h-9 w-9 place-items-center rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-sm group-hover:-rotate-3 transition-transform"><Landmark size={19} strokeWidth={2.4} /></span>
-    <span className="flex flex-col">
-      <span className="font-display text-[1.15rem] font-bold tracking-[-.04em]">Samarth<span className="text-[hsl(var(--accent-foreground))]">Loan</span></span>
-      <span className="hidden text-[9px] font-semibold leading-3 text-[hsl(var(--muted-foreground))] lg:block">{t('brandTagline')}</span>
-    </span>
-  </Link>;
+  return (
+    <Link
+      href="/"
+      className="flex items-center gap-2.5 group"
+      data-testid="link-logo"
+    >
+      <span className="grid h-9 w-9 place-items-center rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-sm group-hover:-rotate-3 transition-transform">
+        <Landmark size={19} strokeWidth={2.4} />
+      </span>
+      <span className="flex flex-col">
+        <span className="font-display text-[1.15rem] font-bold tracking-[-.04em]">
+          Samarth
+          <span className="text-[hsl(var(--accent-foreground))]">Loan</span>
+        </span>
+        <span className="hidden text-[9px] font-semibold leading-3 text-[hsl(var(--muted-foreground))] lg:block">
+          {t("brandTagline")}
+        </span>
+      </span>
+    </Link>
+  );
 }
 
 function Shell({ children }: { children: ReactNode }) {
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
-  const isAdmin = location.startsWith('/admin');
+  const isAdmin = location.startsWith("/admin");
   const nav = isAdmin
-    ? [{ href: '/admin', label: t('overview'), icon: LayoutDashboard }, { href: '/admin/applications', label: t('applications'), icon: FileText }, { href: '/admin/partners', label: t('partners'), icon: UsersRound }, { href: '/admin/schemes', label: t('schemes'), icon: Landmark }, { href: '/admin/analytics', label: t('analytics'), icon: BarChart3 }]
-    : [{ href: '/', label: t('home'), icon: Sparkles }, { href: '/eligibility', label: t('find'), icon: CircleHelp }, { href: '/schemes', label: t('browse'), icon: Landmark }, { href: '/calculator', label: t('calculator'), icon: Calculator }, { href: '/partners', label: t('talkToSathi'), icon: MessageCircle }, { href: '/track', label: t('track'), icon: Navigation }];
-  return <div className="grain page-shell">
-    <header className="sticky top-0 z-30 border-b border-[hsl(var(--border))] bg-[hsl(var(--background)/.92)] backdrop-blur-md">
-      <div className="mx-auto flex h-[4.5rem] max-w-[1280px] items-center justify-between px-5 lg:px-8">
-         <div className="flex items-center gap-8"><Logo /><span className="hidden h-5 w-px bg-[hsl(var(--border))] lg:block" /><span className="hidden text-xs font-semibold uppercase tracking-[.18em] text-[hsl(var(--muted-foreground))] lg:block">{isAdmin ? t('authority') : t('public')}</span></div>
-        <div className="hidden items-center gap-2 md:flex">
-           <div role="group" aria-label={t('language')} className="flex rounded-lg border border-[hsl(var(--border))] p-1">{languageOptions.map(option => <button type="button" key={option.code} onClick={() => setLang(option.code)} aria-pressed={lang === option.code} className={`rounded-md px-2 py-1 text-xs font-bold transition-colors ${lang === option.code ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))]'}`}>{option.label}</button>)}</div>
-           <Link href="/application" className="ml-2 flex items-center gap-2 rounded-lg bg-[hsl(var(--accent))] px-4 py-2.5 text-sm font-bold text-[hsl(var(--accent-foreground))] shadow-sm hover:-translate-y-0.5 transition-transform" data-testid="link-start-application">{t('start')} <ArrowUpRight size={15} /></Link>
+    ? [
+        { href: "/admin", label: t("overview"), icon: LayoutDashboard },
+        {
+          href: "/admin/applications",
+          label: t("applications"),
+          icon: FileText,
+        },
+        { href: "/admin/partners", label: t("partners"), icon: UsersRound },
+        { href: "/admin/schemes", label: t("schemes"), icon: Landmark },
+        { href: "/admin/analytics", label: t("analytics"), icon: BarChart3 },
+      ]
+    : [
+        { href: "/", label: t("home"), icon: Sparkles },
+        { href: "/eligibility", label: t("find"), icon: CircleHelp },
+        { href: "/schemes", label: t("browse"), icon: Landmark },
+        { href: "/calculator", label: t("calculator"), icon: Calculator },
+        { href: "/partners", label: t("talkToSathi"), icon: MessageCircle },
+        { href: "/track", label: t("track"), icon: Navigation },
+      ];
+  return (
+    <div className="grain page-shell">
+      <header className="sticky top-0 z-30 border-b border-[hsl(var(--border))] bg-[hsl(var(--background)/.92)] backdrop-blur-md">
+        <div className="mx-auto flex h-[4.5rem] max-w-[1280px] items-center justify-between px-5 lg:px-8">
+          <div className="flex items-center gap-8">
+            <Logo />
+            <span className="hidden h-5 w-px bg-[hsl(var(--border))] lg:block" />
+            <span className="hidden text-xs font-semibold uppercase tracking-[.18em] text-[hsl(var(--muted-foreground))] lg:block">
+              {isAdmin ? t("authority") : t("public")}
+            </span>
+          </div>
+          <div className="hidden items-center gap-2 md:flex">
+            <div
+              role="group"
+              aria-label={t("language")}
+              className="flex rounded-lg border border-[hsl(var(--border))] p-1"
+            >
+              {languageOptions.map((option) => (
+                <button
+                  type="button"
+                  key={option.code}
+                  onClick={() => setLang(option.code)}
+                  aria-pressed={lang === option.code}
+                  className={`rounded-md px-2 py-1 text-xs font-bold transition-colors ${lang === option.code ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]" : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))]"}`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <Link
+              href="/application"
+              className="ml-2 flex items-center gap-2 rounded-lg bg-[hsl(var(--accent))] px-4 py-2.5 text-sm font-bold text-[hsl(var(--accent-foreground))] shadow-sm hover:-translate-y-0.5 transition-transform"
+              data-testid="link-start-application"
+            >
+              {t("start")} <ArrowUpRight size={15} />
+            </Link>
+          </div>
+          <div className="flex items-center gap-1 md:hidden">
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value as Language)}
+              aria-label={t("language")}
+              className="max-w-[92px] rounded-lg bg-transparent px-1 py-2 text-xs font-semibold text-[hsl(var(--muted-foreground))]"
+              data-testid="select-language-mobile"
+            >
+              {languageOptions.map((option) => (
+                <option key={option.code} value={option.code}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              className="rounded-lg p-2"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Open menu"
+              data-testid="button-open-menu"
+            >
+              {mobileOpen ? <X size={21} /> : <Menu size={21} />}
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-1 md:hidden"><select value={lang} onChange={e => setLang(e.target.value as Language)} aria-label={t('language')} className="max-w-[92px] rounded-lg bg-transparent px-1 py-2 text-xs font-semibold text-[hsl(var(--muted-foreground))]" data-testid="select-language-mobile">{languageOptions.map(option => <option key={option.code} value={option.code}>{option.label}</option>)}</select><button className="rounded-lg p-2" onClick={() => setMobileOpen(!mobileOpen)} aria-label="Open menu" data-testid="button-open-menu">{mobileOpen ? <X size={21} /> : <Menu size={21} />}</button></div>
+        {mobileOpen && (
+          <nav className="border-t border-[hsl(var(--border))] px-5 py-3 md:hidden">
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold hover:bg-[hsl(var(--secondary))]"
+                data-testid={`link-mobile-${item.label.toLowerCase().replaceAll(" ", "-")}`}
+              >
+                <item.icon size={17} />
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        )}
+      </header>
+      <div className="mx-auto flex max-w-[1440px]">
+        <aside className="hidden w-[232px] shrink-0 border-r border-[hsl(var(--border))] px-4 py-7 lg:block">
+          <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[.2em] text-[hsl(var(--muted-foreground))]">
+            {isAdmin ? t("manage") : t("explore")}
+          </p>
+          <nav className="space-y-1">
+            {nav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${location === item.href ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]" : "text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"}`}
+                data-testid={`link-nav-${item.label.toLowerCase().replaceAll(" ", "-")}`}
+              >
+                <item.icon
+                  size={17}
+                  strokeWidth={location === item.href ? 2.5 : 2}
+                />
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <div className="mt-10 rounded-2xl bg-[hsl(var(--secondary))] p-4">
+            <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--card))] text-[hsl(var(--primary))]">
+              <MessageCircle size={16} />
+            </div>
+            <p className="font-display text-sm font-bold">{t("needHelp")}</p>
+            <p className="mt-1 text-xs leading-5 text-[hsl(var(--muted-foreground))]">
+              {t("helpBody")}
+            </p>
+            <button
+              type="button"
+              onClick={() => setLocation("/partners")}
+              className="mt-3 text-xs font-bold text-[hsl(var(--primary))] hover:underline"
+              data-testid="button-contact-help"
+            >
+              {t("talkToSathi")}{" "}
+              <ArrowRight size={13} className="ml-1 inline" />
+            </button>
+          </div>
+        </aside>
+        <main className="min-w-0 flex-1">{children}</main>
       </div>
-      {mobileOpen && <nav className="border-t border-[hsl(var(--border))] px-5 py-3 md:hidden">{nav.map(item => <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)} className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold hover:bg-[hsl(var(--secondary))]" data-testid={`link-mobile-${item.label.toLowerCase().replaceAll(' ', '-')}`}><item.icon size={17} />{item.label}</Link>)}</nav>}
-    </header>
-    <div className="mx-auto flex max-w-[1440px]">
-      <aside className="hidden w-[232px] shrink-0 border-r border-[hsl(var(--border))] px-4 py-7 lg:block">
-         <p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[.2em] text-[hsl(var(--muted-foreground))]">{isAdmin ? t('manage') : t('explore')}</p>
-        <nav className="space-y-1">{nav.map(item => <Link key={item.href} href={item.href} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors ${location === item.href ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]' : 'text-[hsl(var(--muted-foreground))] hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]'}`} data-testid={`link-nav-${item.label.toLowerCase().replaceAll(' ', '-')}`}><item.icon size={17} strokeWidth={location === item.href ? 2.5 : 2} />{item.label}</Link>)}</nav>
-        <div className="mt-10 rounded-2xl bg-[hsl(var(--secondary))] p-4"><div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-[hsl(var(--card))] text-[hsl(var(--primary))]"><MessageCircle size={16} /></div><p className="font-display text-sm font-bold">{t('needHelp')}</p><p className="mt-1 text-xs leading-5 text-[hsl(var(--muted-foreground))]">{t('helpBody')}</p><button type="button" onClick={() => setLocation('/partners')} className="mt-3 text-xs font-bold text-[hsl(var(--primary))] hover:underline" data-testid="button-contact-help">{t('talkToSathi')} <ArrowRight size={13} className="ml-1 inline" /></button></div>
-      </aside>
-      <main className="min-w-0 flex-1">{children}</main>
+      <footer className="mx-auto flex max-w-[1280px] flex-col gap-3 border-t border-[hsl(var(--border))] px-5 pb-24 pt-7 text-xs text-[hsl(var(--muted-foreground))] sm:flex-row sm:items-center sm:justify-between lg:px-8">
+        <span>{t("footer1")}</span>
+        <span>{t("footer2")}</span>
+      </footer>
+      <SathiWidget />
     </div>
-     <footer className="mx-auto flex max-w-[1280px] flex-col gap-3 border-t border-[hsl(var(--border))] px-5 pb-24 pt-7 text-xs text-[hsl(var(--muted-foreground))] sm:flex-row sm:items-center sm:justify-between lg:px-8"><span>SamarthLoan prototype · Built for clearer public finance</span><span>Information is illustrative. Final approval rests with the partner.</span></footer>
-     <SathiWidget />
-  </div>;
+  );
 }
 
-function SathiWidget() { const [open, setOpen] = useState(false); const { t } = useLanguage(); const [, setLocation] = useLocation(); const actions = [{ label: t('findCta'), href: '/eligibility' }, { label: t('calculator'), href: '/calculator' }, { label: t('browse'), href: '/schemes' }, { label: t('partners'), href: '/partners' }]; return <div className="fixed bottom-5 right-5 z-40"><div className={`mb-3 w-[min(21rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-xl transition-all ${open ? 'opacity-100' : 'pointer-events-none max-h-0 opacity-0'}`} aria-hidden={!open}><div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3"><strong className="font-display">{t('talkToSathi')}</strong><button onClick={() => setOpen(false)} aria-label="Close Sathi help" className="rounded-md p-1 hover:bg-[hsl(var(--secondary))]"><X size={18} /></button></div><div className="p-4"><p className="text-sm text-[hsl(var(--muted-foreground))]">Choose a quick next step. Sathi provides guided links, not automated advice.</p><div className="mt-4 grid gap-2">{actions.map(action => <button key={action.href} onClick={() => { setOpen(false); setLocation(action.href); }} className="flex items-center justify-between rounded-xl border border-[hsl(var(--border))] px-3 py-3 text-left text-sm font-semibold hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--accent)/.45)]">{action.label}<ArrowRight size={15} /></button>)}</div></div></div><button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-controls="sathi-quick-help" className="ml-auto flex items-center gap-2 rounded-full bg-[hsl(var(--primary))] px-4 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))] shadow-lg hover:-translate-y-0.5 transition-transform" data-testid="button-sathi"><MessageCircle size={18} /> {t('talkToSathi')}</button></div>; }
+function SathiWidget() {
+  const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  const actions = [
+    { label: t("findCta"), href: "/eligibility" },
+    { label: t("calculator"), href: "/calculator" },
+    { label: t("browse"), href: "/schemes" },
+    { label: t("partners"), href: "/partners" },
+  ];
+  return (
+    <div className="fixed bottom-5 right-5 z-40">
+      <div
+        className={`mb-3 w-[min(21rem,calc(100vw-2.5rem))] overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-xl transition-all ${open ? "opacity-100" : "pointer-events-none max-h-0 opacity-0"}`}
+        aria-hidden={!open}
+      >
+        <div className="flex items-center justify-between border-b border-[hsl(var(--border))] px-4 py-3">
+          <strong className="font-display">{t("talkToSathi")}</strong>
+          <button
+            onClick={() => setOpen(false)}
+            aria-label="Close Sathi help"
+            className="rounded-md p-1 hover:bg-[hsl(var(--secondary))]"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        <div className="p-4">
+          <p className="text-sm text-[hsl(var(--muted-foreground))]">
+            {t("quickHelpBody")}
+          </p>
+          <div className="mt-4 grid gap-2">
+            {actions.map((action) => (
+              <button
+                key={action.href}
+                onClick={() => {
+                  setOpen(false);
+                  setLocation(action.href);
+                }}
+                className="flex items-center justify-between rounded-xl border border-[hsl(var(--border))] px-3 py-3 text-left text-sm font-semibold hover:border-[hsl(var(--primary))] hover:bg-[hsl(var(--accent)/.45)]"
+              >
+                {action.label}
+                <ArrowRight size={15} />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        aria-expanded={open}
+        aria-controls="sathi-quick-help"
+        className="ml-auto flex items-center gap-2 rounded-full bg-[hsl(var(--primary))] px-4 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))] shadow-lg hover:-translate-y-0.5 transition-transform"
+        data-testid="button-sathi"
+      >
+        <MessageCircle size={18} /> {t("talkToSathi")}
+      </button>
+    </div>
+  );
+}
 
 function DocumentTitle() {
   const [route] = useLocation();
   useEffect(() => {
     const titles: Record<string, string> = {
-      '/': 'SamarthLoan — Smart Credit & Scheme Navigator',
-      '/recommendations': 'SamarthLoan — Scheme Recommendation',
-      '/calculator': 'SamarthLoan — EMI Calculator',
-      '/partners': 'SamarthLoan — Find Eligible Partner',
-      '/find-partner': 'SamarthLoan — Find Eligible Partner',
+      "/": "SamarthLoan — Smart Credit & Scheme Navigator",
+      "/recommendations": "SamarthLoan — Scheme Recommendation",
+      "/calculator": "SamarthLoan — EMI Calculator",
+      "/partners": "SamarthLoan — Find Eligible Partner",
+      "/find-partner": "SamarthLoan — Find Eligible Partner",
     };
-    document.title = titles[route] || 'SamarthLoan — Smart Credit & Scheme Navigator';
+    document.title =
+      titles[route] || "SamarthLoan — Smart Credit & Scheme Navigator";
   }, [route]);
   return null;
 }
 
-function Eyebrow({ children }: { children: ReactNode }) { return <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[hsl(var(--primary))]"><span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent))]" />{children}</p>; }
-function PageTitle({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) { const { lang } = useLanguage(); return <div className="mb-8 slide-up"><Eyebrow>{translatePhrase(lang, eyebrow)}</Eyebrow><h1 className="max-w-3xl font-display text-4xl font-bold leading-[1.08] tracking-[-.055em] text-balance md:text-5xl">{translatePhrase(lang, title)}</h1>{body && <p className="mt-4 max-w-2xl text-base leading-7 text-[hsl(var(--muted-foreground))]">{translatePhrase(lang, body)}</p>}</div>; }
-function PrototypeBadge() { const { t } = useLanguage(); return <span className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--accent)/.45)] bg-[hsl(var(--accent)/.15)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-[hsl(var(--accent-foreground))]"><Sparkles size={11} /> {t('prototype')}</span>; }
-function Skeleton({ className = '' }: { className?: string }) { return <div className={`animate-pulse rounded-lg bg-[hsl(var(--muted))] ${className}`} />; }
-function Stat({ label, value, detail, icon: Icon }: { label: string; value: string; detail: string; icon: LucideIcon }) { return <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-5 card-shadow"><div className="flex items-center justify-between"><span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">{label}</span><Icon size={17} className="text-[hsl(var(--primary))]" /></div><p className="mt-4 font-display text-2xl font-bold tracking-[-.04em]">{value}</p><p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{detail}</p></div>; }
-function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) { return <div className="rounded-2xl border border-dashed border-[hsl(var(--border))] bg-[hsl(var(--card)/.6)] p-10 text-center"><div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]"><CircleHelp size={22} /></div><h3 className="font-display text-lg font-bold">{title}</h3><p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[hsl(var(--muted-foreground))]">{body}</p>{action && <div className="mt-5">{action}</div>}</div>; }
-function Button({ children, secondary = false, className = '', ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { secondary?: boolean }) { return <button {...props} className={`${secondary ? 'border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))]' : 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:-translate-y-0.5'} inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-transform disabled:cursor-not-allowed disabled:opacity-50 ${className}`}>{children}</button>; }
-function Field({ label, value, onChange, type = 'text', placeholder, required = false }: { label: string; value: string | number; onChange: (v: string) => void; type?: string; placeholder?: string; required?: boolean }) { return <label className="block text-sm font-semibold"><span className="mb-2 block">{label}{required && <span className="text-[hsl(var(--destructive))]"> *</span>}</span><input required={required} type={type} value={value} placeholder={placeholder} onChange={e => onChange(e.target.value)} className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm outline-none transition-colors placeholder:text-[hsl(var(--muted-foreground)/.7)] focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary)/.15)]" data-testid={`input-${label.toLowerCase().replaceAll(' ', '-')}`} /></label>; }
-
-function Home() { 
-  const { t } = useLanguage(); const [, setLocation] = useLocation(); const schemes = useListSchemes().data || schemesFallback;
-  const [matcherOpen, setMatcherOpen] = useState(false); const [matcherStep, setMatcherStep] = useState(0); const [goal, setGoal] = useState('business'); const [type, setType] = useState<'Entrepreneur' | 'Student'>('Entrepreneur'); const [amount, setAmount] = useState(100000); const [months, setMonths] = useState(36); const recommend = useRecommendSchemes();
-  const monthlyRate = 6.5 / 1200; const emi = Math.round(amount * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1)); const possible = schemes.filter(s => amount <= s.maxLoan).length;
-  const startMatcher = () => { const profile = { ...demoApplicant, applicantType: type, purpose: goal === 'education' ? 'Education' : goal === 'self' ? 'Self-employment activity' : 'Start or grow a business', loanRequired: amount, projectCost: amount }; store('ss_profile', profile); recommend.mutate({ data: profile }, { onSuccess: matches => { store('ss_matches', matches); setLocation('/recommendations'); }, onError: () => { store('ss_matches', fallbackMatches(profile)); setLocation('/recommendations'); } }); };
-  const steps = [{ n: '01', icon: UserRound, title: t('tell'), body: t('tellBody'), detail: t('takes2Mins') }, { n: '02', icon: Lightbulb, title: t('why'), body: t('whyBody'), detail: t('seeReasons') }, { n: '03', icon: Navigation, title: t('route'), body: t('routeBody'), detail: t('chooseNearby') }];
-  return <div className="px-5 py-8 lg:px-12 lg:py-12"><section className="relative overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-6 py-10 shadow-[0_22px_60px_rgba(37,99,235,.09)] md:px-12 md:py-14"><div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border-[40px] border-[hsl(var(--accent)/.8)]" /><div className="relative grid gap-9 lg:grid-cols-[1.12fr_.88fr] lg:items-center"><div className="max-w-3xl slide-up"><div className="mb-6 flex flex-wrap gap-3"><span className="rounded-full bg-[hsl(var(--accent))] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.15em] text-[hsl(var(--accent-foreground))]">{t('brandTagline')}</span><span className="text-xs text-[hsl(var(--muted-foreground))]">{t('forPeople')}</span></div><h1 className="font-display text-5xl font-bold leading-[.98] tracking-[-.07em] md:text-7xl">{t('heroTitle')}<br /><span className="text-[hsl(var(--primary))]">{t('heroAccent')}</span></h1><p className="mt-6 max-w-xl text-base leading-7 text-[hsl(var(--muted-foreground))] md:text-lg">Discover suitable schemes, understand what may fit, estimate repayment, and find the right channel partner.</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><button onClick={() => { setMatcherOpen(true); setMatcherStep(0); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3.5 text-sm font-bold text-[hsl(var(--primary-foreground))] hover:-translate-y-0.5 transition-transform" data-testid="button-find-scheme">{t('findCta')} <ArrowRight size={17} /></button><Link href="/schemes" className="inline-flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--primary)/.45)] bg-[hsl(var(--card))] px-5 py-3.5 text-sm font-bold text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))]">{t('browse')} <Navigation size={16} /></Link></div><div className="mt-7 flex max-w-xl items-start gap-3 rounded-xl bg-[hsl(var(--accent)/.55)] p-3 text-xs leading-5 text-[hsl(var(--muted-foreground))]"><ShieldCheck size={17} className="mt-0.5 shrink-0 text-[hsl(var(--primary))]" />{t('noIdentity')}</div></div><div className="relative mx-auto w-full max-w-sm rounded-2xl border border-[hsl(var(--primary)/.18)] bg-[hsl(var(--accent)/.46)] p-6 shadow-sm"><div className="flex items-center justify-between"><span className="grid h-11 w-11 place-items-center rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]"><Calculator size={21} /></span><span className="rounded-full bg-[hsl(var(--card))] px-3 py-1 text-[11px] font-bold text-[hsl(var(--success-foreground))]">Quick estimate</span></div><label className="mt-7 block text-sm font-bold">Loan amount <span className="float-right text-[hsl(var(--primary))]">{formatMoney(amount)}</span><input aria-label="Loan amount" type="range" min="10000" max="1000000" step="10000" value={amount} onChange={e => setAmount(Number(e.target.value))} className="mt-3 w-full accent-[hsl(var(--primary))]" /></label><label className="mt-5 block text-sm font-bold">Repayment period <span className="float-right text-[hsl(var(--primary))]">{months} months</span><input aria-label="Repayment period" type="range" min="12" max="84" step="12" value={months} onChange={e => setMonths(Number(e.target.value))} className="mt-3 w-full accent-[hsl(var(--primary))]" /></label><div className="mt-6 rounded-xl bg-[hsl(var(--card))] p-4"><p className="text-xs text-[hsl(var(--muted-foreground))]">Estimated monthly repayment</p><p className="mt-1 font-display text-2xl font-bold text-[hsl(var(--primary))]">{formatMoney(emi)} <span className="text-sm">/ month</span></p><p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">Based on your amount, {possible} schemes may fit. <Link href="/eligibility" className="font-bold text-[hsl(var(--primary))]">View matches →</Link></p></div></div></div></section><section className="grid gap-4 py-14 md:grid-cols-3">{steps.map(step => <button key={step.n} type="button" onClick={() => setMatcherOpen(true)} className="group rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-[hsl(var(--primary))] hover:shadow-md focus:-translate-y-1 focus:border-[hsl(var(--primary))]"><div className="flex items-center justify-between"><span className="font-mono text-xs font-bold text-[hsl(var(--primary))]">{step.n}</span><step.icon size={19} className="text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))]" /></div><h2 className="mt-6 font-display text-xl font-bold">{step.title}</h2><p className="mt-2 text-sm leading-6 text-[hsl(var(--muted-foreground))]">{step.body}</p><p className="mt-4 text-xs font-bold text-[hsl(var(--primary))]">→ {step.detail}</p></button>)}</section><section className="grid gap-8 border-t border-[hsl(var(--border))] py-12 md:grid-cols-[1.15fr_.85fr] md:items-center"><div><Eyebrow>Start where you are</Eyebrow><h2 className="font-display text-3xl font-bold tracking-[-.05em] md:text-4xl">Clarity is a service.</h2><p className="mt-4 max-w-lg text-sm leading-7 text-[hsl(var(--muted-foreground))]">Your first conversation should not require financial vocabulary.</p></div><div className="rounded-2xl bg-[hsl(var(--secondary))] p-6"><p className="text-xs font-bold uppercase tracking-[.16em] text-[hsl(var(--primary))]">Prototype promise</p><p className="mt-3 font-display text-xl font-semibold leading-snug">Clearer choices. Simpler next steps. Better access to the right financial route.</p><Link href="/calculator" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]">See the repayment calculator <ArrowRight size={15} /></Link></div></section>{matcherOpen && <div role="dialog" aria-modal="true" aria-label="Find matching schemes" className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4"><div className="w-full max-w-lg rounded-2xl bg-[hsl(var(--card))] p-6 shadow-2xl"><div className="flex justify-between"><div><p className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--primary))]">Quick scheme matcher</p><h2 className="mt-1 font-display text-2xl font-bold">{matcherStep === 0 ? 'What are you looking for?' : matcherStep === 1 ? 'What best describes you?' : 'What amount do you need?'}</h2></div><button onClick={() => setMatcherOpen(false)} aria-label="Close scheme matcher" className="rounded-lg p-2 hover:bg-[hsl(var(--secondary))]"><X size={20} /></button></div><div className="mt-6">{matcherStep === 0 && <div className="grid gap-2">{[['business','Start or grow a business'],['education','Education'],['self','Small/self-employment activity'],['other','Other']].map(([value,label]) => <button key={value} onClick={() => setGoal(value)} className={`rounded-xl border p-4 text-left text-sm font-bold ${goal === value ? 'border-[hsl(var(--primary))] bg-[hsl(var(--accent))]' : 'border-[hsl(var(--border))]'}`}>{label}</button>)}</div>}{matcherStep === 1 && <div className="grid gap-2 sm:grid-cols-2">{(['Student','Entrepreneur'] as const).map(value => <button key={value} onClick={() => setType(value)} className={`rounded-xl border p-5 text-left font-bold ${type === value ? 'border-[hsl(var(--primary))] bg-[hsl(var(--accent))]' : 'border-[hsl(var(--border))]'}`}>{value}</button>)}</div>}{matcherStep === 2 && <label className="block text-sm font-bold">Loan amount<input type="number" min="1000" value={amount} onChange={e => setAmount(Number(e.target.value))} className="mt-3 w-full rounded-xl border border-[hsl(var(--input))] p-3" /><span className="mt-3 block text-xs font-normal text-[hsl(var(--muted-foreground))]">Potential matches only; final eligibility depends on the full assessment.</span></label>}</div><div className="mt-7 flex justify-between"><Button secondary onClick={() => matcherStep ? setMatcherStep(matcherStep - 1) : setMatcherOpen(false)}>{matcherStep ? 'Back' : 'Cancel'}</Button><Button onClick={() => matcherStep < 2 ? setMatcherStep(matcherStep + 1) : startMatcher()} disabled={recommend.isPending}>{recommend.isPending ? 'Finding…' : matcherStep < 2 ? 'Continue' : 'Find matching schemes'} <ArrowRight size={16} /></Button></div></div></div>}</div>;
+function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <p className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.19em] text-[hsl(var(--primary))]">
+      <span className="h-1.5 w-1.5 rounded-full bg-[hsl(var(--accent))]" />
+      {children}
+    </p>
+  );
+}
+function PageTitle({
+  eyebrow,
+  title,
+  body,
+}: {
+  eyebrow: string;
+  title: string;
+  body?: string;
+}) {
+  const { lang } = useLanguage();
+  return (
+    <div className="mb-8 slide-up">
+      <Eyebrow>{translatePhrase(lang, eyebrow)}</Eyebrow>
+      <h1 className="max-w-3xl font-display text-4xl font-bold leading-[1.08] tracking-[-.055em] text-balance md:text-5xl">
+        {translatePhrase(lang, title)}
+      </h1>
+      {body && (
+        <p className="mt-4 max-w-2xl text-base leading-7 text-[hsl(var(--muted-foreground))]">
+          {translatePhrase(lang, body)}
+        </p>
+      )}
+    </div>
+  );
+}
+function PrototypeBadge() {
+  const { t } = useLanguage();
+  return (
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--accent)/.45)] bg-[hsl(var(--accent)/.15)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-[hsl(var(--accent-foreground))]">
+      <Sparkles size={11} /> {t("prototype")}
+    </span>
+  );
+}
+function Skeleton({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`animate-pulse rounded-lg bg-[hsl(var(--muted))] ${className}`}
+    />
+  );
+}
+function Stat({
+  label,
+  value,
+  detail,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-5 card-shadow">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
+          {label}
+        </span>
+        <Icon size={17} className="text-[hsl(var(--primary))]" />
+      </div>
+      <p className="mt-4 font-display text-2xl font-bold tracking-[-.04em]">
+        {value}
+      </p>
+      <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+        {detail}
+      </p>
+    </div>
+  );
+}
+function EmptyState({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  action?: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-dashed border-[hsl(var(--border))] bg-[hsl(var(--card)/.6)] p-10 text-center">
+      <div className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-full bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]">
+        <CircleHelp size={22} />
+      </div>
+      <h3 className="font-display text-lg font-bold">{title}</h3>
+      <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+        {body}
+      </p>
+      {action && <div className="mt-5">{action}</div>}
+    </div>
+  );
+}
+function Button({
+  children,
+  secondary = false,
+  className = "",
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & { secondary?: boolean }) {
+  return (
+    <button
+      {...props}
+      className={`${secondary ? "border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))]" : "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:-translate-y-0.5"} inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold transition-transform disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+    >
+      {children}
+    </button>
+  );
+}
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  placeholder,
+  required = false,
+}: {
+  label: string;
+  value: string | number;
+  onChange: (v: string) => void;
+  type?: string;
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <label className="block text-sm font-semibold">
+      <span className="mb-2 block">
+        {label}
+        {required && <span className="text-[hsl(var(--destructive))]"> *</span>}
+      </span>
+      <input
+        required={required}
+        type={type}
+        value={value}
+        placeholder={placeholder}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm outline-none transition-colors placeholder:text-[hsl(var(--muted-foreground)/.7)] focus:border-[hsl(var(--primary))] focus:ring-2 focus:ring-[hsl(var(--primary)/.15)]"
+        data-testid={`input-${label.toLowerCase().replaceAll(" ", "-")}`}
+      />
+    </label>
+  );
 }
 
- function Eligibility() { 
+function Home() {
+  const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  const schemes = useListSchemes().data || schemesFallback;
+  const [matcherOpen, setMatcherOpen] = useState(false);
+  const [matcherStep, setMatcherStep] = useState(0);
+  const [goal, setGoal] = useState("business");
+  const [type, setType] = useState<"Entrepreneur" | "Student">("Entrepreneur");
+  const [amount, setAmount] = useState(100000);
+  const [months, setMonths] = useState(36);
+  const recommend = useRecommendSchemes();
+  const monthlyRate = 6.5 / 1200;
+  const emi = Math.round(
+    (amount * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+      (Math.pow(1 + monthlyRate, months) - 1),
+  );
+  const possible = schemes.filter((s) => amount <= s.maxLoan).length;
+  const startMatcher = () => {
+    const profile = {
+      ...demoApplicant,
+      applicantType: type,
+      purpose:
+        goal === "education"
+          ? "Education"
+          : goal === "self"
+            ? "Self-employment activity"
+            : "Start or grow a business",
+      loanRequired: amount,
+      projectCost: amount,
+    };
+    store("ss_profile", profile);
+    recommend.mutate(
+      { data: profile },
+      {
+        onSuccess: (matches) => {
+          store("ss_matches", matches);
+          setLocation("/recommendations");
+        },
+        onError: () => {
+          store("ss_matches", fallbackMatches(profile));
+          setLocation("/recommendations");
+        },
+      },
+    );
+  };
+  const steps = [
+    {
+      n: "01",
+      icon: UserRound,
+      title: t("tell"),
+      body: t("tellBody"),
+      detail: t("takes2Mins"),
+    },
+    {
+      n: "02",
+      icon: Lightbulb,
+      title: t("why"),
+      body: t("whyBody"),
+      detail: t("seeReasons"),
+    },
+    {
+      n: "03",
+      icon: Navigation,
+      title: t("route"),
+      body: t("routeBody"),
+      detail: t("chooseNearby"),
+    },
+  ];
+  return (
+    <div className="px-5 py-8 lg:px-12 lg:py-12">
+      <section className="relative overflow-hidden rounded-[2rem] border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-6 py-10 shadow-[0_22px_60px_rgba(37,99,235,.09)] md:px-12 md:py-14">
+        <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full border-[40px] border-[hsl(var(--accent)/.8)]" />
+        <div className="relative grid gap-9 lg:grid-cols-[1.12fr_.88fr] lg:items-center">
+          <div className="max-w-3xl slide-up">
+            <div className="mb-6 flex flex-wrap gap-3">
+              <span className="rounded-full bg-[hsl(var(--accent))] px-3 py-1.5 text-[11px] font-bold uppercase tracking-[.15em] text-[hsl(var(--accent-foreground))]">
+                {t("brandTagline")}
+              </span>
+              <span className="text-xs text-[hsl(var(--muted-foreground))]">
+                {t("forPeople")}
+              </span>
+            </div>
+            <h1 className="font-display text-5xl font-bold leading-[.98] tracking-[-.07em] md:text-7xl">
+              {t("heroTitle")}
+              <br />
+              <span className="text-[hsl(var(--primary))]">
+                {t("heroAccent")}
+              </span>
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-[hsl(var(--muted-foreground))] md:text-lg">
+              {t("heroBody")}
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => {
+                  setMatcherOpen(true);
+                  setMatcherStep(0);
+                }}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3.5 text-sm font-bold text-[hsl(var(--primary-foreground))] hover:-translate-y-0.5 transition-transform"
+                data-testid="button-find-scheme"
+              >
+                {t("findCta")} <ArrowRight size={17} />
+              </button>
+              <Link
+                href="/schemes"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--primary)/.45)] bg-[hsl(var(--card))] px-5 py-3.5 text-sm font-bold text-[hsl(var(--primary))] hover:bg-[hsl(var(--accent))]"
+              >
+                {t("browse")} <Navigation size={16} />
+              </Link>
+            </div>
+            <div className="mt-7 flex max-w-xl items-start gap-3 rounded-xl bg-[hsl(var(--accent)/.55)] p-3 text-xs leading-5 text-[hsl(var(--muted-foreground))]">
+              <ShieldCheck
+                size={17}
+                className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
+              />
+              {t("noIdentity")}
+            </div>
+          </div>
+          <div className="relative mx-auto w-full max-w-sm rounded-2xl border border-[hsl(var(--primary)/.18)] bg-[hsl(var(--accent)/.46)] p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <span className="grid h-11 w-11 place-items-center rounded-xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]">
+                <Calculator size={21} />
+              </span>
+              <span className="rounded-full bg-[hsl(var(--card))] px-3 py-1 text-[11px] font-bold text-[hsl(var(--success-foreground))]">
+                {t("quickEstimate")}
+              </span>
+            </div>
+            <label className="mt-7 block text-sm font-bold">
+              {t("loanAmountLabel")} {" "}
+              <span className="float-right text-[hsl(var(--primary))]">
+                {formatMoney(amount)}
+              </span>
+              <input
+                aria-label={t("loanAmountLabel")}
+                type="range"
+                min="10000"
+                max="1000000"
+                step="10000"
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                className="mt-3 w-full accent-[hsl(var(--primary))]"
+              />
+            </label>
+            <label className="mt-5 block text-sm font-bold">
+                {t("repaymentPeriod")} {" "}
+              <span className="float-right text-[hsl(var(--primary))]">
+                {months} {t("monthsShort")}
+              </span>
+              <input
+                aria-label={t("repaymentPeriod")}
+                type="range"
+                min="12"
+                max="84"
+                step="12"
+                value={months}
+                onChange={(e) => setMonths(Number(e.target.value))}
+                className="mt-3 w-full accent-[hsl(var(--primary))]"
+              />
+            </label>
+            <div className="mt-6 rounded-xl bg-[hsl(var(--card))] p-4">
+              <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                {t("estimatedMonthlyRepayment")}
+              </p>
+              <p className="mt-1 font-display text-2xl font-bold text-[hsl(var(--primary))]">
+                {formatMoney(emi)} <span className="text-sm">/ {t("monthsShort")}</span>
+              </p>
+              <p className="mt-2 text-xs text-[hsl(var(--muted-foreground))]">
+                {t("basedOnAmount").replace("{count}", String(possible))}{" "}
+                <Link
+                  href="/eligibility"
+                  className="font-bold text-[hsl(var(--primary))]"
+                >
+                  {t("viewMatches")} →
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="grid gap-4 py-14 md:grid-cols-3">
+        {steps.map((step) => (
+          <button
+            key={step.n}
+            type="button"
+            onClick={() => setMatcherOpen(true)}
+            className="group rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-5 text-left transition-all duration-200 hover:-translate-y-1 hover:border-[hsl(var(--primary))] hover:shadow-md focus:-translate-y-1 focus:border-[hsl(var(--primary))]"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-mono text-xs font-bold text-[hsl(var(--primary))]">
+                {step.n}
+              </span>
+              <step.icon
+                size={19}
+                className="text-[hsl(var(--muted-foreground))] group-hover:text-[hsl(var(--primary))]"
+              />
+            </div>
+            <h2 className="mt-6 font-display text-xl font-bold">
+              {step.title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+              {step.body}
+            </p>
+            <p className="mt-4 text-xs font-bold text-[hsl(var(--primary))]">
+              → {step.detail}
+            </p>
+          </button>
+        ))}
+      </section>
+      <section className="grid gap-8 border-t border-[hsl(var(--border))] py-12 md:grid-cols-[1.15fr_.85fr] md:items-center">
+        <div>
+          <Eyebrow>{t("startWhereYouAre")}</Eyebrow>
+          <h2 className="font-display text-3xl font-bold tracking-[-.05em] md:text-4xl">
+            {t("clarityService")}
+          </h2>
+          <p className="mt-4 max-w-lg text-sm leading-7 text-[hsl(var(--muted-foreground))]">
+            {t("firstConversation")}
+          </p>
+        </div>
+        <div className="rounded-2xl bg-[hsl(var(--secondary))] p-6">
+          <p className="text-xs font-bold uppercase tracking-[.16em] text-[hsl(var(--primary))]">
+            {t("prototypePromise")}
+          </p>
+          <p className="mt-3 font-display text-xl font-semibold leading-snug">
+            {t("clearerChoices")}
+          </p>
+          <Link
+            href="/calculator"
+            className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
+          >
+            {t("seeRepayment")} <ArrowRight size={15} />
+          </Link>
+        </div>
+      </section>
+      {matcherOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Find matching schemes"
+          className="fixed inset-0 z-50 grid place-items-center bg-slate-950/45 p-4"
+        >
+          <div className="w-full max-w-lg rounded-2xl bg-[hsl(var(--card))] p-6 shadow-2xl">
+            <div className="flex justify-between">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--primary))]">
+                  Quick scheme matcher
+                </p>
+                <h2 className="mt-1 font-display text-2xl font-bold">
+                  {matcherStep === 0
+                    ? "What are you looking for?"
+                    : matcherStep === 1
+                      ? "What best describes you?"
+                      : "What amount do you need?"}
+                </h2>
+              </div>
+              <button
+                onClick={() => setMatcherOpen(false)}
+                aria-label="Close scheme matcher"
+                className="rounded-lg p-2 hover:bg-[hsl(var(--secondary))]"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="mt-6">
+              {matcherStep === 0 && (
+                <div className="grid gap-2">
+                  {[
+                    ["business", "Start or grow a business"],
+                    ["education", "Education"],
+                    ["self", "Small/self-employment activity"],
+                    ["other", "Other"],
+                  ].map(([value, label]) => (
+                    <button
+                      key={value}
+                      onClick={() => setGoal(value)}
+                      className={`rounded-xl border p-4 text-left text-sm font-bold ${goal === value ? "border-[hsl(var(--primary))] bg-[hsl(var(--accent))]" : "border-[hsl(var(--border))]"}`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {matcherStep === 1 && (
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(["Student", "Entrepreneur"] as const).map((value) => (
+                    <button
+                      key={value}
+                      onClick={() => setType(value)}
+                      className={`rounded-xl border p-5 text-left font-bold ${type === value ? "border-[hsl(var(--primary))] bg-[hsl(var(--accent))]" : "border-[hsl(var(--border))]"}`}
+                    >
+                      {value}
+                    </button>
+                  ))}
+                </div>
+              )}
+              {matcherStep === 2 && (
+                <label className="block text-sm font-bold">
+                  Loan amount
+                  <input
+                    type="number"
+                    min="1000"
+                    value={amount}
+                    onChange={(e) => setAmount(Number(e.target.value))}
+                    className="mt-3 w-full rounded-xl border border-[hsl(var(--input))] p-3"
+                  />
+                  <span className="mt-3 block text-xs font-normal text-[hsl(var(--muted-foreground))]">
+                    Potential matches only; final eligibility depends on the
+                    full assessment.
+                  </span>
+                </label>
+              )}
+            </div>
+            <div className="mt-7 flex justify-between">
+              <Button
+                secondary
+                onClick={() =>
+                  matcherStep
+                    ? setMatcherStep(matcherStep - 1)
+                    : setMatcherOpen(false)
+                }
+              >
+                {matcherStep ? "Back" : "Cancel"}
+              </Button>
+              <Button
+                onClick={() =>
+                  matcherStep < 2
+                    ? setMatcherStep(matcherStep + 1)
+                    : startMatcher()
+                }
+                disabled={recommend.isPending}
+              >
+                {recommend.isPending
+                  ? "Finding…"
+                  : matcherStep < 2
+                    ? "Continue"
+                    : "Find matching schemes"}{" "}
+                <ArrowRight size={16} />
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Eligibility() {
   const { t } = useLanguage();
   const [step, setStep] = useState(0);
-  const [profile, setProfile] = useState<ApplicantProfile>(getStored('ss_profile', demoApplicant));
+  const [profile, setProfile] = useState<ApplicantProfile>(
+    getStored("ss_profile", demoApplicant),
+  );
   const [, setLocation] = useLocation();
   const recommend = useRecommendSchemes();
-  const update = (key: keyof ApplicantProfile, value: string | number) => setProfile(p => ({ ...p, [key]: value }));
-  const next = () => { if (step < 3) setStep(step + 1); else { store('ss_profile', profile); recommend.mutate({ data: profile }, { onSuccess: matches => { store('ss_matches', matches); setLocation('/recommendations'); }, onError: () => { const matches = fallbackMatches(profile); store('ss_matches', matches); setLocation('/recommendations'); } }); } };
-   return <div className="mx-auto max-w-4xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="A short conversation" title={t('eligibilityTitle')} body="Answer what you know. You can change anything later. This is a guidance prototype, not an approval decision." /><div className="mb-8 flex items-center gap-2">{[0, 1, 2, 3].map(n => <div key={n} className={`h-1.5 flex-1 rounded-full ${n <= step ? 'bg-[hsl(var(--accent))]' : 'bg-[hsl(var(--muted))]'}`} />)}</div><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-9">
-    {step === 0 && <div className="slide-up"><Eyebrow>{t('aboutYou')}</Eyebrow><h2 className="font-display text-2xl font-bold">{t('stepPath')}</h2><div className="mt-6 grid gap-3 sm:grid-cols-2">{applicantChoices.map(([value, Icon]) => <button key={value} onClick={() => update('applicantType', value)} className={`rounded-xl border p-5 text-left transition-all ${profile.applicantType === value ? 'border-[hsl(var(--primary))] bg-[hsl(var(--primary)/.08)]' : 'border-[hsl(var(--border))] hover:border-[hsl(var(--primary)/.5)]'}`} data-testid={`button-type-${value}`}><span className="flex items-center justify-between"><span className="grid h-10 w-10 place-items-center rounded-lg bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]"><Icon size={20} /></span>{profile.applicantType === value && <Check size={18} className="text-[hsl(var(--primary))]" />}</span><strong className="mt-5 block font-display text-lg">{value === 'Entrepreneur' ? t('entrepreneur') : t('student')}</strong><span className="mt-1 block text-sm text-[hsl(var(--muted-foreground))]">{value === 'Entrepreneur' ? t('entrepreneurBody') : t('studentBody')}</span></button>)}</div></div>}
-    {step === 1 && <div className="slide-up"><Eyebrow>{t('situation')}</Eyebrow><h2 className="font-display text-2xl font-bold">{t('stepSituation')}</h2><div className="mt-7 grid gap-5 sm:grid-cols-2"><Field label={t('yourName')} value={profile.name || ''} onChange={v => update('name', v)} placeholder={t('yourName')} /><Field label={t('age')} type="number" value={profile.age} onChange={v => update('age', Number(v))} /><Field label={t('socialCategory')} value={profile.category} onChange={v => update('category', v)} /><Field label={t('monthlyIncome')} type="number" value={profile.income} onChange={v => update('income', Number(v))} /><Field label={t('educationSkill')} value={profile.education || ''} onChange={v => update('education', v)} /><Field label={t('workSituation')} value={profile.employment || ''} onChange={v => update('employment', v)} /></div></div>}
-    {step === 2 && <div className="slide-up"><Eyebrow>{t('yourNeed')}</Eyebrow><h2 className="font-display text-2xl font-bold">{t('stepNeed')}</h2><div className="mt-7 space-y-5"><Field label={t('purpose')} value={profile.purpose} onChange={v => update('purpose', v)} /><div className="grid gap-5 sm:grid-cols-2"><Field label={t('projectCost')} type="number" value={profile.projectCost || ''} onChange={v => update('projectCost', Number(v))} /><Field label={t('loanAmount')} type="number" value={profile.loanRequired} onChange={v => update('loanRequired', Number(v))} /></div></div></div>}
-    {step === 3 && <div className="slide-up"><Eyebrow>{t('yourPlace')}</Eyebrow><h2 className="font-display text-2xl font-bold">{t('stepPlace')}</h2><p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">{t('locationBody')}</p><div className="mt-7 max-w-md"><Field label={t('cityLocation')} value={profile.location} onChange={v => update('location', v)} required /></div><div className="mt-7 flex items-start gap-3 rounded-xl bg-[hsl(var(--secondary))] p-4 text-sm leading-6"><ShieldCheck size={18} className="mt-1 shrink-0 text-[hsl(var(--primary))]" />{t('noIdentity')}</div></div>}
-     <div className="mt-9 flex justify-between border-t border-[hsl(var(--border))] pt-6"><Button secondary={step === 0} onClick={() => step > 0 ? setStep(step - 1) : setLocation('/')}><ChevronLeft size={16} /> {step === 0 ? t('backHome') : t('back')}</Button><Button onClick={next} disabled={recommend.isPending || (step === 3 && !profile.location)}>{recommend.isPending ? t('finding') : step === 3 ? t('showMatches') : t('continue')} {!recommend.isPending && <ArrowRight size={16} />}</Button></div>
-  </div></div>;
+  const update = (key: keyof ApplicantProfile, value: string | number) =>
+    setProfile((p) => ({ ...p, [key]: value }));
+  const next = () => {
+    if (step < 3) setStep(step + 1);
+    else {
+      store("ss_profile", profile);
+      recommend.mutate(
+        { data: profile },
+        {
+          onSuccess: (matches) => {
+            store("ss_matches", matches);
+            setLocation("/recommendations");
+          },
+          onError: () => {
+            const matches = fallbackMatches(profile);
+            store("ss_matches", matches);
+            setLocation("/recommendations");
+          },
+        },
+      );
+    }
+  };
+  return (
+    <div className="mx-auto max-w-4xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="A short conversation"
+        title={t("eligibilityTitle")}
+        body={t("eligibilityGuidance")}
+      />
+      <div className="mb-8 flex items-center gap-2">
+        {[0, 1, 2, 3].map((n) => (
+          <div
+            key={n}
+            className={`h-1.5 flex-1 rounded-full ${n <= step ? "bg-[hsl(var(--accent))]" : "bg-[hsl(var(--muted))]"}`}
+          />
+        ))}
+      </div>
+      <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-9">
+        {step === 0 && (
+          <div className="slide-up">
+            <Eyebrow>{t("aboutYou")}</Eyebrow>
+            <h2 className="font-display text-2xl font-bold">{t("stepPath")}</h2>
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {applicantChoices.map(([value, Icon]) => (
+                <button
+                  key={value}
+                  onClick={() => update("applicantType", value)}
+                  className={`rounded-xl border p-5 text-left transition-all ${profile.applicantType === value ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary)/.08)]" : "border-[hsl(var(--border))] hover:border-[hsl(var(--primary)/.5)]"}`}
+                  data-testid={`button-type-${value}`}
+                >
+                  <span className="flex items-center justify-between">
+                    <span className="grid h-10 w-10 place-items-center rounded-lg bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]">
+                      <Icon size={20} />
+                    </span>
+                    {profile.applicantType === value && (
+                      <Check size={18} className="text-[hsl(var(--primary))]" />
+                    )}
+                  </span>
+                  <strong className="mt-5 block font-display text-lg">
+                    {value === "Entrepreneur"
+                      ? t("entrepreneur")
+                      : t("student")}
+                  </strong>
+                  <span className="mt-1 block text-sm text-[hsl(var(--muted-foreground))]">
+                    {value === "Entrepreneur"
+                      ? t("entrepreneurBody")
+                      : t("studentBody")}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {step === 1 && (
+          <div className="slide-up">
+            <Eyebrow>{t("situation")}</Eyebrow>
+            <h2 className="font-display text-2xl font-bold">
+              {t("stepSituation")}
+            </h2>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2">
+              <Field
+                label={t("yourName")}
+                value={profile.name || ""}
+                onChange={(v) => update("name", v)}
+                placeholder={t("yourName")}
+              />
+              <Field
+                label={t("age")}
+                type="number"
+                value={profile.age}
+                onChange={(v) => update("age", Number(v))}
+              />
+              <Field
+                label={t("socialCategory")}
+                value={profile.category}
+                onChange={(v) => update("category", v)}
+              />
+              <Field
+                label={t("monthlyIncome")}
+                type="number"
+                value={profile.income}
+                onChange={(v) => update("income", Number(v))}
+              />
+              <Field
+                label={t("educationSkill")}
+                value={profile.education || ""}
+                onChange={(v) => update("education", v)}
+              />
+              <Field
+                label={t("workSituation")}
+                value={profile.employment || ""}
+                onChange={(v) => update("employment", v)}
+              />
+            </div>
+          </div>
+        )}
+        {step === 2 && (
+          <div className="slide-up">
+            <Eyebrow>{t("yourNeed")}</Eyebrow>
+            <h2 className="font-display text-2xl font-bold">{t("stepNeed")}</h2>
+            <div className="mt-7 space-y-5">
+              <Field
+                label={t("purpose")}
+                value={profile.purpose}
+                onChange={(v) => update("purpose", v)}
+              />
+              <div className="grid gap-5 sm:grid-cols-2">
+                <Field
+                  label={t("projectCost")}
+                  type="number"
+                  value={profile.projectCost || ""}
+                  onChange={(v) => update("projectCost", Number(v))}
+                />
+                <Field
+                  label={t("loanAmount")}
+                  type="number"
+                  value={profile.loanRequired}
+                  onChange={(v) => update("loanRequired", Number(v))}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        {step === 3 && (
+          <div className="slide-up">
+            <Eyebrow>{t("yourPlace")}</Eyebrow>
+            <h2 className="font-display text-2xl font-bold">
+              {t("stepPlace")}
+            </h2>
+            <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">
+              {t("locationBody")}
+            </p>
+            <div className="mt-7 max-w-md">
+              <Field
+                label={t("cityLocation")}
+                value={profile.location}
+                onChange={(v) => update("location", v)}
+                required
+              />
+            </div>
+            <div className="mt-7 flex items-start gap-3 rounded-xl bg-[hsl(var(--secondary))] p-4 text-sm leading-6">
+              <ShieldCheck
+                size={18}
+                className="mt-1 shrink-0 text-[hsl(var(--primary))]"
+              />
+              {t("noIdentity")}
+            </div>
+          </div>
+        )}
+        <div className="mt-9 flex justify-between border-t border-[hsl(var(--border))] pt-6">
+          <Button
+            secondary={step === 0}
+            onClick={() => (step > 0 ? setStep(step - 1) : setLocation("/"))}
+          >
+            <ChevronLeft size={16} /> {step === 0 ? t("backHome") : t("back")}
+          </Button>
+          <Button
+            onClick={next}
+            disabled={recommend.isPending || (step === 3 && !profile.location)}
+          >
+            {recommend.isPending
+              ? t("finding")
+              : step === 3
+                ? t("showMatches")
+                : t("continue")}{" "}
+            {!recommend.isPending && <ArrowRight size={16} />}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function fallbackMatches(profile: ApplicantProfile): SchemeMatch[] {
-  return schemesFallback.map((scheme, i) => ({ ...scheme, score: scheme.applicantType === profile.applicantType ? 92 - i * 8 : 61 - i * 5, reasons: [scheme.applicantType === profile.applicantType ? `Designed for ${profile.applicantType.toLowerCase()} applicants` : 'May support your stated purpose', profile.loanRequired <= scheme.maxLoan ? 'Requested amount is within the scheme limit' : 'Requested amount is above the illustrative limit', `${scheme.interest}% illustrative interest keeps repayment visible`], breakdown: { 'Applicant type': scheme.applicantType === profile.applicantType ? 40 : 19, 'Loan fit': profile.loanRequired <= scheme.maxLoan ? 32 : 12, 'Purpose': 20, 'Location': 8 } })).sort((a, b) => b.score - a.score);
+  return schemesFallback
+    .map((scheme, i) => ({
+      ...scheme,
+      score:
+        scheme.applicantType === profile.applicantType
+          ? 92 - i * 8
+          : 61 - i * 5,
+      reasons: [
+        scheme.applicantType === profile.applicantType
+          ? `Designed for ${profile.applicantType.toLowerCase()} applicants`
+          : "May support your stated purpose",
+        profile.loanRequired <= scheme.maxLoan
+          ? "Requested amount is within the scheme limit"
+          : "Requested amount is above the illustrative limit",
+        `${scheme.interest}% illustrative interest keeps repayment visible`,
+      ],
+      breakdown: {
+        "Applicant type":
+          scheme.applicantType === profile.applicantType ? 40 : 19,
+        "Loan fit": profile.loanRequired <= scheme.maxLoan ? 32 : 12,
+        Purpose: 20,
+        Location: 8,
+      },
+    }))
+    .sort((a, b) => b.score - a.score);
 }
 
-function Recommendations() { const { t } = useLanguage(); 
-  const [storedMatches, setStoredMatches] = useState<SchemeMatch[]>(getStored('ss_matches', []));
-  const profile = getStored('ss_profile', demoApplicant);
+function Recommendations() {
+  const { t } = useLanguage();
+  const [storedMatches, setStoredMatches] = useState<SchemeMatch[]>(
+    getStored("ss_matches", []),
+  );
+  const profile = getStored("ss_profile", demoApplicant);
   const schemesQuery = useListSchemes();
-  const matches = storedMatches.length ? storedMatches : fallbackMatches(profile);
-  useEffect(() => { if (schemesQuery.data && storedMatches.length === 0) setStoredMatches(fallbackMatches(profile)); }, [schemesQuery.data]);
-  return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14"><div className="flex flex-col justify-between gap-5 md:flex-row md:items-end"><PageTitle eyebrow="Your shortlist" title="A match you can understand." body={`Based on ${profile.name || 'your answers'}’s stated need. Scores are guidance, not a promise of approval.`} /><Link href="/eligibility" className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]" data-testid="link-edit-profile"><PencilLine size={15} /> Edit answers</Link></div><div className="mb-7 flex flex-wrap items-center gap-3"><span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">{profile.applicantType} · {profile.location}</span><span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">{formatMoney(profile.loanRequired)} needed</span><PrototypeBadge /></div><div className="space-y-5">{matches.map((match, index) => <MatchCard key={match.id} match={match} rank={index + 1} />)}</div>{!matches.length && <EmptyState title="No matches yet" body="Complete the short eligibility conversation to see explainable matches." action={<Link href="/eligibility" className="inline-flex rounded-xl bg-[hsl(var(--primary))] px-4 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]" data-testid="link-complete-eligibility">Start eligibility</Link>} />}</div>;
+  const matches = storedMatches.length
+    ? storedMatches
+    : fallbackMatches(profile);
+  useEffect(() => {
+    if (schemesQuery.data && storedMatches.length === 0)
+      setStoredMatches(fallbackMatches(profile));
+  }, [schemesQuery.data]);
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+        <PageTitle
+          eyebrow="Your shortlist"
+          title="A match you can understand."
+          body={`Based on ${profile.name || "your answers"}’s stated need. Scores are guidance, not a promise of approval.`}
+        />
+        <Link
+          href="/eligibility"
+          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
+          data-testid="link-edit-profile"
+        >
+          <PencilLine size={15} /> Edit answers
+        </Link>
+      </div>
+      <div className="mb-7 flex flex-wrap items-center gap-3">
+        <span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">
+          {profile.applicantType} · {profile.location}
+        </span>
+        <span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">
+          {formatMoney(profile.loanRequired)} needed
+        </span>
+        <PrototypeBadge />
+      </div>
+      <div className="space-y-5">
+        {matches.map((match, index) => (
+          <MatchCard key={match.id} match={match} rank={index + 1} />
+        ))}
+      </div>
+      {!matches.length && (
+        <EmptyState
+          title="No matches yet"
+          body="Complete the short eligibility conversation to see explainable matches."
+          action={
+            <Link
+              href="/eligibility"
+              className="inline-flex rounded-xl bg-[hsl(var(--primary))] px-4 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+              data-testid="link-complete-eligibility"
+            >
+              Start eligibility
+            </Link>
+          }
+        />
+      )}
+    </div>
+  );
 }
 
-function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) { const { t } = useLanguage();  const [open, setOpen] = useState(rank === 1); return <article className={`rounded-2xl border bg-[hsl(var(--card))] p-5 transition-shadow md:p-6 ${rank === 1 ? 'border-[hsl(var(--primary)/.4)] card-shadow' : 'border-[hsl(var(--card-border))]'}`} data-testid={`card-match-${match.id}`}><div className="flex flex-col gap-5 md:flex-row md:items-start"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--primary))] font-display text-lg font-bold text-[hsl(var(--primary-foreground))]">{rank}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><h2 className="font-display text-xl font-bold tracking-[-.03em]">{match.name}</h2>{rank === 1 && <span className="rounded-full bg-[hsl(var(--accent))] px-2 py-1 text-[10px] font-bold uppercase tracking-wider">Best fit</span>}</div><p className="mt-2 max-w-2xl text-sm leading-6 text-[hsl(var(--muted-foreground))]">{match.purpose}</p><div className="mt-4 flex flex-wrap gap-2">{match.tags.slice(0, 3).map(tag => <span key={tag} className="rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-[11px] font-semibold">{tag}</span>)}</div></div><div className="flex items-center gap-4 md:block md:text-right"><div><span className="font-display text-3xl font-bold text-[hsl(var(--primary))]">{Math.round(match.score)}</span><span className="ml-1 text-xs text-[hsl(var(--muted-foreground))]">/ 100</span></div><span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">fit score</span></div></div><div className="mt-5 grid gap-3 border-t border-[hsl(var(--border))] pt-5 sm:grid-cols-3"><div><p className="text-xs text-[hsl(var(--muted-foreground))]">Up to</p><p className="mt-1 font-display font-bold">{formatMoney(match.maxLoan)}</p></div><div><p className="text-xs text-[hsl(var(--muted-foreground))]">Illustrative interest</p><p className="mt-1 font-display font-bold">{match.interest}% p.a.</p></div><div><p className="text-xs text-[hsl(var(--muted-foreground))]">Repayment window</p><p className="mt-1 font-display font-bold">{match.tenure} years</p></div></div><button onClick={() => setOpen(!open)} className="mt-5 flex items-center gap-2 text-xs font-bold text-[hsl(var(--primary))]" data-testid={`button-explain-${match.id}`}>{open ? t('hideWhyFits') : t('showWhyFits')}<ChevronDown size={15} className={open ? 'rotate-180 transition-transform' : 'transition-transform'} /></button>{open && <div className="mt-4 grid gap-3 rounded-xl bg-[hsl(var(--secondary)/.65)] p-4 sm:grid-cols-2">{match.reasons.map((reason, i) => <div key={reason} className="flex gap-2 text-xs leading-5"><Check size={14} className="mt-0.5 shrink-0 text-[hsl(var(--primary))]" />{reason}</div>)}</div>}<div className="mt-5 flex flex-wrap gap-3"><Link href={`/schemes/${match.id}`} className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-4 py-2.5 text-xs font-bold text-[hsl(var(--primary-foreground))]" data-testid={`link-view-scheme-${match.id}`}>View scheme <ArrowRight size={14} /></Link><Link href={`/calculator?scheme=${match.id}`} className="inline-flex items-center gap-2 rounded-xl border border-[hsl(var(--border))] px-4 py-2.5 text-xs font-bold" data-testid={`link-calculate-${match.id}`}><Calculator size={14} /> Estimate EMI</Link></div></article>; }
+function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
+  const { t } = useLanguage();
+  const [open, setOpen] = useState(rank === 1);
+  return (
+    <article
+      className={`rounded-2xl border bg-[hsl(var(--card))] p-5 transition-shadow md:p-6 ${rank === 1 ? "border-[hsl(var(--primary)/.4)] card-shadow" : "border-[hsl(var(--card-border))]"}`}
+      data-testid={`card-match-${match.id}`}
+    >
+      <div className="flex flex-col gap-5 md:flex-row md:items-start">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[hsl(var(--primary))] font-display text-lg font-bold text-[hsl(var(--primary-foreground))]">
+          {rank}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="font-display text-xl font-bold tracking-[-.03em]">
+              {match.name}
+            </h2>
+            {rank === 1 && (
+              <span className="rounded-full bg-[hsl(var(--accent))] px-2 py-1 text-[10px] font-bold uppercase tracking-wider">
+                Best fit
+              </span>
+            )}
+          </div>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+            {match.purpose}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {match.tags.slice(0, 3).map((tag) => (
+              <span
+                key={tag}
+                className="rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-[11px] font-semibold"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-center gap-4 md:block md:text-right">
+          <div>
+            <span className="font-display text-3xl font-bold text-[hsl(var(--primary))]">
+              {Math.round(match.score)}
+            </span>
+            <span className="ml-1 text-xs text-[hsl(var(--muted-foreground))]">
+              / 100
+            </span>
+          </div>
+          <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
+            fit score
+          </span>
+        </div>
+      </div>
+      <div className="mt-5 grid gap-3 border-t border-[hsl(var(--border))] pt-5 sm:grid-cols-3">
+        <div>
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">Up to</p>
+          <p className="mt-1 font-display font-bold">
+            {formatMoney(match.maxLoan)}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">
+            Illustrative interest
+          </p>
+          <p className="mt-1 font-display font-bold">{match.interest}% p.a.</p>
+        </div>
+        <div>
+          <p className="text-xs text-[hsl(var(--muted-foreground))]">
+            Repayment window
+          </p>
+          <p className="mt-1 font-display font-bold">{match.tenure} years</p>
+        </div>
+      </div>
+      <button
+        onClick={() => setOpen(!open)}
+        className="mt-5 flex items-center gap-2 text-xs font-bold text-[hsl(var(--primary))]"
+        data-testid={`button-explain-${match.id}`}
+      >
+        {open ? t("hideWhyFits") : t("showWhyFits")}
+        <ChevronDown
+          size={15}
+          className={
+            open ? "rotate-180 transition-transform" : "transition-transform"
+          }
+        />
+      </button>
+      {open && (
+        <div className="mt-4 grid gap-3 rounded-xl bg-[hsl(var(--secondary)/.65)] p-4 sm:grid-cols-2">
+          {match.reasons.map((reason, i) => (
+            <div key={reason} className="flex gap-2 text-xs leading-5">
+              <Check
+                size={14}
+                className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
+              />
+              {reason}
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="mt-5 flex flex-wrap gap-3">
+        <Link
+          href={`/schemes/${match.id}`}
+          className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-4 py-2.5 text-xs font-bold text-[hsl(var(--primary-foreground))]"
+          data-testid={`link-view-scheme-${match.id}`}
+        >
+          View scheme <ArrowRight size={14} />
+        </Link>
+        <Link
+          href={`/calculator?scheme=${match.id}`}
+          className="inline-flex items-center gap-2 rounded-xl border border-[hsl(var(--border))] px-4 py-2.5 text-xs font-bold"
+          data-testid={`link-calculate-${match.id}`}
+        >
+          <Calculator size={14} /> Estimate EMI
+        </Link>
+      </div>
+    </article>
+  );
+}
 
 function Schemes() {
   const query = useListSchemes();
   const schemes = query.data?.length ? query.data : schemesFallback;
-  const [search, setSearch] = useState('');
-  const { t } = useLanguage();
-  const filtered = schemes.filter((scheme) => `${scheme.name} ${scheme.purpose} ${(scheme.tags || []).join(' ')}`.toLowerCase().includes(search.toLowerCase()));
+  const [search, setSearch] = useState("");
+  const { lang, t } = useLanguage();
+  const filtered = schemes.filter((scheme) => {
+    const localized = translateScheme(lang, scheme);
+    return `${localized.name} ${localized.purpose} ${(localized.tags || []).join(" ")}`
+      .toLowerCase()
+      .includes(search.toLowerCase());
+  });
 
-  return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
-    <PageTitle eyebrow="Scheme library" title="Browse support, without the fine print fog." body="A prototype library of public-service schemes. Open any card to see limits, repayment shape and who it is designed for." />
-    <div className="mb-8 flex flex-col gap-3 sm:flex-row">
-      <label className="relative flex-1"><Search size={17} className="absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]" /><input aria-label={t('searchSchemes')} value={search} onChange={e => setSearch(e.target.value)} placeholder={t('searchSchemes')} className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] py-3 pl-10 pr-4 text-sm outline-none focus:border-[hsl(var(--primary))]" data-testid="input-search-schemes" /></label>
-      <PrototypeBadge />
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Scheme library"
+        title="Browse support, without the fine print fog."
+        body={t("schemesLibraryBody")}
+      />
+      <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+        <label className="relative flex-1">
+          <Search
+            size={17}
+            className="absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]"
+          />
+          <input
+            aria-label={t("searchSchemes")}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={t("searchSchemes")}
+            className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] py-3 pl-10 pr-4 text-sm outline-none focus:border-[hsl(var(--primary))]"
+            data-testid="input-search-schemes"
+          />
+        </label>
+        <PrototypeBadge />
+      </div>
+      {query.isError && (
+        <p className="mb-5 rounded-xl border border-[hsl(var(--warning)/.35)] bg-[hsl(var(--warning)/.1)] px-4 py-3 text-sm text-[hsl(var(--warning-foreground))]">
+          Live scheme data is unavailable, so you are viewing the prototype
+          catalogue.
+        </p>
+      )}
+      <div className="grid gap-5 md:grid-cols-2">
+        {filtered.map((scheme) => (
+          <SchemeCard key={scheme.id} scheme={scheme} />
+        ))}
+      </div>
+      {!filtered.length && (
+        <EmptyState title={t("noMatches")} body={t("completeEligibility")} />
+      )}
     </div>
-    {query.isError && <p className="mb-5 rounded-xl border border-[hsl(var(--warning)/.35)] bg-[hsl(var(--warning)/.1)] px-4 py-3 text-sm text-[hsl(var(--warning-foreground))]">Live scheme data is unavailable, so you are viewing the prototype catalogue.</p>}
-    <div className="grid gap-5 md:grid-cols-2">{filtered.map(scheme => <SchemeCard key={scheme.id} scheme={scheme} />)}</div>
-    {!filtered.length && <EmptyState title={t('noMatches')} body={t('completeEligibility')} />}
-  </div>;
+  );
 }
-function SchemeCard({ scheme }: { scheme: Scheme }) { return <article className="group flex flex-col rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow transition-transform hover:-translate-y-1" data-testid={`card-scheme-${scheme.id}`}><div className="flex items-start justify-between gap-4"><span className="grid h-10 w-10 place-items-center rounded-xl bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]"><HandCoins size={20} /></span>{scheme.isPrototypeData && <PrototypeBadge />}</div><p className="mt-6 text-xs font-bold uppercase tracking-[.14em] text-[hsl(var(--primary))]">{scheme.applicantType}</p><h2 className="mt-2 font-display text-xl font-bold tracking-[-.03em]">{scheme.name}</h2><p className="mt-2 min-h-12 text-sm leading-6 text-[hsl(var(--muted-foreground))]">{scheme.purpose}</p><div className="mt-6 grid grid-cols-3 gap-3 border-y border-[hsl(var(--border))] py-4"><div><p className="text-[10px] text-[hsl(var(--muted-foreground))]">Max loan</p><p className="mt-1 text-sm font-bold">{formatMoney(scheme.maxLoan)}</p></div><div><p className="text-[10px] text-[hsl(var(--muted-foreground))]">Interest</p><p className="mt-1 text-sm font-bold">{scheme.interest}%</p></div><div><p className="text-[10px] text-[hsl(var(--muted-foreground))]">Tenure</p><p className="mt-1 text-sm font-bold">{scheme.tenure} yrs</p></div></div><div className="mt-5 flex flex-1 flex-wrap content-start gap-2">{scheme.tags.map(t => <span key={t} className="rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-[11px] font-semibold">{t}</span>)}</div><Link href={`/schemes/${scheme.id}`} className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]" data-testid={`link-scheme-${scheme.id}`}>Understand this scheme <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" /></Link></article>; }
+function SchemeCard({ scheme }: { scheme: Scheme }) {
+  const { lang, t } = useLanguage();
+  const localized = translateScheme(lang, scheme);
+  return (
+    <article
+      className="group flex flex-col rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow transition-transform hover:-translate-y-1"
+      data-testid={`card-scheme-${scheme.id}`}
+    >
+      <div className="flex items-start justify-between gap-4">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]">
+          <HandCoins size={20} />
+        </span>
+        {scheme.isPrototypeData && <PrototypeBadge />}
+      </div>
+      <p className="mt-6 text-xs font-bold uppercase tracking-[.14em] text-[hsl(var(--primary))]">
+        {localized.applicantType}
+      </p>
+      <h2 className="mt-2 font-display text-xl font-bold tracking-[-.03em]">
+        {localized.name}
+      </h2>
+      <p className="mt-2 min-h-12 text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+        {localized.purpose}
+      </p>
+      <div className="mt-6 grid grid-cols-3 gap-3 border-y border-[hsl(var(--border))] py-4">
+        <div>
+          <p className="text-[10px] text-[hsl(var(--muted-foreground))]">
+            {t("maxLoanLabel")}
+          </p>
+          <p className="mt-1 text-sm font-bold">
+            {formatMoney(scheme.maxLoan)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] text-[hsl(var(--muted-foreground))]">
+            {t("interestLabel")}
+          </p>
+          <p className="mt-1 text-sm font-bold">{scheme.interest}%</p>
+        </div>
+        <div>
+          <p className="text-[10px] text-[hsl(var(--muted-foreground))]">
+            {t("tenureLabel")}
+          </p>
+          <p className="mt-1 text-sm font-bold">
+            {scheme.tenure} {t("yearsShort")}
+          </p>
+        </div>
+      </div>
+      <div className="mt-5 flex flex-1 flex-wrap content-start gap-2">
+        {localized.tags.map((tag) => (
+          <span
+            key={tag}
+            className="rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-[11px] font-semibold"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <Link
+        href={`/schemes/${scheme.id}`}
+        className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
+        data-testid={`link-scheme-${scheme.id}`}
+      >
+        {t("understandScheme")}{" "}
+        <ArrowRight
+          size={15}
+          className="transition-transform group-hover:translate-x-1"
+        />
+      </Link>
+    </article>
+  );
+}
 
-function SchemeDetail() { const { id = '' } = useParams<{ id: string }>(); const query = useGetScheme(id); const scheme = query.data || schemesFallback.find(s => s.id === id) || schemesFallback[0]; return <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14">{query.isLoading ? <><Skeleton className="h-12 w-2/3" /><Skeleton className="mt-5 h-28 w-full" /></> : <><Link href="/schemes" className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]" data-testid="link-back-schemes"><ChevronLeft size={16} /> All schemes</Link><div className="grid gap-8 md:grid-cols-[1fr_280px]"><div><div className="flex flex-wrap items-center gap-3"><PrototypeBadge /><span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">{scheme.applicantType}</span></div><h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-[-.06em] md:text-5xl">{scheme.name}</h1><p className="mt-5 max-w-2xl text-lg leading-8 text-[hsl(var(--muted-foreground))]">{scheme.purpose}</p><div className="mt-8 flex flex-wrap gap-2">{scheme.tags.map(t => <span key={t} className="rounded-md bg-[hsl(var(--secondary))] px-2.5 py-1.5 text-xs font-semibold">{t}</span>)}</div></div><div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))]"><p className="text-xs font-bold uppercase tracking-[.16em] opacity-70">Illustrative maximum</p><p className="mt-3 font-display text-3xl font-bold">{formatMoney(scheme.maxLoan)}</p><p className="mt-1 text-xs opacity-70">Subject to partner assessment</p><Link href={`/application?scheme=${scheme.id}`} className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[hsl(var(--accent))] px-4 py-3 text-sm font-bold text-[hsl(var(--accent-foreground))]" data-testid="link-apply-scheme">Use this scheme <ArrowRight size={15} /></Link></div></div><div className="mt-12"><Eyebrow>At a glance</Eyebrow><div className="grid gap-px overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--border))] sm:grid-cols-3"><div className="bg-[hsl(var(--card))] p-5"><Percent size={17} className="text-[hsl(var(--primary))]" /><p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">Interest rate</p><p className="mt-1 font-display text-xl font-bold">{scheme.interest}% p.a.</p></div><div className="bg-[hsl(var(--card))] p-5"><Clock3 size={17} className="text-[hsl(var(--primary))]" /><p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">Moratorium</p><p className="mt-1 font-display text-xl font-bold">{scheme.moratorium} months</p></div><div className="bg-[hsl(var(--card))] p-5"><WalletCards size={17} className="text-[hsl(var(--primary))]" /><p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">Tenure</p><p className="mt-1 font-display text-xl font-bold">Up to {scheme.tenure} years</p></div></div></div></>}</div>; }
+function SchemeDetail() {
+  const { id = "" } = useParams<{ id: string }>();
+  const query = useGetScheme(id);
+  const scheme =
+    query.data ||
+    schemesFallback.find((s) => s.id === id) ||
+    schemesFallback[0];
+  return (
+    <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14">
+      {query.isLoading ? (
+        <>
+          <Skeleton className="h-12 w-2/3" />
+          <Skeleton className="mt-5 h-28 w-full" />
+        </>
+      ) : (
+        <>
+          <Link
+            href="/schemes"
+            className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
+            data-testid="link-back-schemes"
+          >
+            <ChevronLeft size={16} /> All schemes
+          </Link>
+          <div className="grid gap-8 md:grid-cols-[1fr_280px]">
+            <div>
+              <div className="flex flex-wrap items-center gap-3">
+                <PrototypeBadge />
+                <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
+                  {scheme.applicantType}
+                </span>
+              </div>
+              <h1 className="mt-5 font-display text-4xl font-bold leading-tight tracking-[-.06em] md:text-5xl">
+                {scheme.name}
+              </h1>
+              <p className="mt-5 max-w-2xl text-lg leading-8 text-[hsl(var(--muted-foreground))]">
+                {scheme.purpose}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-2">
+                {scheme.tags.map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-md bg-[hsl(var(--secondary))] px-2.5 py-1.5 text-xs font-semibold"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))]">
+              <p className="text-xs font-bold uppercase tracking-[.16em] opacity-70">
+                Illustrative maximum
+              </p>
+              <p className="mt-3 font-display text-3xl font-bold">
+                {formatMoney(scheme.maxLoan)}
+              </p>
+              <p className="mt-1 text-xs opacity-70">
+                Subject to partner assessment
+              </p>
+              <Link
+                href={`/application?scheme=${scheme.id}`}
+                className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[hsl(var(--accent))] px-4 py-3 text-sm font-bold text-[hsl(var(--accent-foreground))]"
+                data-testid="link-apply-scheme"
+              >
+                Use this scheme <ArrowRight size={15} />
+              </Link>
+            </div>
+          </div>
+          <div className="mt-12">
+            <Eyebrow>At a glance</Eyebrow>
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--border))] sm:grid-cols-3">
+              <div className="bg-[hsl(var(--card))] p-5">
+                <Percent size={17} className="text-[hsl(var(--primary))]" />
+                <p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">
+                  Interest rate
+                </p>
+                <p className="mt-1 font-display text-xl font-bold">
+                  {scheme.interest}% p.a.
+                </p>
+              </div>
+              <div className="bg-[hsl(var(--card))] p-5">
+                <Clock3 size={17} className="text-[hsl(var(--primary))]" />
+                <p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">
+                  Moratorium
+                </p>
+                <p className="mt-1 font-display text-xl font-bold">
+                  {scheme.moratorium} months
+                </p>
+              </div>
+              <div className="bg-[hsl(var(--card))] p-5">
+                <WalletCards size={17} className="text-[hsl(var(--primary))]" />
+                <p className="mt-5 text-xs text-[hsl(var(--muted-foreground))]">
+                  Tenure
+                </p>
+                <p className="mt-1 font-display text-xl font-bold">
+                  Up to {scheme.tenure} years
+                </p>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
-function CalculatorPage() { const [principal, setPrincipal] = useState(90000); const [rate, setRate] = useState(6.5); const [years, setYears] = useState(5); const [moratorium, setMoratorium] = useState(3); const [result, setResult] = useState<EmiResult | null>(null); const calc = useCalculateEmi(); const local = useMemo(() => {
+function CalculatorPage() {
+  const { t } = useLanguage();
+  const [principal, setPrincipal] = useState(90000);
+  const [rate, setRate] = useState(6.5);
+  const [years, setYears] = useState(5);
+  const [moratorium, setMoratorium] = useState(3);
+  const [result, setResult] = useState<EmiResult | null>(null);
+  const calc = useCalculateEmi();
+  const local = useMemo(() => {
     const totalMonths = Math.max(1, years * 12);
-    const moratoriumMonths = Math.min(Math.max(0, moratorium), Math.max(totalMonths - 1, 1));
+    const moratoriumMonths = Math.min(
+      Math.max(0, moratorium),
+      Math.max(totalMonths - 1, 1),
+    );
     const repaymentMonths = Math.max(1, totalMonths - moratoriumMonths);
     const r = rate / 1200;
-    const balanceAfterMoratorium = r === 0 ? principal : principal * Math.pow(1 + r, moratoriumMonths);
-    const emi = r === 0 ? balanceAfterMoratorium / repaymentMonths : balanceAfterMoratorium * r * Math.pow(1 + r, repaymentMonths) / (Math.pow(1 + r, repaymentMonths) - 1);
+    const balanceAfterMoratorium =
+      r === 0 ? principal : principal * Math.pow(1 + r, moratoriumMonths);
+    const emi =
+      r === 0
+        ? balanceAfterMoratorium / repaymentMonths
+        : (balanceAfterMoratorium * r * Math.pow(1 + r, repaymentMonths)) /
+          (Math.pow(1 + r, repaymentMonths) - 1);
     const totalRepayment = emi * repaymentMonths;
-    return { emi: Math.round(emi), principal, totalInterest: Math.round(totalRepayment - principal), totalRepayment: Math.round(totalRepayment) };
-  }, [principal, rate, years, moratorium]); const shown = result || local; const run = () => calc.mutate({ data: { principal, annualRate: rate, tenureYears: years, moratoriumMonths: moratorium } }, { onSuccess: setResult, onError: () => setResult(null) }); return <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="Make repayment legible" title="A monthly number you can plan around." body="This is an illustrative estimate. A moratorium may defer repayment, but the partner will explain the final schedule." /><div className="grid gap-6 md:grid-cols-[.8fr_1.2fr]"><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow"><div className="space-y-6"><Field label="Loan amount" type="number" value={principal} onChange={v => { setPrincipal(Number(v)); setResult(null); }} /><label className="block text-sm font-semibold"><span className="mb-3 flex justify-between"><span>Interest rate</span><b>{rate}%</b></span><input type="range" min="2" max="18" step=".25" value={rate} onChange={e => { setRate(Number(e.target.value)); setResult(null); }} className="w-full accent-[hsl(var(--primary))]" data-testid="input-interest-rate" /><span className="mt-2 flex justify-between text-[10px] font-normal text-[hsl(var(--muted-foreground))]"><span>2%</span><span>18%</span></span></label><label className="block text-sm font-semibold"><span className="mb-3 flex justify-between"><span>Tenure</span><b>{years} years</b></span><input type="range" min="1" max="10" step="1" value={years} onChange={e => { setYears(Number(e.target.value)); setResult(null); }} className="w-full accent-[hsl(var(--primary))]" data-testid="input-tenure" /></label><label className="block text-sm font-semibold"><span className="mb-2 block">Moratorium</span><select value={moratorium} onChange={e => { setMoratorium(Number(e.target.value)); setResult(null); }} className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm" data-testid="select-moratorium"><option value={0}>No moratorium</option><option value={3}>3 months</option><option value={6}>6 months</option><option value={12}>12 months</option></select></label><Button onClick={run} disabled={calc.isPending} className="w-full">{calc.isPending ? 'Calculating…' : 'Calculate my EMI'} <Calculator size={16} /></Button></div></div><div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))] md:p-8"><div className="flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-[.16em] opacity-70">Estimated monthly EMI</span><Banknote size={20} className="text-[hsl(var(--accent))]" /></div><p className="mt-5 font-display text-5xl font-bold tracking-[-.06em]">{formatMoney(shown.emi)}</p><p className="mt-2 text-sm opacity-70">for {years * 12} monthly instalments after the illustrative schedule begins</p><div className="mt-10 space-y-4 border-t border-[hsl(var(--primary-foreground)/.18)] pt-5"><div className="flex justify-between text-sm"><span className="opacity-70">Principal</span><strong>{formatMoney(shown.principal)}</strong></div><div className="flex justify-between text-sm"><span className="opacity-70">Total interest</span><strong>{formatMoney(shown.totalInterest)}</strong></div><div className="flex justify-between text-sm"><span className="opacity-70">Total repayment</span><strong>{formatMoney(shown.totalRepayment)}</strong></div></div><div className="mt-8 flex gap-3 rounded-xl bg-[hsl(var(--primary-foreground)/.1)] p-4 text-xs leading-5"><CircleHelp size={16} className="shrink-0 text-[hsl(var(--accent))]" />Interest and schedule are illustrative. Ask your selected partner for the final repayment calendar.</div></div></div></div>; }
+    return {
+      emi: Math.round(emi),
+      principal,
+      totalInterest: Math.round(totalRepayment - principal),
+      totalRepayment: Math.round(totalRepayment),
+    };
+  }, [principal, rate, years, moratorium]);
+  const shown = result || local;
+  const run = () =>
+    calc.mutate(
+      {
+        data: {
+          principal,
+          annualRate: rate,
+          tenureYears: years,
+          moratoriumMonths: moratorium,
+        },
+      },
+      { onSuccess: setResult, onError: () => setResult(null) },
+    );
+  return (
+    <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Make repayment legible"
+        title="A monthly number you can plan around."
+        body={t("illustrativeEstimate")}
+      />
+      <div className="grid gap-6 md:grid-cols-[.8fr_1.2fr]">
+        <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
+          <div className="space-y-6">
+            <Field
+              label={t("loanAmountLabel")}
+              type="number"
+              value={principal}
+              onChange={(v) => {
+                setPrincipal(Number(v));
+                setResult(null);
+              }}
+            />
+            <label className="block text-sm font-semibold">
+              <span className="mb-3 flex justify-between">
+                <span>{t("interestRateLabel")}</span>
+                <b>{rate}%</b>
+              </span>
+              <input
+                type="range"
+                min="2"
+                max="18"
+                step=".25"
+                value={rate}
+                onChange={(e) => {
+                  setRate(Number(e.target.value));
+                  setResult(null);
+                }}
+                className="w-full accent-[hsl(var(--primary))]"
+                data-testid="input-interest-rate"
+              />
+              <span className="mt-2 flex justify-between text-[10px] font-normal text-[hsl(var(--muted-foreground))]">
+                <span>2%</span>
+                <span>18%</span>
+              </span>
+            </label>
+            <label className="block text-sm font-semibold">
+              <span className="mb-3 flex justify-between">
+                <span>{t("tenureLabel")}</span>
+                <b>{years} {t("yearsShort")}</b>
+              </span>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                step="1"
+                value={years}
+                onChange={(e) => {
+                  setYears(Number(e.target.value));
+                  setResult(null);
+                }}
+                className="w-full accent-[hsl(var(--primary))]"
+                data-testid="input-tenure"
+              />
+            </label>
+            <label className="block text-sm font-semibold">
+              <span className="mb-2 block">{t("moratoriumLabel")}</span>
+              <select
+                value={moratorium}
+                onChange={(e) => {
+                  setMoratorium(Number(e.target.value));
+                  setResult(null);
+                }}
+                className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm"
+                data-testid="select-moratorium"
+              >
+                <option value={0}>{t("noMoratorium")}</option>
+                <option value={3}>3 {t("monthsShort")}</option>
+                <option value={6}>6 {t("monthsShort")}</option>
+                <option value={12}>12 {t("monthsShort")}</option>
+              </select>
+            </label>
+            <Button onClick={run} disabled={calc.isPending} className="w-full">
+              {calc.isPending ? t("finding") : t("calculateEmi")}{" "}
+              <Calculator size={16} />
+            </Button>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))] md:p-8">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold uppercase tracking-[.16em] opacity-70">
+              {t("estimatedMonthlyEmi")}
+            </span>
+            <Banknote size={20} className="text-[hsl(var(--accent))]" />
+          </div>
+          <p className="mt-5 font-display text-5xl font-bold tracking-[-.06em]">
+            {formatMoney(shown.emi)}
+          </p>
+          <p className="mt-2 text-sm opacity-70">
+            {t("installmentSchedule").replace("{count}", String(years * 12))}
+          </p>
+          <div className="mt-10 space-y-4 border-t border-[hsl(var(--primary-foreground)/.18)] pt-5">
+            <div className="flex justify-between text-sm">
+              <span className="opacity-70">{t("principalLabel")}</span>
+              <strong>{formatMoney(shown.principal)}</strong>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="opacity-70">{t("totalInterestLabel")}</span>
+              <strong>{formatMoney(shown.totalInterest)}</strong>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="opacity-70">{t("totalRepaymentLabel")}</span>
+              <strong>{formatMoney(shown.totalRepayment)}</strong>
+            </div>
+          </div>
+          <div className="mt-8 flex gap-3 rounded-xl bg-[hsl(var(--primary-foreground)/.1)] p-4 text-xs leading-5">
+            <CircleHelp
+              size={16}
+              className="shrink-0 text-[hsl(var(--accent))]"
+            />
+            {t("interestScheduleNote")}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-function LegacyPartnersOld() { const query = useListPartners(); const partners = query.data || partnersFallback; const profile = getStored('ss_profile', demoApplicant); const matches = partners.map((p, i) => ({ ...p, score: 94 - i * 9, reasons: [i === 0 ? 'Closest service point to your location' : 'Serves applicants in your area', 'Accepts applications for your selected scheme', `${p.processingCapacity}% current processing capacity`] } as PartnerMatch)); const [selected, setSelected] = useState(matches[0]?.id); return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="Choose your route" title="A nearby partner, with a reason." body={`Suggested for ${profile.location || 'your area'}. Compare service area, capacity and distance before you choose.`} /><div className="mb-7 flex items-center gap-2 rounded-xl bg-[hsl(var(--secondary))] p-4 text-sm"><LocateFixed size={18} className="text-[hsl(var(--primary))]" /><span>We found <strong>{partners.length} demo partners</strong> that could support your journey.</span></div><div className="grid gap-5 md:grid-cols-2">{matches.map((p, i) => <article key={p.id} className={`rounded-2xl border bg-[hsl(var(--card))] p-5 transition-all ${selected === p.id ? 'border-[hsl(var(--primary))] ring-2 ring-[hsl(var(--primary)/.12)]' : 'border-[hsl(var(--card-border))]'}`} data-testid={`card-partner-${p.id}`}><div className="flex items-start justify-between gap-3"><div className="flex gap-3"><div className="grid h-11 w-11 place-items-center rounded-xl bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]"><Landmark size={20} /></div><div><h2 className="font-display text-lg font-bold">{p.name}</h2><p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{p.type}</p></div></div><span className="font-display text-lg font-bold text-[hsl(var(--primary))]">{p.score}</span></div><div className="mt-5 grid grid-cols-2 gap-3 text-xs"><div className="rounded-lg bg-[hsl(var(--secondary)/.7)] p-3"><MapPin size={14} className="text-[hsl(var(--primary))]" /><p className="mt-2 text-[hsl(var(--muted-foreground))]">Distance</p><strong>{p.distance} km</strong></div><div className="rounded-lg bg-[hsl(var(--secondary)/.7)] p-3"><Gauge size={14} className="text-[hsl(var(--primary))]" /><p className="mt-2 text-[hsl(var(--muted-foreground))]">Capacity</p><strong>{p.processingCapacity}% available</strong></div></div><div className="mt-5 space-y-2">{p.reasons.map(r => <p key={r} className="flex gap-2 text-xs text-[hsl(var(--muted-foreground))]"><Check size={14} className="shrink-0 text-[hsl(var(--primary))]" />{r}</p>)}</div><p className="mt-5 border-t border-[hsl(var(--border))] pt-4 text-xs text-[hsl(var(--muted-foreground))]">{p.address}</p><Button onClick={() => setSelected(p.id)} secondary={selected !== p.id} className="mt-4 w-full">{selected === p.id ? <><Check size={15} /> Selected partner</> : 'Choose this partner'}</Button></article>)}</div><div className="mt-8 flex justify-end"><Link href={`/application?partner=${selected}`} className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]" data-testid="link-continue-application">Continue to application <ArrowRight size={16} /></Link></div></div>; }
+function LegacyPartnersOld() {
+  const query = useListPartners();
+  const partners = query.data || partnersFallback;
+  const profile = getStored("ss_profile", demoApplicant);
+  const matches = partners.map(
+    (p, i) =>
+      ({
+        ...p,
+        score: 94 - i * 9,
+        reasons: [
+          i === 0
+            ? "Closest service point to your location"
+            : "Serves applicants in your area",
+          "Accepts applications for your selected scheme",
+          `${p.processingCapacity}% current processing capacity`,
+        ],
+      }) as PartnerMatch,
+  );
+  const [selected, setSelected] = useState(matches[0]?.id);
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Choose your route"
+        title="A nearby partner, with a reason."
+        body={`Suggested for ${profile.location || "your area"}. Compare service area, capacity and distance before you choose.`}
+      />
+      <div className="mb-7 flex items-center gap-2 rounded-xl bg-[hsl(var(--secondary))] p-4 text-sm">
+        <LocateFixed size={18} className="text-[hsl(var(--primary))]" />
+        <span>
+          We found <strong>{partners.length} demo partners</strong> that could
+          support your journey.
+        </span>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2">
+        {matches.map((p, i) => (
+          <article
+            key={p.id}
+            className={`rounded-2xl border bg-[hsl(var(--card))] p-5 transition-all ${selected === p.id ? "border-[hsl(var(--primary))] ring-2 ring-[hsl(var(--primary)/.12)]" : "border-[hsl(var(--card-border))]"}`}
+            data-testid={`card-partner-${p.id}`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex gap-3">
+                <div className="grid h-11 w-11 place-items-center rounded-xl bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]">
+                  <Landmark size={20} />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg font-bold">{p.name}</h2>
+                  <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+                    {p.type}
+                  </p>
+                </div>
+              </div>
+              <span className="font-display text-lg font-bold text-[hsl(var(--primary))]">
+                {p.score}
+              </span>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-3 text-xs">
+              <div className="rounded-lg bg-[hsl(var(--secondary)/.7)] p-3">
+                <MapPin size={14} className="text-[hsl(var(--primary))]" />
+                <p className="mt-2 text-[hsl(var(--muted-foreground))]">
+                  Distance
+                </p>
+                <strong>{p.distance} km</strong>
+              </div>
+              <div className="rounded-lg bg-[hsl(var(--secondary)/.7)] p-3">
+                <Gauge size={14} className="text-[hsl(var(--primary))]" />
+                <p className="mt-2 text-[hsl(var(--muted-foreground))]">
+                  Capacity
+                </p>
+                <strong>{p.processingCapacity}% available</strong>
+              </div>
+            </div>
+            <div className="mt-5 space-y-2">
+              {p.reasons.map((r) => (
+                <p
+                  key={r}
+                  className="flex gap-2 text-xs text-[hsl(var(--muted-foreground))]"
+                >
+                  <Check
+                    size={14}
+                    className="shrink-0 text-[hsl(var(--primary))]"
+                  />
+                  {r}
+                </p>
+              ))}
+            </div>
+            <p className="mt-5 border-t border-[hsl(var(--border))] pt-4 text-xs text-[hsl(var(--muted-foreground))]">
+              {p.address}
+            </p>
+            <Button
+              onClick={() => setSelected(p.id)}
+              secondary={selected !== p.id}
+              className="mt-4 w-full"
+            >
+              {selected === p.id ? (
+                <>
+                  <Check size={15} /> Selected partner
+                </>
+              ) : (
+                "Choose this partner"
+              )}
+            </Button>
+          </article>
+        ))}
+      </div>
+      <div className="mt-8 flex justify-end">
+        <Link
+          href={`/application?partner=${selected}`}
+          className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+          data-testid="link-continue-application"
+        >
+          Continue to application <ArrowRight size={16} />
+        </Link>
+      </div>
+    </div>
+  );
+}
 
-function ApplicationPage() { const { t } = useLanguage();  const [, setLocation] = useLocation(); const params = new URLSearchParams(location.search); const profile = getStored('ss_profile', demoApplicant); const [form, setForm] = useState({ name: profile.name || '', phone: '', email: '', address: profile.location || '', schemeId: params.get('scheme') || 'udyam-sakhi', partnerId: params.get('partner') || 'sahayata-hub', income: String(profile.income || 18000), loanRequired: String(profile.loanRequired || 90000), projectType: profile.purpose || '', projectCost: String(profile.projectCost || 120000), documents: '' }); const create = useCreateApplication(); const update = (key: string, value: string) => setForm(f => ({ ...f, [key]: value })); const submit = (e: React.FormEvent) => { e.preventDefault(); const payload = { ...form, income: Number(form.income), loanRequired: Number(form.loanRequired), projectCost: Number(form.projectCost), documents: form.documents ? form.documents.split(',').map(x => x.trim()) : [] }; create.mutate({ data: payload }, { onSuccess: app => { store('ss_application', app); setLocation('/application/success'); }, onError: () => { const app: Application = { ...payload, id: `SS-${Date.now().toString().slice(-6)}`, status: t('applicationReceived'), createdAt: new Date().toISOString() }; store('ss_application', app); setLocation('/application/success'); } }); }; return <div className="mx-auto max-w-4xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="A clear next step" title="Start your application, without the overwhelm." body="This prototype only asks for the details a partner needs to begin a conversation. You will not be asked for identity documents here." /><form onSubmit={submit} className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-9"><div className="grid gap-5 sm:grid-cols-2"><Field label="Full name" value={form.name} onChange={v => update('name', v)} required /><Field label="Phone number" value={form.phone} onChange={v => update('phone', v)} placeholder="10-digit mobile number" required /><Field label="Email address" value={form.email} onChange={v => update('email', v)} type="email" required /><Field label="Address / service area" value={form.address} onChange={v => update('address', v)} required /></div><div className="my-8 border-t border-[hsl(var(--border))] pt-7"><Eyebrow>Need and route</Eyebrow><div className="grid gap-5 sm:grid-cols-2"><Field label="Monthly income" type="number" value={form.income} onChange={v => update('income', v)} required /><Field label="Loan required" type="number" value={form.loanRequired} onChange={v => update('loanRequired', v)} required /><Field label="Project or course purpose" value={form.projectType} onChange={v => update('projectType', v)} required /><Field label="Estimated project cost" type="number" value={form.projectCost} onChange={v => update('projectCost', v)} required /><label className="block text-sm font-semibold sm:col-span-2"><span className="mb-2 block">Documents you may have <span className="font-normal text-[hsl(var(--muted-foreground))]">(optional, comma separated)</span></span><input value={form.documents} onChange={e => update('documents', e.target.value)} placeholder="For example, income proof, quotation" className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm outline-none focus:border-[hsl(var(--primary))]" data-testid="input-documents" /></label></div></div><div className="flex items-start gap-3 rounded-xl bg-[hsl(var(--secondary))] p-4 text-xs leading-5"><ShieldCheck size={16} className="mt-0.5 shrink-0 text-[hsl(var(--primary))]" />By continuing, you are creating a prototype enquiry. Do not enter Aadhaar, bank account, password or other sensitive identity details.</div><div className="mt-7 flex justify-end"><Button type="submit" disabled={create.isPending}>{create.isPending ? 'Sending enquiry…' : 'Submit application'} <ArrowRight size={16} /></Button></div></form></div>; }
+function ApplicationPage() {
+  const { t } = useLanguage();
+  const [, setLocation] = useLocation();
+  const params = new URLSearchParams(location.search);
+  const profile = getStored("ss_profile", demoApplicant);
+  const [form, setForm] = useState({
+    name: profile.name || "",
+    phone: "",
+    email: "",
+    address: profile.location || "",
+    schemeId: params.get("scheme") || "udyam-sakhi",
+    partnerId: params.get("partner") || "sahayata-hub",
+    income: String(profile.income || 18000),
+    loanRequired: String(profile.loanRequired || 90000),
+    projectType: profile.purpose || "",
+    projectCost: String(profile.projectCost || 120000),
+    documents: "",
+  });
+  const create = useCreateApplication();
+  const update = (key: string, value: string) =>
+    setForm((f) => ({ ...f, [key]: value }));
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = {
+      ...form,
+      income: Number(form.income),
+      loanRequired: Number(form.loanRequired),
+      projectCost: Number(form.projectCost),
+      documents: form.documents
+        ? form.documents.split(",").map((x) => x.trim())
+        : [],
+    };
+    create.mutate(
+      { data: payload },
+      {
+        onSuccess: (app) => {
+          store("ss_application", app);
+          setLocation("/application/success");
+        },
+        onError: () => {
+          const app: Application = {
+            ...payload,
+            id: `SS-${Date.now().toString().slice(-6)}`,
+            status: t("applicationReceived"),
+            createdAt: new Date().toISOString(),
+          };
+          store("ss_application", app);
+          setLocation("/application/success");
+        },
+      },
+    );
+  };
+  return (
+    <div className="mx-auto max-w-4xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="A clear next step"
+        title="Start your application, without the overwhelm."
+        body="This prototype only asks for the details a partner needs to begin a conversation. You will not be asked for identity documents here."
+      />
+      <form
+        onSubmit={submit}
+        className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-9"
+      >
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field
+            label="Full name"
+            value={form.name}
+            onChange={(v) => update("name", v)}
+            required
+          />
+          <Field
+            label="Phone number"
+            value={form.phone}
+            onChange={(v) => update("phone", v)}
+            placeholder="10-digit mobile number"
+            required
+          />
+          <Field
+            label="Email address"
+            value={form.email}
+            onChange={(v) => update("email", v)}
+            type="email"
+            required
+          />
+          <Field
+            label="Address / service area"
+            value={form.address}
+            onChange={(v) => update("address", v)}
+            required
+          />
+        </div>
+        <div className="my-8 border-t border-[hsl(var(--border))] pt-7">
+          <Eyebrow>Need and route</Eyebrow>
+          <div className="grid gap-5 sm:grid-cols-2">
+            <Field
+              label="Monthly income"
+              type="number"
+              value={form.income}
+              onChange={(v) => update("income", v)}
+              required
+            />
+            <Field
+              label="Loan required"
+              type="number"
+              value={form.loanRequired}
+              onChange={(v) => update("loanRequired", v)}
+              required
+            />
+            <Field
+              label="Project or course purpose"
+              value={form.projectType}
+              onChange={(v) => update("projectType", v)}
+              required
+            />
+            <Field
+              label="Estimated project cost"
+              type="number"
+              value={form.projectCost}
+              onChange={(v) => update("projectCost", v)}
+              required
+            />
+            <label className="block text-sm font-semibold sm:col-span-2">
+              <span className="mb-2 block">
+                Documents you may have{" "}
+                <span className="font-normal text-[hsl(var(--muted-foreground))]">
+                  (optional, comma separated)
+                </span>
+              </span>
+              <input
+                value={form.documents}
+                onChange={(e) => update("documents", e.target.value)}
+                placeholder="For example, income proof, quotation"
+                className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm outline-none focus:border-[hsl(var(--primary))]"
+                data-testid="input-documents"
+              />
+            </label>
+          </div>
+        </div>
+        <div className="flex items-start gap-3 rounded-xl bg-[hsl(var(--secondary))] p-4 text-xs leading-5">
+          <ShieldCheck
+            size={16}
+            className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
+          />
+          By continuing, you are creating a prototype enquiry. Do not enter
+          Aadhaar, bank account, password or other sensitive identity details.
+        </div>
+        <div className="mt-7 flex justify-end">
+          <Button type="submit" disabled={create.isPending}>
+            {create.isPending ? "Sending enquiry…" : "Submit application"}{" "}
+            <ArrowRight size={16} />
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
 
-function Success() { const { t } = useLanguage();  const app = getStored<Application>('ss_application', { id: 'SS-482913', name: 'Asha Kumari', phone: '', email: '', address: '', schemeId: 'udyam-sakhi', partnerId: 'sahayata-hub', income: 18000, loanRequired: 90000, projectType: 'Expand my tailoring studio', projectCost: 120000, documents: [], status: t('applicationReceived'), createdAt: new Date().toISOString() }); return <div className="mx-auto max-w-2xl px-5 py-16 text-center lg:py-24"><div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-lg"><Check size={30} /></div><Eyebrow>Application received</Eyebrow><h1 className="font-display text-4xl font-bold tracking-[-.06em]">You have a clear next step.</h1><p className="mx-auto mt-4 max-w-lg text-base leading-7 text-[hsl(var(--muted-foreground))]">Your enquiry is ready for a partner to review. Keep this ID safe — it is the easiest way to track progress.</p><div className="mx-auto mt-8 max-w-sm rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 card-shadow"><p className="text-xs font-bold uppercase tracking-[.16em] text-[hsl(var(--muted-foreground))]">Application ID</p><p className="mt-3 font-mono text-2xl font-bold tracking-wider text-[hsl(var(--primary))]" data-testid="text-application-id">{app.id}</p><p className="mt-4 text-xs text-[hsl(var(--muted-foreground))]">Status · {app.status}</p></div><div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row"><Link href="/track" className="inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]" data-testid="link-track-success">Track application <Navigation size={15} /></Link><Link href="/" className="inline-flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--border))] px-5 py-3 text-sm font-bold" data-testid="link-home-success">Back home</Link></div></div>; }
+function Success() {
+  const { t } = useLanguage();
+  const app = getStored<Application>("ss_application", {
+    id: "SS-482913",
+    name: "Asha Kumari",
+    phone: "",
+    email: "",
+    address: "",
+    schemeId: "udyam-sakhi",
+    partnerId: "sahayata-hub",
+    income: 18000,
+    loanRequired: 90000,
+    projectType: "Expand my tailoring studio",
+    projectCost: 120000,
+    documents: [],
+    status: t("applicationReceived"),
+    createdAt: new Date().toISOString(),
+  });
+  return (
+    <div className="mx-auto max-w-2xl px-5 py-16 text-center lg:py-24">
+      <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] shadow-lg">
+        <Check size={30} />
+      </div>
+      <Eyebrow>Application received</Eyebrow>
+      <h1 className="font-display text-4xl font-bold tracking-[-.06em]">
+        You have a clear next step.
+      </h1>
+      <p className="mx-auto mt-4 max-w-lg text-base leading-7 text-[hsl(var(--muted-foreground))]">
+        Your enquiry is ready for a partner to review. Keep this ID safe — it is
+        the easiest way to track progress.
+      </p>
+      <div className="mx-auto mt-8 max-w-sm rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 card-shadow">
+        <p className="text-xs font-bold uppercase tracking-[.16em] text-[hsl(var(--muted-foreground))]">
+          Application ID
+        </p>
+        <p
+          className="mt-3 font-mono text-2xl font-bold tracking-wider text-[hsl(var(--primary))]"
+          data-testid="text-application-id"
+        >
+          {app.id}
+        </p>
+        <p className="mt-4 text-xs text-[hsl(var(--muted-foreground))]">
+          Status · {app.status}
+        </p>
+      </div>
+      <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+        <Link
+          href="/track"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-5 py-3 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+          data-testid="link-track-success"
+        >
+          Track application <Navigation size={15} />
+        </Link>
+        <Link
+          href="/"
+          className="inline-flex items-center justify-center gap-2 rounded-xl border border-[hsl(var(--border))] px-5 py-3 text-sm font-bold"
+          data-testid="link-home-success"
+        >
+          Back home
+        </Link>
+      </div>
+    </div>
+  );
+}
 
-function Track() { const { t } = useLanguage();  const [id, setId] = useState(getStored<Application | null>('ss_application', null)?.id || ''); const [searched, setSearched] = useState(false); const query = useGetApplication(id || 'demo'); const stored = getStored<Application | null>('ss_application', null); const app = (searched && query.data) || stored; const stages = [t('applicationReceived'), 'Partner review', 'Documents checked', 'Decision shared']; const current = app?.status === t('applicationReceived') ? 0 : 1; return <div className="mx-auto max-w-3xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="Keep moving" title="Track your application, one step at a time." body="Enter your application ID to see the latest stage. For this prototype, your submitted enquiry is available on this device." /><div className="flex flex-col gap-3 sm:flex-row"><input value={id} onChange={e => setId(e.target.value)} placeholder="Example: SS-482913" className="flex-1 rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-3 text-sm outline-none focus:border-[hsl(var(--primary))]" data-testid="input-application-id" /><Button onClick={() => setSearched(true)}><Search size={16} /> Find application</Button></div>{searched && !app && <div className="mt-6"><EmptyState title="We could not find that ID" body="Check the characters and try again. This prototype only recognises applications created in this browser." /></div>}{app && <div className="mt-8 rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-8"><div className="flex flex-wrap items-start justify-between gap-3 border-b border-[hsl(var(--border))] pb-6"><div><p className="text-xs text-[hsl(var(--muted-foreground))]">Application</p><h2 className="mt-1 font-mono text-lg font-bold">{app.id}</h2></div><span className="rounded-full bg-[hsl(var(--accent)/.2)] px-3 py-1.5 text-xs font-bold">{app.status}</span></div><div className="relative mt-8 space-y-8">{stages.map((stage, i) => <div key={stage} className="relative flex gap-4">{i < stages.length - 1 && <span className={`absolute left-[11px] top-7 h-10 w-px ${i < current ? 'bg-[hsl(var(--primary))]' : 'bg-[hsl(var(--border))]'}`} />}<span className={`relative z-10 grid h-6 w-6 shrink-0 place-items-center rounded-full ${i <= current ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]' : 'border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--muted-foreground))]'}`}>{i <= current ? <Check size={13} /> : <span className="text-[10px]">{i + 1}</span>}</span><div><p className={`text-sm font-bold ${i <= current ? '' : 'text-[hsl(var(--muted-foreground))]'}`}>{stage}</p>{i === current && <p className="mt-1 text-xs leading-5 text-[hsl(var(--muted-foreground))]">Your application is in the queue for a partner conversation. You will be contacted through the details you shared.</p>}</div></div>)}</div></div>}</div>; }
+function Track() {
+  const { t } = useLanguage();
+  const [id, setId] = useState(
+    getStored<Application | null>("ss_application", null)?.id || "",
+  );
+  const [searched, setSearched] = useState(false);
+  const query = useGetApplication(id, { query: { enabled: searched && Boolean(id) } });
+  const stored = getStored<Application | null>("ss_application", null);
+  const app = (searched && query.data) || stored;
+  const stages = [
+    t("applicationReceived"),
+    t("trackStatus2"),
+    t("trackStatus3"),
+    t("trackStatus4"),
+  ];
+  const current = app?.status === t("applicationReceived") ? 0 : 1;
+  return (
+    <div className="mx-auto max-w-3xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Keep moving"
+        title="Track your application, one step at a time."
+        body={t("trackSubtitle")}
+      />
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <input
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          placeholder={t("applicationIdPlaceholder")}
+          className="flex-1 rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-4 py-3 text-sm outline-none focus:border-[hsl(var(--primary))]"
+          data-testid="input-application-id"
+        />
+        <Button onClick={() => setSearched(true)}>
+          <Search size={16} /> {t("findApplication")}
+        </Button>
+      </div>
+      {searched && !app && (
+        <div className="mt-6">
+          <EmptyState
+            title="We could not find that ID"
+            body={t("applicationNotFound")}
+          />
+        </div>
+      )}
+      {app && (
+        <div className="mt-8 rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow md:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[hsl(var(--border))] pb-6">
+            <div>
+              <p className="text-xs text-[hsl(var(--muted-foreground))]">
+                {t("applications")}
+              </p>
+              <h2 className="mt-1 font-mono text-lg font-bold">{app.id}</h2>
+            </div>
+            <span className="rounded-full bg-[hsl(var(--accent)/.2)] px-3 py-1.5 text-xs font-bold">
+              {app.status}
+            </span>
+          </div>
+          <div className="relative mt-8 space-y-8">
+            {stages.map((stage, i) => (
+              <div key={stage} className="relative flex gap-4">
+                {i < stages.length - 1 && (
+                  <span
+                    className={`absolute left-[11px] top-7 h-10 w-px ${i < current ? "bg-[hsl(var(--primary))]" : "bg-[hsl(var(--border))]"}`}
+                  />
+                )}
+                <span
+                  className={`relative z-10 grid h-6 w-6 shrink-0 place-items-center rounded-full ${i <= current ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]" : "border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--muted-foreground))]"}`}
+                >
+                  {i <= current ? (
+                    <Check size={13} />
+                  ) : (
+                    <span className="text-[10px]">{i + 1}</span>
+                  )}
+                </span>
+                <div>
+                  <p
+                    className={`text-sm font-bold ${i <= current ? "" : "text-[hsl(var(--muted-foreground))]"}`}
+                  >
+                    {stage}
+                  </p>
+                  {i === current && (
+                    <p className="mt-1 text-xs leading-5 text-[hsl(var(--muted-foreground))]">
+                      {t("trackQueueBody")}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
-function Dashboard() { const { t } = useLanguage();  const app = getStored<Application | null>('ss_application', null); const profile = getStored('ss_profile', demoApplicant); return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="Your Sathi dashboard" title={`Good to see you, ${profile.name?.split(' ')[0] || 'there'}.`} body="A simple view of your finance journey — what you explored, what is next, and where to ask for help." /><div className="grid gap-4 sm:grid-cols-3"><Stat label="Journey stage" value={app ? 'In review' : 'Exploring'} detail={app ? 'Partner review is next' : 'Find a matching scheme'} icon={Navigation} /><Stat label="Selected support" value={app ? formatMoney(app.loanRequired) : '—'} detail={app ? app.projectType : 'Not selected yet'} icon={HandCoins} /><Stat label="Your profile" value={profile.applicantType} detail={`${profile.location || 'Location not set'}`} icon={UserRound} /></div><div className="mt-8 grid gap-6 md:grid-cols-[1.15fr_.85fr]"><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow"><div className="flex items-center justify-between"><h2 className="font-display text-xl font-bold">Your next steps</h2><Sparkles size={18} className="text-[hsl(var(--accent-foreground))]" /></div><div className="mt-6 space-y-4">{[{ title: 'Understand your scheme match', done: true, href: '/recommendations' }, { title: 'Choose a local partner', done: !!app, href: '/partners' }, { title: 'Send your enquiry', done: !!app, href: '/application' }, { title: 'Track partner review', done: false, href: '/track' }].map((s, i) => <Link key={s.title} href={s.href} className="flex items-center gap-4 rounded-xl border border-[hsl(var(--border))] p-4 hover:bg-[hsl(var(--secondary))]" data-testid={`link-dashboard-step-${i}`}><span className={`grid h-8 w-8 place-items-center rounded-full ${s.done ? 'bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]' : 'bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))]'}`}>{s.done ? <Check size={15} /> : <span className="text-xs font-bold">{i + 1}</span>}</span><span className="flex-1 text-sm font-bold">{s.title}</span><ArrowRight size={15} className="text-[hsl(var(--muted-foreground))]" /></Link>)}</div></div><div className="rounded-2xl bg-[hsl(var(--secondary))] p-6"><Eyebrow>One useful number</Eyebrow><h2 className="font-display text-3xl font-bold tracking-[-.05em]">{formatMoney(profile.loanRequired)}</h2><p className="mt-2 text-sm leading-6 text-[hsl(var(--muted-foreground))]">is the amount you told us you may need. Use the calculator to see how a monthly plan could look.</p><Link href="/calculator" className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]" data-testid="link-dashboard-calculator">Open calculator <ArrowRight size={15} /></Link></div></div></div>; }
+function Dashboard() {
+  const { t } = useLanguage();
+  const app = getStored<Application | null>("ss_application", null);
+  const profile = getStored("ss_profile", demoApplicant);
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Your Sathi dashboard"
+        title={`Good to see you, ${profile.name?.split(" ")[0] || "there"}.`}
+        body="A simple view of your finance journey — what you explored, what is next, and where to ask for help."
+      />
+      <div className="grid gap-4 sm:grid-cols-3">
+        <Stat
+          label="Journey stage"
+          value={app ? "In review" : "Exploring"}
+          detail={app ? "Partner review is next" : "Find a matching scheme"}
+          icon={Navigation}
+        />
+        <Stat
+          label="Selected support"
+          value={app ? formatMoney(app.loanRequired) : "—"}
+          detail={app ? app.projectType : "Not selected yet"}
+          icon={HandCoins}
+        />
+        <Stat
+          label="Your profile"
+          value={profile.applicantType}
+          detail={`${profile.location || "Location not set"}`}
+          icon={UserRound}
+        />
+      </div>
+      <div className="mt-8 grid gap-6 md:grid-cols-[1.15fr_.85fr]">
+        <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-bold">Your next steps</h2>
+            <Sparkles
+              size={18}
+              className="text-[hsl(var(--accent-foreground))]"
+            />
+          </div>
+          <div className="mt-6 space-y-4">
+            {[
+              {
+                title: "Understand your scheme match",
+                done: true,
+                href: "/recommendations",
+              },
+              {
+                title: "Choose a local partner",
+                done: !!app,
+                href: "/partners",
+              },
+              { title: "Send your enquiry", done: !!app, href: "/application" },
+              { title: "Track partner review", done: false, href: "/track" },
+            ].map((s, i) => (
+              <Link
+                key={s.title}
+                href={s.href}
+                className="flex items-center gap-4 rounded-xl border border-[hsl(var(--border))] p-4 hover:bg-[hsl(var(--secondary))]"
+                data-testid={`link-dashboard-step-${i}`}
+              >
+                <span
+                  className={`grid h-8 w-8 place-items-center rounded-full ${s.done ? "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))]" : "bg-[hsl(var(--secondary))] text-[hsl(var(--muted-foreground))]"}`}
+                >
+                  {s.done ? (
+                    <Check size={15} />
+                  ) : (
+                    <span className="text-xs font-bold">{i + 1}</span>
+                  )}
+                </span>
+                <span className="flex-1 text-sm font-bold">{s.title}</span>
+                <ArrowRight
+                  size={15}
+                  className="text-[hsl(var(--muted-foreground))]"
+                />
+              </Link>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[hsl(var(--secondary))] p-6">
+          <Eyebrow>One useful number</Eyebrow>
+          <h2 className="font-display text-3xl font-bold tracking-[-.05em]">
+            {formatMoney(profile.loanRequired)}
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[hsl(var(--muted-foreground))]">
+            is the amount you told us you may need. Use the calculator to see
+            how a monthly plan could look.
+          </p>
+          <Link
+            href="/calculator"
+            className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-[hsl(var(--primary))]"
+            data-testid="link-dashboard-calculator"
+          >
+            Open calculator <ArrowRight size={15} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-function AdminOverview({ detail = false }: { detail?: boolean }) { const query = useGetAdminAnalytics(); const data = query.data || fallbackAnalytics; return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow={detail ? 'Analytics' : 'Authority workspace'} title={detail ? 'Read the demand, not just the volume.' : 'A clearer view of who needs support.'} body="Prototype analytics for service authorities. Use patterns to improve outreach, routing and partner capacity." /><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Stat label="Applications" value={data.totalApplications.toString()} detail="all enquiries" icon={FileText} /><Stat label="Matched" value={data.matchedApplications.toString()} detail="with a scheme fit" icon={Sparkles} /><Stat label="Routed" value={data.routedApplications.toString()} detail="to a partner" icon={Navigation} /><Stat label="Assistance requested" value={formatMoney(data.assistance)} detail="illustrative total" icon={Banknote} /></div><div className="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]"><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow"><div className="flex items-center justify-between"><div><h2 className="font-display text-xl font-bold">Applications over time</h2><p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">Last six months</p></div><BarChart3 size={18} className="text-[hsl(var(--primary))]" /></div><div className="mt-8 flex h-52 items-end gap-3 sm:gap-5">{data.monthly.map((m, i) => { const max = Math.max(...data.monthly.map(x => x.applications)); return <div key={m.month} className="flex flex-1 flex-col items-center gap-2"><span className="text-[10px] font-bold text-[hsl(var(--muted-foreground))]">{m.applications}</span><div className="flex h-36 w-full items-end rounded-md bg-[hsl(var(--secondary))]"><div className={`w-full rounded-md ${i === data.monthly.length - 1 ? 'bg-[hsl(var(--accent))]' : 'bg-[hsl(var(--primary))]'}`} style={{ height: `${(m.applications / max) * 100}%` }} /></div><span className="text-[10px] text-[hsl(var(--muted-foreground))]">{m.month}</span></div>; })}</div></div><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow"><h2 className="font-display text-xl font-bold">Current pipeline</h2><div className="mt-6 space-y-4">{data.status.map((s, i) => <div key={s.name}><div className="mb-1.5 flex justify-between text-xs"><span className="font-semibold">{s.name}</span><span className="text-[hsl(var(--muted-foreground))]">{s.value}</span></div><div className="h-2 rounded-full bg-[hsl(var(--secondary))]"><div className={`h-full rounded-full ${i === 0 ? 'bg-[hsl(var(--primary))]' : i === 1 ? 'bg-[hsl(var(--accent))]' : 'bg-[hsl(var(--chart-3))]'}`} style={{ width: `${(s.value / data.totalApplications) * 100}%` }} /></div></div>)}</div><div className="mt-8 border-t border-[hsl(var(--border))] pt-5 text-xs leading-5 text-[hsl(var(--muted-foreground))]">Routing rate is <strong className="text-[hsl(var(--foreground))]">{Math.round((data.routedApplications / data.totalApplications) * 100)}%</strong> in this prototype view.</div></div></div><div className="mt-6 grid gap-6 md:grid-cols-2"><div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow"><h2 className="font-display text-xl font-bold">Demand by purpose</h2><div className="mt-5 space-y-4">{data.demand.map(d => <div key={d.name} className="flex items-center gap-3"><span className="w-28 shrink-0 text-xs font-semibold">{d.name}</span><div className="h-2 flex-1 rounded-full bg-[hsl(var(--secondary))]"><div className="h-full rounded-full bg-[hsl(var(--primary))]" style={{ width: `${d.value}%` }} /></div><span className="w-7 text-right text-xs text-[hsl(var(--muted-foreground))]">{d.value}</span></div>)}</div></div><div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))]"><p className="text-xs font-bold uppercase tracking-[.16em] opacity-70">Signal to act on</p><h2 className="mt-4 font-display text-2xl font-bold leading-tight">Micro enterprise is the loudest ask in the room.</h2><p className="mt-3 text-sm leading-6 opacity-75">Consider adding intake hours near local enterprise clusters and expanding starter-loan partner capacity.</p><Link href="/admin/partners" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--accent))] px-4 py-2.5 text-xs font-bold text-[hsl(var(--accent-foreground))]" data-testid="link-admin-partners">Review partner capacity <ArrowRight size={14} /></Link></div></div></div>; }
+function AdminOverview({ detail = false }: { detail?: boolean }) {
+  const query = useGetAdminAnalytics();
+  const data = query.data || fallbackAnalytics;
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow={detail ? "Analytics" : "Authority workspace"}
+        title={
+          detail
+            ? "Read the demand, not just the volume."
+            : "A clearer view of who needs support."
+        }
+        body="Prototype analytics for service authorities. Use patterns to improve outreach, routing and partner capacity."
+      />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat
+          label="Applications"
+          value={data.totalApplications.toString()}
+          detail="all enquiries"
+          icon={FileText}
+        />
+        <Stat
+          label="Matched"
+          value={data.matchedApplications.toString()}
+          detail="with a scheme fit"
+          icon={Sparkles}
+        />
+        <Stat
+          label="Routed"
+          value={data.routedApplications.toString()}
+          detail="to a partner"
+          icon={Navigation}
+        />
+        <Stat
+          label="Assistance requested"
+          value={formatMoney(data.assistance)}
+          detail="illustrative total"
+          icon={Banknote}
+        />
+      </div>
+      <div className="mt-7 grid gap-6 lg:grid-cols-[1.3fr_.7fr]">
+        <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-xl font-bold">
+                Applications over time
+              </h2>
+              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">
+                Last six months
+              </p>
+            </div>
+            <BarChart3 size={18} className="text-[hsl(var(--primary))]" />
+          </div>
+          <div className="mt-8 flex h-52 items-end gap-3 sm:gap-5">
+            {data.monthly.map((m, i) => {
+              const max = Math.max(...data.monthly.map((x) => x.applications));
+              return (
+                <div
+                  key={m.month}
+                  className="flex flex-1 flex-col items-center gap-2"
+                >
+                  <span className="text-[10px] font-bold text-[hsl(var(--muted-foreground))]">
+                    {m.applications}
+                  </span>
+                  <div className="flex h-36 w-full items-end rounded-md bg-[hsl(var(--secondary))]">
+                    <div
+                      className={`w-full rounded-md ${i === data.monthly.length - 1 ? "bg-[hsl(var(--accent))]" : "bg-[hsl(var(--primary))]"}`}
+                      style={{ height: `${(m.applications / max) * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] text-[hsl(var(--muted-foreground))]">
+                    {m.month}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
+          <h2 className="font-display text-xl font-bold">Current pipeline</h2>
+          <div className="mt-6 space-y-4">
+            {data.status.map((s, i) => (
+              <div key={s.name}>
+                <div className="mb-1.5 flex justify-between text-xs">
+                  <span className="font-semibold">{s.name}</span>
+                  <span className="text-[hsl(var(--muted-foreground))]">
+                    {s.value}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-[hsl(var(--secondary))]">
+                  <div
+                    className={`h-full rounded-full ${i === 0 ? "bg-[hsl(var(--primary))]" : i === 1 ? "bg-[hsl(var(--accent))]" : "bg-[hsl(var(--chart-3))]"}`}
+                    style={{
+                      width: `${(s.value / data.totalApplications) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 border-t border-[hsl(var(--border))] pt-5 text-xs leading-5 text-[hsl(var(--muted-foreground))]">
+            Routing rate is{" "}
+            <strong className="text-[hsl(var(--foreground))]">
+              {Math.round(
+                (data.routedApplications / data.totalApplications) * 100,
+              )}
+              %
+            </strong>{" "}
+            in this prototype view.
+          </div>
+        </div>
+      </div>
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
+          <h2 className="font-display text-xl font-bold">Demand by purpose</h2>
+          <div className="mt-5 space-y-4">
+            {data.demand.map((d) => (
+              <div key={d.name} className="flex items-center gap-3">
+                <span className="w-28 shrink-0 text-xs font-semibold">
+                  {d.name}
+                </span>
+                <div className="h-2 flex-1 rounded-full bg-[hsl(var(--secondary))]">
+                  <div
+                    className="h-full rounded-full bg-[hsl(var(--primary))]"
+                    style={{ width: `${d.value}%` }}
+                  />
+                </div>
+                <span className="w-7 text-right text-xs text-[hsl(var(--muted-foreground))]">
+                  {d.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))]">
+          <p className="text-xs font-bold uppercase tracking-[.16em] opacity-70">
+            Signal to act on
+          </p>
+          <h2 className="mt-4 font-display text-2xl font-bold leading-tight">
+            Micro enterprise is the loudest ask in the room.
+          </h2>
+          <p className="mt-3 text-sm leading-6 opacity-75">
+            Consider adding intake hours near local enterprise clusters and
+            expanding starter-loan partner capacity.
+          </p>
+          <Link
+            href="/admin/partners"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--accent))] px-4 py-2.5 text-xs font-bold text-[hsl(var(--accent-foreground))]"
+            data-testid="link-admin-partners"
+          >
+            Review partner capacity <ArrowRight size={14} />
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-function AdminTable({ type }: { type: 'applications' | 'partners' | 'schemes' }) { const { t } = useLanguage();  const data = type === 'partners' ? partnersFallback : type === 'schemes' ? schemesFallback : [getStored<Application>('ss_application', { id: 'SS-482913', name: 'Asha Kumari', phone: '', email: '', address: 'Bengaluru', schemeId: 'udyam-sakhi', partnerId: 'sahayata-hub', income: 18000, loanRequired: 90000, projectType: 'Tailoring studio', projectCost: 120000, documents: [], status: t('applicationReceived'), createdAt: new Date().toISOString() }), { id: 'SS-482706', name: 'Ravi N', phone: '', email: '', address: 'Mysuru', schemeId: 'kaushal-udyam', partnerId: 'pragati-kendra', income: 24000, loanRequired: 210000, projectType: 'Repair workshop', projectCost: 280000, documents: [], status: 'Partner review', createdAt: new Date().toISOString() }]; const titles = { applications: ['Applications', 'Review enquiries and their current route.'], partners: ['Partner network', 'Monitor coverage, capacity and intake status.'], schemes: ['Scheme catalogue', 'Prototype schemes currently available for matching.'] }; return <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14"><PageTitle eyebrow="Authority workspace" title={titles[type][0]} body={titles[type][1]} /><div className="overflow-x-auto rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] card-shadow"><table className="w-full min-w-[680px] text-left text-sm"><thead className="border-b border-[hsl(var(--border))] bg-[hsl(var(--secondary)/.55)] text-xs uppercase tracking-wider text-[hsl(var(--muted-foreground))]"><tr>{(type === 'applications' ? ['ID / applicant', 'Purpose', 'Amount', 'Status'] : type === 'partners' ? ['Partner', 'Type', 'Distance', 'Capacity', 'Status'] : ['Scheme', 'Applicant type', 'Max loan', 'Interest']).map(h => <th key={h} className="px-5 py-4 font-bold">{h}</th>)}</tr></thead><tbody className="divide-y divide-[hsl(var(--border))]">{data.map((item: any, i) => <tr key={item.id} className="hover:bg-[hsl(var(--secondary)/.3)]" data-testid={`row-${type}-${item.id}`}><td className="px-5 py-5 font-semibold">{type === 'applications' ? <><span className="block font-mono text-xs text-[hsl(var(--primary))]">{item.id}</span><span className="mt-1 block">{item.name}</span></> : <><span className="block">{item.name}</span><span className="mt-1 block text-xs text-[hsl(var(--muted-foreground))]">{item.address || item.purpose}</span></>}</td>{type === 'applications' && <><td className="px-5 py-5 text-[hsl(var(--muted-foreground))]">{item.projectType}</td><td className="px-5 py-5 font-semibold">{formatMoney(item.loanRequired)}</td><td className="px-5 py-5"><span className="rounded-full bg-[hsl(var(--accent)/.2)] px-2.5 py-1 text-xs font-bold">{item.status}</span></td></>}{type === 'partners' && <><td className="px-5 py-5 text-[hsl(var(--muted-foreground))]">{item.type}</td><td className="px-5 py-5">{item.distance} km</td><td className="px-5 py-5">{item.processingCapacity}%</td><td className="px-5 py-5"><span className="text-xs font-bold text-[hsl(var(--primary))]">{item.status}</span></td></>}{type === 'schemes' && <><td className="px-5 py-5">{item.applicantType}</td><td className="px-5 py-5 font-semibold">{formatMoney(item.maxLoan)}</td><td className="px-5 py-5">{item.interest}%</td></>}</tr>)}</tbody></table></div><div className="mt-5 flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]"><Sparkles size={14} className="text-[hsl(var(--accent-foreground))]" /> Prototype records are clearly labelled and safe for demonstration.</div></div>; }
+function AdminTable({
+  type,
+}: {
+  type: "applications" | "partners" | "schemes";
+}) {
+  const { t } = useLanguage();
+  const data =
+    type === "partners"
+      ? partnersFallback
+      : type === "schemes"
+        ? schemesFallback
+        : [
+            getStored<Application>("ss_application", {
+              id: "SS-482913",
+              name: "Asha Kumari",
+              phone: "",
+              email: "",
+              address: "Bengaluru",
+              schemeId: "udyam-sakhi",
+              partnerId: "sahayata-hub",
+              income: 18000,
+              loanRequired: 90000,
+              projectType: "Tailoring studio",
+              projectCost: 120000,
+              documents: [],
+              status: t("applicationReceived"),
+              createdAt: new Date().toISOString(),
+            }),
+            {
+              id: "SS-482706",
+              name: "Ravi N",
+              phone: "",
+              email: "",
+              address: "Mysuru",
+              schemeId: "kaushal-udyam",
+              partnerId: "pragati-kendra",
+              income: 24000,
+              loanRequired: 210000,
+              projectType: "Repair workshop",
+              projectCost: 280000,
+              documents: [],
+              status: "Partner review",
+              createdAt: new Date().toISOString(),
+            },
+          ];
+  const titles = {
+    applications: ["Applications", "Review enquiries and their current route."],
+    partners: [
+      "Partner network",
+      "Monitor coverage, capacity and intake status.",
+    ],
+    schemes: [
+      "Scheme catalogue",
+      "Prototype schemes currently available for matching.",
+    ],
+  };
+  return (
+    <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
+      <PageTitle
+        eyebrow="Authority workspace"
+        title={titles[type][0]}
+        body={titles[type][1]}
+      />
+      <div className="overflow-x-auto rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] card-shadow">
+        <table className="w-full min-w-[680px] text-left text-sm">
+          <thead className="border-b border-[hsl(var(--border))] bg-[hsl(var(--secondary)/.55)] text-xs uppercase tracking-wider text-[hsl(var(--muted-foreground))]">
+            <tr>
+              {(type === "applications"
+                ? ["ID / applicant", "Purpose", "Amount", "Status"]
+                : type === "partners"
+                  ? ["Partner", "Type", "Distance", "Capacity", "Status"]
+                  : ["Scheme", "Applicant type", "Max loan", "Interest"]
+              ).map((h) => (
+                <th key={h} className="px-5 py-4 font-bold">
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[hsl(var(--border))]">
+            {data.map((item: any, i) => (
+              <tr
+                key={item.id}
+                className="hover:bg-[hsl(var(--secondary)/.3)]"
+                data-testid={`row-${type}-${item.id}`}
+              >
+                <td className="px-5 py-5 font-semibold">
+                  {type === "applications" ? (
+                    <>
+                      <span className="block font-mono text-xs text-[hsl(var(--primary))]">
+                        {item.id}
+                      </span>
+                      <span className="mt-1 block">{item.name}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="block">{item.name}</span>
+                      <span className="mt-1 block text-xs text-[hsl(var(--muted-foreground))]">
+                        {item.address || item.purpose}
+                      </span>
+                    </>
+                  )}
+                </td>
+                {type === "applications" && (
+                  <>
+                    <td className="px-5 py-5 text-[hsl(var(--muted-foreground))]">
+                      {item.projectType}
+                    </td>
+                    <td className="px-5 py-5 font-semibold">
+                      {formatMoney(item.loanRequired)}
+                    </td>
+                    <td className="px-5 py-5">
+                      <span className="rounded-full bg-[hsl(var(--accent)/.2)] px-2.5 py-1 text-xs font-bold">
+                        {item.status}
+                      </span>
+                    </td>
+                  </>
+                )}
+                {type === "partners" && (
+                  <>
+                    <td className="px-5 py-5 text-[hsl(var(--muted-foreground))]">
+                      {item.type}
+                    </td>
+                    <td className="px-5 py-5">{item.distance} km</td>
+                    <td className="px-5 py-5">{item.processingCapacity}%</td>
+                    <td className="px-5 py-5">
+                      <span className="text-xs font-bold text-[hsl(var(--primary))]">
+                        {item.status}
+                      </span>
+                    </td>
+                  </>
+                )}
+                {type === "schemes" && (
+                  <>
+                    <td className="px-5 py-5">{item.applicantType}</td>
+                    <td className="px-5 py-5 font-semibold">
+                      {formatMoney(item.maxLoan)}
+                    </td>
+                    <td className="px-5 py-5">{item.interest}%</td>
+                  </>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="mt-5 flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+        <Sparkles size={14} className="text-[hsl(var(--accent-foreground))]" />{" "}
+        Prototype records are clearly labelled and safe for demonstration.
+      </div>
+    </div>
+  );
+}
 
-function Router() { return <ErrorBoundary resetKey={location.pathname}><Shell><DocumentTitle /><Switch><Route path="/" component={Home} /><Route path="/eligibility" component={Eligibility} /><Route path="/recommendations" component={Recommendations} /><Route path="/schemes" component={Schemes} /><Route path="/schemes/:id" component={SchemeDetail} /><Route path="/calculator" component={CalculatorPage} /><Route path="/partners" component={LegacyPartners} /><Route path="/find-partner" component={LegacyPartners} /><Route path="/application" component={ApplicationPage} /><Route path="/application/success" component={Success} /><Route path="/track" component={Track} /><Route path="/dashboard" component={Dashboard} /><Route path="/admin" component={() => <AdminOverview />} /><Route path="/admin/applications" component={() => <AdminTable type="applications" />} /><Route path="/admin/partners" component={() => <AdminTable type="partners" />} /><Route path="/admin/schemes" component={() => <AdminTable type="schemes" />} /><Route path="/admin/analytics" component={() => <AdminOverview detail />} /><Route component={NotFound} /></Switch></Shell></ErrorBoundary>; }
+function Router() {
+  return (
+    <ErrorBoundary resetKey={location.pathname}>
+      <Shell>
+        <DocumentTitle />
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/eligibility" component={Eligibility} />
+          <Route path="/recommendations" component={Recommendations} />
+          <Route path="/schemes" component={Schemes} />
+          <Route path="/schemes/:id" component={SchemeDetail} />
+          <Route path="/calculator" component={CalculatorPage} />
+          <Route path="/partners" component={LegacyPartners} />
+          <Route path="/find-partner" component={LegacyPartners} />
+          <Route path="/application" component={ApplicationPage} />
+          <Route path="/application/success" component={Success} />
+          <Route path="/track" component={Track} />
+          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/admin" component={() => <AdminOverview />} />
+          <Route
+            path="/admin/applications"
+            component={() => <AdminTable type="applications" />}
+          />
+          <Route
+            path="/admin/partners"
+            component={() => <AdminTable type="partners" />}
+          />
+          <Route
+            path="/admin/schemes"
+            component={() => <AdminTable type="schemes" />}
+          />
+          <Route
+            path="/admin/analytics"
+            component={() => <AdminOverview detail />}
+          />
+          <Route component={NotFound} />
+        </Switch>
+      </Shell>
+    </ErrorBoundary>
+  );
+}
 
- function App() { return <QueryClientProvider client={queryClient}><TooltipProvider><LanguageProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><Toaster /></LanguageProvider></TooltipProvider></QueryClientProvider>; }
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <LanguageProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </LanguageProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 export default App;

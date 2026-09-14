@@ -23,7 +23,7 @@ const english: Dictionary = {
   trackQueueBody: 'Your application is in the queue for a partner conversation. You will be contacted through the details you shared.',
   recommendationBody: "Based on {name}'s stated need. Scores are guidance, not a promise of approval.", yourAnswers: 'your answers',
   editAnswersLink: 'Edit answers', neededLabel: 'needed', bestFitBadge: 'Best fit', fitScoreLabel: 'fit score',
-  upToLabel: 'Up to', illustrativeInterestLabel: 'Illustrative interest', repaymentWindowLabel: 'Repayment window',
+  upToLabel: 'Up to', illustrativeInterestLabel: 'Illustrative interest', repaymentWindowLabel: 'Repayment window', maxLoanLabel: 'Max loan', interestLabel: 'Interest', tenureLabel: 'Tenure', yearsShort: 'yrs', loanAmountLabel: 'Loan amount', interestRateLabel: 'Interest rate', moratoriumLabel: 'Moratorium', quickEstimate: 'Quick estimate', repaymentPeriod: 'Repayment period', monthsShort: 'months', estimatedMonthlyRepayment: 'Estimated monthly repayment', perMonth: 'per month', viewMatches: 'View matches', basedOnAmount: 'Based on your amount, {count} schemes may fit.', quickHelpBody: 'Choose a quick next step. Sathi provides guided links, not automated advice.', illustrativeEstimate: 'This is an illustrative estimate. A moratorium may defer repayment, but the partner will explain the final schedule.', estimatedMonthlyEmi: 'Estimated monthly EMI', installmentSchedule: 'for {count} monthly instalments after the illustrative schedule begins', principalLabel: 'Principal', totalInterestLabel: 'Total interest', totalRepaymentLabel: 'Total repayment', interestScheduleNote: 'Interest and schedule are illustrative. Ask your selected partner for the final repayment calendar.', eligibilityGuidance: 'Answer what you know. You can change anything later. This is a guidance prototype, not an approval decision.', schemesLibraryBody: 'A prototype library of public-service schemes. Open any card to see limits, repayment shape and who it is designed for.', noMoratorium: 'No moratorium', calculateEmi: 'Calculate my EMI', processingCapacity: 'Processing capacity', capacityAvailable: 'available', npaWithin: 'within threshold', npaAbove: 'above threshold', distanceFromLocation: '{distance} km from your location', yourLocation: 'Your location', selectPartner: 'Select {name}', findApplication: 'Find application', applicationIdPlaceholder: 'Example: SS-482913', applicationNotFound: 'Check the characters and try again. This prototype only recognises applications created in this browser.',
 };
 
 const hindi: Dictionary = {
@@ -39,7 +39,7 @@ const hindi: Dictionary = {
   trackQueueBody: 'आपका आवेदन साझेदार से बातचीत के लिए कतार में है। आपके द्वारा साझा किए गए विवरण के ज़रिए आपसे संपर्क किया जाएगा।',
   recommendationBody: 'बताई गई ज़रूरत के आधार पर। स्कोर केवल मार्गदर्शन के लिए हैं, स्वीकृति का वादा नहीं।', yourAnswers: 'आपके उत्तर',
   editAnswersLink: 'उत्तर बदलें', neededLabel: 'चाहिए', bestFitBadge: 'सबसे सही', fitScoreLabel: 'मिलान स्कोर',
-  upToLabel: 'अधिकतम', illustrativeInterestLabel: 'अनुमानित ब्याज', repaymentWindowLabel: 'भुगतान की अवधि',
+  upToLabel: 'अधिकतम', illustrativeInterestLabel: 'अनुमानित ब्याज', repaymentWindowLabel: 'भुगतान की अवधि', maxLoanLabel: 'अधिकतम ऋण', interestLabel: 'ब्याज', tenureLabel: 'अवधि', yearsShort: 'वर्ष', loanAmountLabel: 'ऋण राशि', interestRateLabel: 'ब्याज दर', moratoriumLabel: 'स्थगन अवधि', quickEstimate: 'त्वरित अनुमान', repaymentPeriod: 'भुगतान की अवधि', monthsShort: 'महीने', estimatedMonthlyRepayment: 'अनुमानित मासिक भुगतान', perMonth: 'प्रति माह', viewMatches: 'मिलान देखें', basedOnAmount: 'आपकी राशि के आधार पर, {count} योजनाएँ उपयुक्त हो सकती हैं।', quickHelpBody: 'अगला कदम चुनें। साथी केवल मार्गदर्शित लिंक देते हैं, स्वचालित सलाह नहीं।', illustrativeEstimate: 'यह एक अनुमानित गणना है। स्थगन अवधि भुगतान को टाल सकती है, लेकिन अंतिम समय-सारणी साझेदार समझाएगा।', estimatedMonthlyEmi: 'अनुमानित मासिक ईएमआई', installmentSchedule: 'अनुमानित समय-सारणी शुरू होने के बाद {count} मासिक किस्तों के लिए', principalLabel: 'मूलधन', totalInterestLabel: 'कुल ब्याज', totalRepaymentLabel: 'कुल भुगतान', interestScheduleNote: 'ब्याज और समय-सारणी केवल अनुमानित हैं। अंतिम भुगतान कैलेंडर के लिए अपने चुने हुए साझेदार से पूछें।', eligibilityGuidance: 'जो जानकारी आप जानते हैं, वह भरें। आप बाद में कुछ भी बदल सकते हैं। यह मार्गदर्शन प्रोटोटाइप है, स्वीकृति का निर्णय नहीं।', schemesLibraryBody: 'सार्वजनिक सेवा योजनाओं की प्रोटोटाइप सूची। सीमा, भुगतान का स्वरूप और योजना किसके लिए है, यह देखने के लिए कोई कार्ड खोलें।', noMoratorium: 'कोई स्थगन अवधि नहीं', calculateEmi: 'मेरी ईएमआई निकालें', processingCapacity: 'प्रसंस्करण क्षमता', capacityAvailable: 'उपलब्ध', npaWithin: 'सीमा के भीतर', npaAbove: 'सीमा से अधिक', distanceFromLocation: '{distance} किमी आपके स्थान से', yourLocation: 'आपका स्थान', selectPartner: '{name} चुनें', findApplication: 'आवेदन खोजें', applicationIdPlaceholder: 'उदाहरण: SS-482913', applicationNotFound: 'अक्षरों की जाँच करके फिर से प्रयास करें। यह प्रोटोटाइप केवल इसी ब्राउज़र में बनाए गए आवेदनों को पहचानता है।',
 };
 
 const kannada: Dictionary = {
@@ -55,10 +55,43 @@ const kannada: Dictionary = {
   trackQueueBody: 'ನಿಮ್ಮ ಅರ್ಜಿಯು ಪಾಲುದಾರರೊಂದಿಗೆ ಸಂಭಾಷಣೆಗಾಗಿ ಸರದಿಯಲ್ಲಿದೆ. ನೀವು ಹಂಚಿಕೊಂಡ ವಿವರಗಳ ಮೂಲಕ ನಿಮ್ಮನ್ನು ಸಂಪರ್ಕಿಸಲಾಗುತ್ತದೆ.',
   recommendationBody: 'ಅಗತ್ಯದ ಆಧಾರದ ಮೇಲೆ. ಸ್ಕೋರ್‌ಗಳು ಕೇವಲ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ, ಅನುಮೋದನೆಯ ಭರವಸೆಯಲ್ಲ.', yourAnswers: 'ನಿಮ್ಮ ಉತ್ತರಗಳು',
   editAnswersLink: 'ಉತ್ತರಗಳನ್ನು ಬದಲಿಸಿ', neededLabel: 'ಬೇಕಾಗಿದೆ', bestFitBadge: 'ಅತ್ಯುತ್ತಮ', fitScoreLabel: 'ಹೊಂದಾಣಿಕೆ ಸ್ಕೋರ್',
-  upToLabel: 'ಗರಿಷ್ಠ', illustrativeInterestLabel: 'ಅಂದಾಜು ಬಡ್ಡಿ', repaymentWindowLabel: 'ಮರುಪಾವತಿ ಅವಧಿ',
+  upToLabel: 'ಗರಿಷ್ಠ', illustrativeInterestLabel: 'ಅಂದಾಜು ಬಡ್ಡಿ', repaymentWindowLabel: 'ಮರುಪಾವತಿ ಅವಧಿ', maxLoanLabel: 'ಗರಿಷ್ಠ ಸಾಲ', interestLabel: 'ಬಡ್ಡಿ', tenureLabel: 'ಅವಧಿ', yearsShort: 'ವರ್ಷ', loanAmountLabel: 'ಸಾಲದ ಮೊತ್ತ', interestRateLabel: 'ಬಡ್ಡಿ ದರ', moratoriumLabel: 'ವಿರಾಮ ಅವಧಿ', quickEstimate: 'ತ್ವರಿತ ಅಂದಾಜು', repaymentPeriod: 'ಮರುಪಾವತಿ ಅವಧಿ', monthsShort: 'ತಿಂಗಳು', estimatedMonthlyRepayment: 'ಅಂದಾಜು ಮಾಸಿಕ ಮರುಪಾವತಿ', perMonth: 'ತಿಂಗಳಿಗೆ', viewMatches: 'ಹೊಂದಾಣಿಕೆಗಳನ್ನು ನೋಡಿ', basedOnAmount: 'ನಿಮ್ಮ ಮೊತ್ತದ ಆಧಾರದ ಮೇಲೆ, {count} ಯೋಜನೆಗಳು ಸೂಕ್ತವಾಗಬಹುದು.', quickHelpBody: 'ಮುಂದಿನ ಹಂತವನ್ನು ಆರಿಸಿ. ಸಾಥಿ ಮಾರ್ಗದರ್ಶಿತ ಲಿಂಕ್‌ಗಳನ್ನು ನೀಡುತ್ತಾರೆ, ಸ್ವಯಂಚಾಲಿತ ಸಲಹೆಯಲ್ಲ.', illustrativeEstimate: 'ಇದು ಒಂದು ಅಂದಾಜು ಲೆಕ್ಕಾಚಾರ. ವಿರಾಮ ಅವಧಿಯು ಮರುಪಾವತಿಯನ್ನು ಮುಂದೂಡಬಹುದು, ಆದರೆ ಅಂತಿಮ ವೇಳಾಪಟ್ಟಿಯನ್ನು ಪಾಲುದಾರರು ವಿವರಿಸುತ್ತಾರೆ.', estimatedMonthlyEmi: 'ಅಂದಾಜು ಮಾಸಿಕ EMI', installmentSchedule: 'ಅಂದಾಜು ವೇಳಾಪಟ್ಟಿ ಆರಂಭವಾದ ನಂತರ {count} ಮಾಸಿಕ ಕಂತುಗಳಿಗೆ', principalLabel: 'ಅಸಲು', totalInterestLabel: 'ಒಟ್ಟು ಬಡ್ಡಿ', totalRepaymentLabel: 'ಒಟ್ಟು ಮರುಪಾವತಿ', interestScheduleNote: 'ಬಡ್ಡಿ ಮತ್ತು ವೇಳಾಪಟ್ಟಿ ಅಂದಾಜು ಮಾತ್ರ. ಅಂತಿಮ ಮರುಪಾವತಿ ಕ್ಯಾಲೆಂಡರ್‌ಗಾಗಿ ನಿಮ್ಮ ಆಯ್ಕೆ ಪಾಲುದಾರರನ್ನು ಕೇಳಿ.', eligibilityGuidance: 'ನಿಮಗೆ ತಿಳಿದಿರುವ ಮಾಹಿತಿಯನ್ನು ನೀಡಿ. ನಂತರ ಏನನ್ನಾದರೂ ಬದಲಾಯಿಸಬಹುದು. ಇದು ಮಾರ್ಗದರ್ಶನ ಮಾದರಿ, ಅನುಮೋದನೆ ನಿರ್ಧಾರವಲ್ಲ.', schemesLibraryBody: 'ಸಾರ್ವಜನಿಕ ಸೇವಾ ಯೋಜನೆಗಳ ಮಾದರಿ ಪಟ್ಟಿ. ಮಿತಿಗಳು, ಮರುಪಾವತಿ ವಿಧಾನ ಮತ್ತು ಯಾರಿಗಾಗಿ ಎಂಬುದನ್ನು ನೋಡಲು ಯಾವುದೇ ಕಾರ್ಡ್ ತೆರೆಯಿರಿ.', noMoratorium: 'ವಿರಾಮ ಅವಧಿ ಇಲ್ಲ', calculateEmi: 'ನನ್ನ EMI ಲೆಕ್ಕಿಸಿ', processingCapacity: 'ಸಂಸ್ಕರಣಾ ಸಾಮರ್ಥ್ಯ', capacityAvailable: 'ಲಭ್ಯ', npaWithin: 'ಮಿತಿಯೊಳಗೆ', npaAbove: 'ಮಿತಿಗಿಂತ ಹೆಚ್ಚು', distanceFromLocation: '{distance} ಕಿಮೀ ನಿಮ್ಮ ಸ್ಥಳದಿಂದ', yourLocation: 'ನಿಮ್ಮ ಸ್ಥಳ', selectPartner: '{name} ಆಯ್ಕೆಮಾಡಿ', findApplication: 'ಅರ್ಜಿಯನ್ನು ಹುಡುಕಿ', applicationIdPlaceholder: 'ಉದಾಹರಣೆ: SS-482913', applicationNotFound: 'ಅಕ್ಷರಗಳನ್ನು ಪರಿಶೀಲಿಸಿ ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. ಈ ಮಾದರಿ ಈ ಬ್ರೌಸರ್‌ನಲ್ಲಿ ರಚಿಸಲಾದ ಅರ್ಜಿಗಳನ್ನು ಮಾತ್ರ ಗುರುತಿಸುತ್ತದೆ.',
 };
 
 const dictionaries: Record<Language, Dictionary> = { en: english, hi: hindi, kn: kannada };
+type SchemeText = { name: string; purpose: string; applicantType: string; tags: string[] };
+const schemeTranslations: Record<'hi' | 'kn', Record<string, SchemeText>> = {
+  hi: {
+    'micro-finance': { name: 'सूक्ष्म वित्त योजना', purpose: 'छोटी परियोजनाओं और शुरुआती व्यवसायों के लिए सहायता।', applicantType: 'उद्यमी', tags: ['छोटी परियोजनाएँ', 'आय के अनुकूल', 'कम ब्याज'] },
+    'term-loan': { name: 'सावधि ऋण योजना', purpose: 'बड़ी व्यावसायिक और परियोजना आवश्यकताओं के लिए सहायता।', applicantType: 'उद्यमी', tags: ['बड़ी परियोजनाएँ', 'लचीली अवधि'] },
+    'education-loan': { name: 'शिक्षा ऋण योजना', purpose: 'उच्च शिक्षा और व्यावसायिक पाठ्यक्रमों के लिए सहायता।', applicantType: 'विद्यार्थी', tags: ['उच्च शिक्षा', 'स्थगन अवधि'] },
+    'equipment-support': { name: 'उपकरण सहायता योजना', purpose: 'स्थापित उद्यम के लिए उत्पादक उपकरण खरीदने की सहायता।', applicantType: 'उद्यमी', tags: ['उपकरण', 'व्यवसाय वृद्धि'] },
+    'working-capital': { name: 'कार्यशील पूंजी योजना', purpose: 'भंडार और रोज़मर्रा के व्यावसायिक खर्चों के लिए सहायता।', applicantType: 'उद्यमी', tags: ['कार्यशील पूंजी', 'त्वरित सहायता'] },
+    'women-enterprise': { name: 'महिला उद्यम आरंभ योजना', purpose: 'महिला नेतृत्व वाले छोटे उद्यमों और घरेलू व्यवसायों के लिए आरंभिक वित्त।', applicantType: 'उद्यमी', tags: ['महिला नेतृत्व', 'आरंभिक', 'सूक्ष्म उद्यम'] },
+    'livelihood-fund': { name: 'आजीविका विकास निधि', purpose: 'ग्रामीण और अर्ध-शहरी समुदायों में आजीविका गतिविधियों के लिए पूंजी।', applicantType: 'उद्यमी', tags: ['आजीविका', 'ग्रामीण', 'समुदाय'] },
+    'skill-support': { name: 'कौशल विकास सहायता', purpose: 'व्यावसायिक प्रशिक्षण और रोजगार-केंद्रित प्रमाणन के लिए शिक्षा सहायता।', applicantType: 'विद्यार्थी', tags: ['कौशल', 'व्यावसायिक', 'विद्यार्थी'] },
+    'green-equipment': { name: 'हरित उद्यम उपकरण निधि', purpose: 'ऊर्जा-कुशल उपकरणों और पर्यावरण-अनुकूल उद्यमों के लिए वित्त।', applicantType: 'उद्यमी', tags: ['हरित व्यवसाय', 'उपकरण'] },
+    'udyam-sakhi': { name: 'उद्यम सखी आरंभिक ऋण', purpose: 'पहला उद्यम शुरू करने या घरेलू व्यवसाय बढ़ाने वाली महिलाओं के लिए सहायता।', applicantType: 'उद्यमी', tags: ['महिला नेतृत्व', 'सूक्ष्म उद्यम', 'आरंभिक'] },
+    'vidya-vikas': { name: 'विद्या विकास शिक्षा सहायता', purpose: 'व्यावसायिक या उच्च शिक्षा में निवेश करने वाले विद्यार्थियों के लिए लचीली सहायता।', applicantType: 'विद्यार्थी', tags: ['विद्यार्थी', 'शिक्षा', 'कम ब्याज'] },
+    'kaushal-udyam': { name: 'कौशल उद्यम विकास ऋण', purpose: 'कुशल व्यापार, स्थानीय सेवाओं और छोटे उत्पादन केंद्रों के लिए कार्यशील पूंजी।', applicantType: 'उद्यमी', tags: ['कुशल व्यापार', 'कार्यशील पूंजी', 'विकास'] },
+    'jan-aajeevika': { name: 'जन आजीविका निधि', purpose: 'ग्रामीण और अर्ध-शहरी समुदायों में आजीविका गतिविधियों के लिए पूंजी।', applicantType: 'उद्यमी', tags: ['आजीविका', 'ग्रामीण', 'समुदाय'] },
+  },
+  kn: {
+    'micro-finance': { name: 'ಸೂಕ್ಷ್ಮ ಹಣಕಾಸು ಯೋಜನೆ', purpose: 'ಸಣ್ಣ ಯೋಜನೆಗಳು ಮತ್ತು ಆರಂಭಿಕ ವ್ಯವಹಾರಗಳಿಗೆ ನೆರವು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಸಣ್ಣ ಯೋಜನೆಗಳು', 'ಆದಾಯ ಹೊಂದಾಣಿಕೆ', 'ಕಡಿಮೆ ಬಡ್ಡಿ'] },
+    'term-loan': { name: 'ಅವಧಿ ಸಾಲ ಯೋಜನೆ', purpose: 'ದೊಡ್ಡ ವ್ಯವಹಾರ ಮತ್ತು ಯೋಜನಾ ಅಗತ್ಯಗಳಿಗೆ ನೆರವು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ದೊಡ್ಡ ಯೋಜನೆಗಳು', 'ಹೊಂದಿಕೊಳ್ಳುವ ಅವಧಿ'] },
+    'education-loan': { name: 'ಶಿಕ್ಷಣ ಸಾಲ ಯೋಜನೆ', purpose: 'ಉನ್ನತ ಶಿಕ್ಷಣ ಮತ್ತು ವೃತ್ತಿಪರ ಕೋರ್ಸ್‌ಗಳಿಗೆ ನೆರವು.', applicantType: 'ವಿದ್ಯಾರ್ಥಿ', tags: ['ಉನ್ನತ ಶಿಕ್ಷಣ', 'ವಿರಾಮ ಅವಧಿ'] },
+    'equipment-support': { name: 'ಉಪಕರಣ ನೆರವು ಯೋಜನೆ', purpose: 'ಸ್ಥಾಪಿತ ಉದ್ಯಮಕ್ಕೆ ಉತ್ಪಾದಕ ಉಪಕರಣಗಳಿಗಾಗಿ ನೆರವು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಉಪಕರಣ', 'ವ್ಯವಹಾರ ಬೆಳವಣಿಗೆ'] },
+    'working-capital': { name: 'ಕಾರ್ಯನಿರ್ವಹಣಾ ಬಂಡವಾಳ ಯೋಜನೆ', purpose: 'ದಾಸ್ತಾನು ಮತ್ತು ದೈನಂದಿನ ವ್ಯವಹಾರ ವೆಚ್ಚಗಳಿಗೆ ನೆರವು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಕಾರ್ಯನಿರ್ವಹಣಾ ಬಂಡವಾಳ', 'ತ್ವರಿತ ನೆರವು'] },
+    'women-enterprise': { name: 'ಮಹಿಳಾ ಉದ್ಯಮ ಆರಂಭ ಯೋಜನೆ', purpose: 'ಮಹಿಳೆಯರು ನಡೆಸುವ ಸಣ್ಣ ಉದ್ಯಮಗಳು ಮತ್ತು ಗೃಹ ವ್ಯವಹಾರಗಳಿಗೆ ಆರಂಭಿಕ ಹಣಕಾಸು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಮಹಿಳಾ ನೇತೃತ್ವ', 'ಆರಂಭಿಕ', 'ಸೂಕ್ಷ್ಮ ಉದ್ಯಮ'] },
+    'livelihood-fund': { name: 'ಜೀವನೋಪಾಯ ಬೆಳವಣಿಗೆ ನಿಧಿ', purpose: 'ಗ್ರಾಮೀಣ ಮತ್ತು ಅರೆ-ನಗರ ಸಮುದಾಯಗಳ ಜೀವನೋಪಾಯ ಚಟುವಟಿಕೆಗಳಿಗೆ ಬಂಡವಾಳ.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಜೀವನೋಪಾಯ', 'ಗ್ರಾಮೀಣ', 'ಸಮುದಾಯ'] },
+    'skill-support': { name: 'ಕೌಶಲ್ಯ ಅಭಿವೃದ್ಧಿ ನೆರವು', purpose: 'ವೃತ್ತಿಪರ ತರಬೇತಿ ಮತ್ತು ಉದ್ಯೋಗಕೇಂದ್ರಿತ ಪ್ರಮಾಣಪತ್ರಗಳಿಗೆ ಶಿಕ್ಷಣ ನೆರವು.', applicantType: 'ವಿದ್ಯಾರ್ಥಿ', tags: ['ಕೌಶಲ್ಯ', 'ವೃತ್ತಿಪರ', 'ವಿದ್ಯಾರ್ಥಿಗಳು'] },
+    'green-equipment': { name: 'ಹಸಿರು ಉದ್ಯಮ ಉಪಕರಣ ನಿಧಿ', purpose: 'ಇಂಧನ-ಸಮರ್ಥ ಸಾಧನಗಳು ಮತ್ತು ಪರಿಸರ ಸ್ನೇಹಿ ಉದ್ಯಮಗಳಿಗೆ ಹಣಕಾಸು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಹಸಿರು ವ್ಯವಹಾರ', 'ಉಪಕರಣ'] },
+    'udyam-sakhi': { name: 'ಉದ್ಯಮ ಸಖಿ ಆರಂಭಿಕ ಸಾಲ', purpose: 'ಮೊದಲ ಉದ್ಯಮ ಆರಂಭಿಸುವ ಅಥವಾ ಗೃಹ ವ್ಯವಹಾರ ಬೆಳೆಸುವ ಮಹಿಳೆಯರಿಗೆ ನೆರವು.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಮಹಿಳಾ ನೇತೃತ್ವ', 'ಸೂಕ್ಷ್ಮ ಉದ್ಯಮ', 'ಆರಂಭಿಕ'] },
+    'vidya-vikas': { name: 'ವಿದ್ಯಾ ವಿಕಾಸ ಶಿಕ್ಷಣ ನೆರವು', purpose: 'ವೃತ್ತಿಪರ ಅಥವಾ ಉನ್ನತ ಶಿಕ್ಷಣದಲ್ಲಿ ಹೂಡಿಕೆ ಮಾಡುವ ವಿದ್ಯಾರ್ಥಿಗಳಿಗೆ ಹೊಂದಿಕೊಳ್ಳುವ ನೆರವು.', applicantType: 'ವಿದ್ಯಾರ್ಥಿ', tags: ['ವಿದ್ಯಾರ್ಥಿಗಳು', 'ಶಿಕ್ಷಣ', 'ಕಡಿಮೆ ಬಡ್ಡಿ'] },
+    'kaushal-udyam': { name: 'ಕೌಶಲ್ಯ ಉದ್ಯಮ ಬೆಳವಣಿಗೆ ಸಾಲ', purpose: 'ಕುಶಲ ವೃತ್ತಿಗಳು, ಸ್ಥಳೀಯ ಸೇವೆಗಳು ಮತ್ತು ಸಣ್ಣ ಉತ್ಪಾದನಾ ಘಟಕಗಳಿಗೆ ಕಾರ್ಯನಿರ್ವಹಣಾ ಬಂಡವಾಳ.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಕುಶಲ ವೃತ್ತಿ', 'ಕಾರ್ಯನಿರ್ವಹಣಾ ಬಂಡವಾಳ', 'ಬೆಳವಣಿಗೆ'] },
+    'jan-aajeevika': { name: 'ಜನ ಆಜೀವಿಕಾ ಜೀವನೋಪಾಯ ನಿಧಿ', purpose: 'ಗ್ರಾಮೀಣ ಮತ್ತು ಅರೆ-ನಗರ ಸಮುದಾಯಗಳ ಜೀವನೋಪಾಯ ಚಟುವಟಿಕೆಗಳಿಗೆ ಬಂಡವಾಳ.', applicantType: 'ಉದ್ಯಮಿ', tags: ['ಜೀವನೋಪಾಯ', 'ಗ್ರಾಮೀಣ', 'ಸಮುದಾಯ'] },
+  },
+};
 const legacyLanguageMap: Record<string, Language> = { English: 'en', 'हिन्दी': 'hi', 'ಕನ್ನಡ': 'kn' };
 const phraseAliases: Record<string, string> = {
   'A short conversation': 'aboutYou', 'Your shortlist': 'yourShortlist', 'A match you can understand.': 'yourShortlist',
@@ -91,4 +124,52 @@ export function useLanguage() {
 export function translatePhrase(lang: Language, text: string) {
   const key = phraseAliases[text] || text;
   return dictionaries[lang]?.[key] || english[key] || text;
+}
+
+export function translateScheme<T extends { id: string; name: string; purpose: string; applicantType: string; tags: string[] }>(lang: Language, scheme: T): T {
+  const translation = lang === 'en' ? undefined : schemeTranslations[lang][scheme.id];
+  return translation ? { ...scheme, ...translation } : scheme;
+}
+
+const partnerTranslations: Record<'hi' | 'kn', Record<string, { name: string; type: string }>> = {
+  hi: {
+    p1: { name: 'बेंगलुरु उद्यम सहायता केंद्र', type: 'एससीए' },
+    p2: { name: 'कर्नाटक ग्रामीण बैंक - इंदिरानगर', type: 'क्षेत्रीय ग्रामीण बैंक' },
+    p3: { name: 'उद्यम एमएफआई - जयनगर', type: 'एनबीएफसी-एमएफआई' },
+    p4: { name: 'पीपल्स डेवलपमेंट फाइनेंस', type: 'एससीए' },
+    p5: { name: 'नेशनल पब्लिक बैंक - कोरमंगला', type: 'सार्वजनिक क्षेत्र का बैंक' },
+  },
+  kn: {
+    p1: { name: 'ಬೆಂಗಳೂರು ಉದ್ಯಮ ಸಹಾಯ ಕೇಂದ್ರ', type: 'ಎಸ್‌ಸಿಎ' },
+    p2: { name: 'ಕರ್ನಾಟಕ ಗ್ರಾಮೀಣ ಬ್ಯಾಂಕ್ - ಇಂದಿರಾನಗರ', type: 'ಪ್ರಾದೇಶಿಕ ಗ್ರಾಮೀಣ ಬ್ಯಾಂಕ್' },
+    p3: { name: 'ಉದ್ಯಮ ಎಂಎಫ್‌ಐ - ಜಯನಗರ', type: 'ಎನ್‌ಬಿಎಫ್‌ಸಿ-ಎಂಎಫ್‌ಐ' },
+    p4: { name: 'ಪೀಪಲ್ಸ್ ಡೆವಲಪ್‌ಮೆಂಟ್ ಫೈನಾನ್ಸ್', type: 'ಎಸ್‌ಸಿಎ' },
+    p5: { name: 'ನ್ಯಾಷನಲ್ ಪಬ್ಲಿಕ್ ಬ್ಯಾಂಕ್ - ಕೋರಮಂಗಲ', type: 'ಸಾರ್ವಜನಿಕ ವಲಯದ ಬ್ಯಾಂಕ್' },
+  },
+};
+
+const partnerReasonTranslations: Record<'hi' | 'kn', Record<string, string>> = {
+  hi: {
+    'Supports your selected scheme': 'आपकी चुनी हुई योजना का समर्थन करता है', 'Authorized channel partner': 'अधिकृत चैनल साझेदार',
+    'Fund utilization is within the configured threshold': 'फंड उपयोग निर्धारित सीमा के भीतर है', 'NPA and overdue rates are within thresholds': 'एनपीए और बकाया दरें निर्धारित सीमा के भीतर हैं',
+    'Currently accepting applications': 'वर्तमान में आवेदन स्वीकार किए जा रहे हैं', 'Processing capacity is available': 'प्रसंस्करण क्षमता उपलब्ध है',
+    'Partner authorization is not active': 'साझेदार का प्राधिकरण सक्रिय नहीं है', 'Selected scheme is not supported': 'चुनी हुई योजना समर्थित नहीं है', 'Partner is currently inactive': 'साझेदार अभी सक्रिय नहीं है', 'Partner is not accepting applications': 'साझेदार आवेदन स्वीकार नहीं कर रहा है',
+    'Fund utilization is above the configured threshold': 'फंड उपयोग निर्धारित सीमा से अधिक है', 'NPA is above the configured threshold': 'एनपीए निर्धारित सीमा से अधिक है', 'Overdue rate is above the configured threshold': 'बकाया दर निर्धारित सीमा से अधिक है', 'Processing capacity is currently limited': 'प्रसंस्करण क्षमता अभी सीमित है',
+  },
+  kn: {
+    'Supports your selected scheme': 'ನೀವು ಆಯ್ಕೆ ಮಾಡಿದ ಯೋಜನೆಯನ್ನು ಬೆಂಬಲಿಸುತ್ತದೆ', 'Authorized channel partner': 'ಅಧಿಕೃತ ಚಾನೆಲ್ ಪಾಲುದಾರ',
+    'Fund utilization is within the configured threshold': 'ನಿಧಿ ಬಳಕೆ ನಿಗದಿತ ಮಿತಿಯೊಳಗಿದೆ', 'NPA and overdue rates are within thresholds': 'ಎನ್‌ಪಿಎ ಮತ್ತು ಬಾಕಿ ದರಗಳು ನಿಗದಿತ ಮಿತಿಯೊಳಗಿವೆ',
+    'Currently accepting applications': 'ಪ್ರಸ್ತುತ ಅರ್ಜಿಗಳನ್ನು ಸ್ವೀಕರಿಸಲಾಗುತ್ತಿದೆ', 'Processing capacity is available': 'ಸಂಸ್ಕರಣಾ ಸಾಮರ್ಥ್ಯ ಲಭ್ಯವಿದೆ',
+    'Partner authorization is not active': 'ಪಾಲುದಾರರ ಅನುಮೋದನೆ ಸಕ್ರಿಯವಾಗಿಲ್ಲ', 'Selected scheme is not supported': 'ಆಯ್ಕೆ ಮಾಡಿದ ಯೋಜನೆ ಬೆಂಬಲಿತವಾಗಿಲ್ಲ', 'Partner is currently inactive': 'ಪಾಲುದಾರರು ಪ್ರಸ್ತುತ ನಿಷ್ಕ್ರಿಯರಾಗಿದ್ದಾರೆ', 'Partner is not accepting applications': 'ಪಾಲುದಾರರು ಅರ್ಜಿಗಳನ್ನು ಸ್ವೀಕರಿಸುತ್ತಿಲ್ಲ',
+    'Fund utilization is above the configured threshold': 'ನಿಧಿ ಬಳಕೆ ನಿಗದಿತ ಮಿತಿಗಿಂತ ಹೆಚ್ಚಾಗಿದೆ', 'NPA is above the configured threshold': 'ಎನ್‌ಪಿಎ ನಿಗದಿತ ಮಿತಿಗಿಂತ ಹೆಚ್ಚಾಗಿದೆ', 'Overdue rate is above the configured threshold': 'ಬಾಕಿ ದರ ನಿಗದಿತ ಮಿತಿಗಿಂತ ಹೆಚ್ಚಾಗಿದೆ', 'Processing capacity is currently limited': 'ಸಂಸ್ಕರಣಾ ಸಾಮರ್ಥ್ಯ ಪ್ರಸ್ತುತ ಸೀಮಿತವಾಗಿದೆ',
+  },
+};
+
+export function translatePartner<T extends { id: string; name: string; type?: string }>(lang: Language, partner: T): T {
+  const translation = lang === 'en' ? undefined : partnerTranslations[lang][partner.id];
+  return translation ? { ...partner, ...translation } : partner;
+}
+
+export function translatePartnerReason(lang: Language, reason: string) {
+  return lang === 'en' ? reason : partnerReasonTranslations[lang][reason] || reason;
 }
