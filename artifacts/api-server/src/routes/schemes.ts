@@ -1,120 +1,410 @@
-import { Router, type IRouter, type Request, type Response } from "express";
-import {
-  CalculateEmiBody,
-  RecommendSchemesBody,
-  RecommendPartnersBody,
-  CreateApplicationBody,
-} from "@workspace/api-zod";
-import { getEligiblePartners, partners, partnerPolicy, resolvePincode, type UserLocation } from "../services/partner-routing";
-import { db, applications, emiCalculations, schemeRecommendations } from "@workspace/db";
+import { Router, type IRouter } from "express";
+import { CalculateEmiBody, RecommendSchemesBody, RecommendPartnersBody } from "@workspace/api-zod";
+import { getEligiblePartners, resolvePincode, type UserLocation } from "../services/partner-routing";
+import { loadAuthUser, requireAuth } from "../middleware/auth";
+import { postgresDb, schemes as pgSchemes, schemeMatchRequests, schemeMatchResults } from "@workspace/db/postgres";
 import { eq } from "drizzle-orm";
 
 const router: IRouter = Router();
 
-const schemes = [
-  { id: "micro-finance", name: "Micro Finance Scheme", purpose: "Small projects and first-stage businesses", maxLoan: 140000, interest: 6.5, moratorium: 3, tenure: 5, applicantType: "Entrepreneur", tags: ["Small projects", "Income compatible", "Low interest"], isPrototypeData: true },
-  { id: "term-loan", name: "Term Loan Scheme", purpose: "Larger business and project requirements", maxLoan: 5000000, interest: 8, moratorium: 6, tenure: 7, applicantType: "Entrepreneur", tags: ["Larger projects", "Flexible tenure"], isPrototypeData: true },
-  { id: "education-loan", name: "Education Loan Scheme", purpose: "Higher education and professional courses", maxLoan: 2000000, interest: 7, moratorium: 12, tenure: 10, applicantType: "Student", tags: ["Higher education", "Moratorium"], isPrototypeData: true },
-  { id: "equipment-support", name: "Equipment Support Scheme", purpose: "Productive equipment for an established enterprise", maxLoan: 1000000, interest: 7.25, moratorium: 6, tenure: 5, applicantType: "Entrepreneur", tags: ["Equipment", "Business growth"], isPrototypeData: true },
-  { id: "working-capital", name: "Working Capital Scheme", purpose: "Inventory and day-to-day business expenses", maxLoan: 500000, interest: 7.5, moratorium: 3, tenure: 3, applicantType: "Entrepreneur", tags: ["Working capital", "Quick access"], isPrototypeData: true },
-  { id: "women-enterprise", name: "Women Enterprise Starter Scheme", purpose: "Starter finance for women-led micro enterprises and home businesses", maxLoan: 150000, interest: 6.5, moratorium: 3, tenure: 5, applicantType: "Entrepreneur", tags: ["Women-led", "Starter", "Micro enterprise"], isPrototypeData: true },
-  { id: "livelihood-fund", name: "Livelihood Growth Fund", purpose: "Patient capital for livelihood activities in rural and semi-urban communities", maxLoan: 300000, interest: 7, moratorium: 6, tenure: 5, applicantType: "Entrepreneur", tags: ["Livelihood", "Rural", "Community"], isPrototypeData: true },
-  { id: "skill-support", name: "Skill Development Support", purpose: "Education support for vocational training and job-ready certification", maxLoan: 350000, interest: 5.5, moratorium: 12, tenure: 5, applicantType: "Student", tags: ["Skills", "Vocational", "Students"], isPrototypeData: true },
-  { id: "green-equipment", name: "Green Enterprise Equipment Fund", purpose: "Finance for energy-efficient tools and environmentally responsible enterprises", maxLoan: 1200000, interest: 7.25, moratorium: 6, tenure: 7, applicantType: "Entrepreneur", tags: ["Green business", "Equipment"], isPrototypeData: true },
-];
+router.get("/schemes", async (req, res) => {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Database configuration missing." } });
+    }
+    const allSchemes = await postgresDb.select().from(pgSchemes);
+    return res.json({ schemes: allSchemes, total: allSchemes.length });
+  } catch (err) {
+    return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Database is unavailable." } });
+  }
+});
 
-function scoreScheme(input: Record<string, unknown>, scheme: (typeof schemes)[number]) {
-  const applicantType = String(input.applicantType);
-  const purpose = String(input.purpose ?? "");
-  const loan = Number(input.loanRequired ?? 0);
-  const income = Number(input.income ?? 0);
-  const typeMatch = applicantType === scheme.applicantType;
-  const amountMatch = loan > 0 && loan <= scheme.maxLoan;
-  const purposeMatch = scheme.id === "education-loan" ? applicantType === "Student" : applicantType === "Entrepreneur";
-  const incomeMatch = income <= 500000 || scheme.id === "term-loan";
-  if (!typeMatch || !amountMatch) return null;
-  const purposeBoost = purpose.toLowerCase().includes(scheme.id === "micro-finance" ? "business" : scheme.id.replace("-", " ")) ? 10 : 5;
-  const breakdown = { income: incomeMatch ? 25 : 12, projectType: purposeMatch ? 25 : 10, loanAmount: amountMatch ? 20 : 0, applicantType: typeMatch ? 15 : 0, purpose: purposeBoost, other: 5 };
-  const score = Math.min(99, Object.values(breakdown).reduce((sum, value) => sum + value, 0));
-  const reasons = [
-    incomeMatch ? "Your income is within the configured prototype range" : "Income may need additional verification",
-    "Your applicant type is compatible",
-    "Your requested amount is within the prototype limit",
-  ];
-  return { ...scheme, score, reasons, breakdown };
+router.get("/schemes/:id", async (req, res) => {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Database configuration missing." } });
+    }
+    const [scheme] = await postgresDb.select().from(pgSchemes).where(eq(pgSchemes.id, req.params.id));
+    return scheme ? res.json(scheme) : res.status(404).json({ error: { code: "NOT_FOUND", message: "Scheme not found" } });
+  } catch (err) {
+    if (err instanceof Error && err.message.includes("invalid input syntax for type uuid")) {
+       return res.status(400).json({ error: { code: "INVALID_ID", message: "Invalid scheme ID format." } });
+    }
+    return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Database is unavailable." } });
+  }
+});
+
+router.post("/schemes/recommend", loadAuthUser, requireAuth, async (req, res) => {
+  try {
+    const input = RecommendSchemesBody.parse(req.body);
+    
+    if (!process.env.DATABASE_URL) {
+      return res.json({ matches: [], total: 0 }); 
+    }
+
+    const allSchemes = await postgresDb.select().from(pgSchemes).where(eq(pgSchemes.status, 'ACTIVE'));
+    if (allSchemes.length === 0) {
+      return res.json({ matches: [], total: 0 });
+    }
+
+    const loan = Number(input.loanRequired ?? 0);
+    const income = Number(input.income ?? 0);
+    const applicantType = String(input.applicantType);
+
+    const matches = [];
+
+    for (const scheme of allSchemes) {
+      const reasons: string[] = [];
+      let isEligible = true;
+
+      // Deterministic applicant type match: if targetBeneficiary is defined, it must match exactly
+      if (scheme.targetBeneficiary && scheme.targetBeneficiary.trim() !== "") {
+         if (scheme.targetBeneficiary !== applicantType) {
+           isEligible = false;
+         } else {
+           reasons.push(`Designed for ${applicantType.toLowerCase()} applicants`);
+         }
+      }
+
+      // Deterministic loan amount match
+      if (scheme.maxLoanAmount !== null && loan > Number(scheme.maxLoanAmount)) {
+        isEligible = false;
+      } else if (scheme.minLoanAmount !== null && loan < Number(scheme.minLoanAmount)) {
+        isEligible = false;
+      } else if (scheme.maxLoanAmount !== null || scheme.minLoanAmount !== null) {
+        reasons.push("Requested amount is within the scheme's limits");
+      }
+
+      // Deterministic income match
+      if (scheme.maxIncome !== null && income > Number(scheme.maxIncome)) {
+        isEligible = false;
+      } else if (scheme.minIncome !== null && income < Number(scheme.minIncome)) {
+        isEligible = false;
+      } else if (scheme.maxIncome !== null || scheme.minIncome !== null) {
+        reasons.push("Your income is within the recorded eligibility limit");
+      }
+
+      // Removed fuzzy purpose match: schemes currently do not have a deterministic purpose rule column.
+      
+      if (isEligible) {
+        matches.push({
+          ...scheme,
+          reasons,
+          // Removed arbitrary score and breakdown fields
+        });
+      }
+    }
+
+    if (matches.length > 0) {
+      await postgresDb.transaction(async (tx) => {
+        const [matchRequest] = await tx
+          .insert(schemeMatchRequests)
+          .values({
+            userId: req.authUser!.id,
+            purpose: String(input.purpose ?? ""),
+            userType: applicantType,
+            educationStatus: input.education ? String(input.education) : null,
+            employmentStatus: input.employment ? String(input.employment) : null,
+            annualIncome: input.income ? String(input.income) : null,
+            requestedAmount: String(input.loanRequired ?? 0),
+            state: input.location ? String(input.location.split(',')[1]?.trim() || input.location) : null,
+            district: input.location ? String(input.location.split(',')[0]?.trim() || input.location) : null,
+            pincode: null,
+          })
+          .returning({ id: schemeMatchRequests.id });
+
+        for (const match of matches) {
+          await tx.insert(schemeMatchResults).values({
+            requestId: matchRequest.id,
+            schemeId: match.id,
+            matchStatus: "POTENTIALLY_SUITABLE",
+            matchReason: { reasons: match.reasons },
+            ruleVersion: 1,
+          });
+        }
+      });
+    }
+
+    return res.json({ matches, total: matches.length });
+  } catch (err: any) {
+    if (err?.name === "ZodError") {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid input" } });
+    }
+    console.error("Match error:", err);
+    return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Could not process match" } });
+  }
+});
+
+
+/**
+ * Shared deterministic EMI calculation engine.
+ *
+ * Moratorium assumption: interest capitalizes on the principal during the
+ * moratorium period. No repayments are made during moratorium. This is the
+ * standard treatment for this calculator. Scheme-specific moratorium rules
+ * (e.g. interest-free moratoriums) are NOT assumed; users should use the
+ * general calculator and note the scheme's official terms.
+ *
+ * Rounding: internal precision kept at float; only rounds at API boundary.
+ * Zero-interest: EMI = principal / repaymentMonths (no division by zero risk).
+ */
+function computeEmi(input: {
+  principal: number;
+  annualRate: number;
+  tenureYears: number;
+  moratoriumMonths: number;
+}): {
+  principalAmount: number;
+  annualInterestRate: number;
+  tenureMonths: number;
+  moratoriumMonths: number;
+  monthlyEmi: number;
+  totalInterest: number;
+  totalRepayment: number;
+} {
+  const principal = input.principal;
+  const totalMonths = Math.max(1, Math.round(input.tenureYears * 12));
+  // Moratorium must be >= 0 and < totalMonths (at least 1 repayment month)
+  const moratoriumMonths = Math.min(
+    Math.max(0, Math.round(input.moratoriumMonths)),
+    Math.max(totalMonths - 1, 0),
+  );
+  const repaymentMonths = Math.max(1, totalMonths - moratoriumMonths);
+  const monthlyRate = input.annualRate / 1200; // annualRate is %, convert to monthly decimal
+
+  // Interest capitalizes during moratorium period
+  const balanceAfterMoratorium =
+    monthlyRate === 0
+      ? principal
+      : principal * Math.pow(1 + monthlyRate, moratoriumMonths);
+
+  // Standard amortization formula; safe for zero-interest
+  const emi =
+    monthlyRate === 0
+      ? balanceAfterMoratorium / repaymentMonths
+      : (balanceAfterMoratorium * monthlyRate * Math.pow(1 + monthlyRate, repaymentMonths)) /
+        (Math.pow(1 + monthlyRate, repaymentMonths) - 1);
+
+  const totalRepayment = emi * repaymentMonths;
+
+  return {
+    principalAmount: principal,
+    annualInterestRate: input.annualRate,
+    tenureMonths: totalMonths,
+    moratoriumMonths,
+    monthlyEmi: emi,
+    totalInterest: totalRepayment - principal,
+    totalRepayment,
+  };
 }
 
-router.get("/schemes", (_req, res) => res.json(schemes));
-router.get("/schemes/:id", (req, res) => {
-  const scheme = schemes.find((item) => item.id === req.params.id);
-  scheme ? res.json(scheme) : res.status(404).json({ error: "Scheme not found" });
-});
-router.post("/schemes/recommend", (req, res) => {
-  const input = RecommendSchemesBody.parse(req.body) as Record<string, unknown>;
-  const matches = schemes.map((scheme) => scoreScheme(input, scheme)).filter(Boolean).sort((a, b) => (b?.score ?? 0) - (a?.score ?? 0));
-  const now = new Date().toISOString();
-  for (const match of matches) {
-    if (match) db.insert(schemeRecommendations).values({ id: crypto.randomUUID(), schemeId: match.id, matchScore: match.score, reasons: match.reasons, breakdown: match.breakdown, createdAt: now }).run();
-  }
-  res.json(matches);
-});
+/**
+ * POST /calculator/emi
+ * Public — pure calculation, no persistence, no authentication required.
+ * Returns precise result; front-end may display the rounded values.
+ */
 router.post("/calculator/emi", (req, res) => {
-  const input = CalculateEmiBody.parse(req.body);
-  const principal = Number(input.principal);
-  const totalMonths = Math.max(1, Number(input.tenureYears) * 12);
-  const moratoriumMonths = Math.min(Math.max(0, Number(input.moratoriumMonths)), Math.max(totalMonths - 1, 1));
-  const repaymentMonths = Math.max(1, totalMonths - moratoriumMonths);
-  const rate = Number(input.annualRate) / 1200;
-  const balanceAfterMoratorium = rate === 0 ? principal : principal * Math.pow(1 + rate, moratoriumMonths);
-  const emi = rate === 0 ? balanceAfterMoratorium / repaymentMonths : balanceAfterMoratorium * rate * Math.pow(1 + rate, repaymentMonths) / (Math.pow(1 + rate, repaymentMonths) - 1);
-  const totalRepayment = emi * repaymentMonths;
-  const result = { emi: Math.round(emi), principal, totalInterest: Math.round(totalRepayment - principal), totalRepayment: Math.round(totalRepayment) };
-  db.insert(emiCalculations).values({ id: crypto.randomUUID(), ...input, emi: result.emi, totalInterest: result.totalInterest, totalRepayment: result.totalRepayment, createdAt: new Date().toISOString() }).run();
-  res.json(result);
+  try {
+    const input = CalculateEmiBody.parse(req.body);
+
+    // Strict validation beyond Zod minimums
+    if (input.principal <= 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Principal must be greater than 0." } });
+    }
+    if (input.annualRate < 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Annual interest rate cannot be negative." } });
+    }
+    if (input.tenureYears <= 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Tenure must be greater than 0 years." } });
+    }
+    const totalMonths = Math.round(input.tenureYears * 12);
+    if (input.moratoriumMonths >= totalMonths) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Moratorium months must be less than total tenure months." } });
+    }
+
+    const r = computeEmi(input);
+    return res.json({
+      // Preserve backward-compat shape for existing frontend (EmiResult)
+      emi: Math.round(r.monthlyEmi),
+      principal: r.principalAmount,
+      totalInterest: Math.round(r.totalInterest),
+      totalRepayment: Math.round(r.totalRepayment),
+      // Extended fields
+      tenureMonths: r.tenureMonths,
+      moratoriumMonths: r.moratoriumMonths,
+      annualInterestRate: r.annualInterestRate,
+    });
+  } catch (err: any) {
+    if (err?.name === "ZodError") {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid financial input." } });
+    }
+    return res.status(500).json({ error: { code: "INTERNAL_ERROR", message: "Unexpected error." } });
+  }
 });
-router.get("/partners", (_req, res) => res.json(partners.map((partner) => ({
-  ...partner, distance: 0, status: partner.acceptingApplications ? "Accepting" : "Unavailable",
-  fundingAvailability: 100 - partner.fundUtilizationPercent,
-}))));
-router.get("/partners/eligible", (req, res) => {
+
+/**
+ * POST /calculator/emi/save
+ * Authenticated — recalculates EMI server-side, stores in PostgreSQL financial_calculations.
+ * Ownership is derived exclusively from req.authUser!.id; no body/query userId accepted.
+ * Optionally associates a real scheme UUID when schemeId is provided.
+ */
+router.post("/calculator/emi/save", loadAuthUser, requireAuth, async (req, res) => {
+  try {
+    const input = CalculateEmiBody.parse(req.body);
+    const schemeIdRaw: string | undefined = typeof req.body.schemeId === "string" ? req.body.schemeId : undefined;
+
+    // Strict validation
+    if (input.principal <= 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Principal must be greater than 0." } });
+    }
+    if (input.annualRate < 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Annual interest rate cannot be negative." } });
+    }
+    if (input.tenureYears <= 0) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Tenure must be greater than 0 years." } });
+    }
+    const totalMonths = Math.round(input.tenureYears * 12);
+    if (input.moratoriumMonths >= totalMonths) {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Moratorium months must be less than total tenure months." } });
+    }
+
+    if (!process.env.DATABASE_URL) {
+      return res.status(503).json({
+        error: { code: "SERVICE_UNAVAILABLE", message: "Saving calculations requires a database connection." },
+      });
+    }
+
+    const { postgresDb, financialCalculations, schemes: pgSchemesTable } = await import("@workspace/db/postgres");
+
+    // Server-side recalculation — never trust frontend-provided EMI totals
+    const r = computeEmi(input);
+
+    // Validate scheme UUID exists if provided — do not accept arbitrary strings
+    let resolvedSchemeId: string | null = null;
+    if (schemeIdRaw) {
+      try {
+        const [scheme] = await postgresDb
+          .select({ id: pgSchemesTable.id })
+          .from(pgSchemesTable)
+          .where(eq(pgSchemesTable.id, schemeIdRaw));
+        resolvedSchemeId = scheme?.id ?? null;
+      } catch {
+        // Invalid UUID format — silently ignore, save without scheme
+        resolvedSchemeId = null;
+      }
+    }
+
+    const [saved] = await postgresDb
+      .insert(financialCalculations)
+      .values({
+        userId: req.authUser!.id, // ownership from session only
+        schemeId: resolvedSchemeId,
+        principalAmount: String(r.principalAmount),
+        interestRate: String(r.annualInterestRate),
+        tenureMonths: r.tenureMonths,
+        moratoriumMonths: r.moratoriumMonths,
+        monthlyEmi: String(r.monthlyEmi.toFixed(2)),
+        totalInterest: String(r.totalInterest.toFixed(2)),
+        totalRepayment: String(r.totalRepayment.toFixed(2)),
+      })
+      .returning();
+
+    return res.status(201).json({
+      id: saved.id,
+      message: "Calculation saved successfully.",
+      createdAt: saved.createdAt,
+    });
+  } catch (err: any) {
+    if (err?.name === "ZodError") {
+      return res.status(400).json({ error: { code: "VALIDATION_ERROR", message: "Invalid financial input." } });
+    }
+    console.error("POST /calculator/emi/save error:", err);
+    return res.status(503).json({ error: { code: "SERVICE_UNAVAILABLE", message: "Database is unavailable." } });
+  }
+});
+
+
+router.get("/partners", async (_req, res) => {
+  if (!process.env.DATABASE_URL) return res.json([]);
+  const { postgresDb, channelPartners, partnerOperationalMetrics } = await import("@workspace/db/postgres");
+  const { eq } = await import("drizzle-orm");
+  const results = await postgresDb
+    .select({
+      partner: channelPartners,
+      metrics: partnerOperationalMetrics,
+    })
+    .from(channelPartners)
+    .leftJoin(
+      partnerOperationalMetrics,
+      eq(partnerOperationalMetrics.partnerId, channelPartners.id)
+    );
+    
+  res.json(results.map(row => ({
+    id: row.partner.id,
+    name: row.partner.name,
+    type: row.partner.partnerType,
+    address: row.partner.address,
+    status: row.partner.acceptingApplications ? "Accepting" : "Unavailable",
+    distance: 0,
+    fundingAvailability: row.metrics ? 100 - Number(row.metrics.fundUtilizationPercent) : 0,
+  })));
+});
+
+router.get("/partners/eligible", async (req, res) => {
   const schemeId = String(req.query.schemeId || "");
   const latitude = Number(req.query.latitude);
   const longitude = Number(req.query.longitude);
   const pincode = String(req.query.pincode || "");
   if (!schemeId) return res.status(400).json({ error: "schemeId is required" });
+  
   const location: UserLocation | null = Number.isFinite(latitude) && Number.isFinite(longitude) && latitude >= -90 && latitude <= 90 && longitude >= -180 && longitude <= 180
     ? { latitude, longitude, source: "browser" }
     : resolvePincode(pincode);
-  if (!location) return res.status(400).json({ error: "Provide valid coordinates or a supported Indian PIN code" });
-  const ranked = getEligiblePartners(schemeId, location);
-  const eligible = ranked.filter((partner) => partner.eligible);
-  return res.json({ userLocation: location, schemeId, recommendedPartnerId: eligible[0]?.id ?? null, policy: partnerPolicy, partners: ranked });
+    
+  if (!location) {
+    if (pincode) {
+        return res.status(400).json({ error: "Location lookup is currently unavailable." });
+    }
+    return res.status(400).json({ error: "Provide valid coordinates or a supported Indian PIN code" });
+  }
+  
+  try {
+    const ranked = await getEligiblePartners(schemeId, location);
+    const eligible = ranked.filter((partner) => partner.eligible);
+    return res.json({ 
+        userLocation: location, 
+        schemeId, 
+        recommendedPartnerId: eligible[0]?.id ?? null, 
+        partners: ranked 
+    });
+  } catch (error) {
+    console.error("Error fetching partners:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
-router.post("/partners/recommend", (req, res) => {
+
+router.post("/partners/recommend", async (req, res) => {
   const { schemeId, location } = RecommendPartnersBody.parse(req.body);
-  const resolved = resolvePincode(location.replace(/\D/g, "")) ?? { latitude: 12.9716, longitude: 77.5946, source: "pincode" as const };
-  const ranked = getEligiblePartners(schemeId, resolved);
-  res.json(ranked);
+  const resolved = resolvePincode(location.replace(/\D/g, ""));
+  if (!resolved) {
+      return res.status(400).json({ error: "Location lookup is currently unavailable." });
+  }
+  try {
+    const ranked = await getEligiblePartners(schemeId, resolved);
+    res.json(ranked);
+  } catch (error) {
+    console.error("Error fetching recommended partners:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
 });
-router.post("/applications", (req, res) => {
-  const input = CreateApplicationBody.parse(req.body);
-  const existing = db.select().from(applications).all().find((application) => application.name === input.name && application.schemeId === input.schemeId && application.partnerId === input.partnerId);
-  if (existing) return res.status(200).json(existing);
-  const id = `SS-26092-${Math.floor(1000 + Math.random() * 8999)}`;
-  const application = { ...input, id, documents: input.documents ?? [], status: "Partner Review", createdAt: new Date().toISOString() };
-  db.insert(applications).values(application).run();
-  return res.status(201).json(application);
-});
-router.get("/applications/:id", (req, res) => {
-  const application = db.select().from(applications).where(eq(applications.id, req.params.id)).get();
-  application ? res.json(application) : res.status(404).json({ error: "Application not found" });
-});
-router.get("/admin/analytics", (_req, res) => res.json({
-  totalApplications: 1284, matchedApplications: 1042, routedApplications: 936, assistance: 48000000,
-  monthly: [{ month: "Jan", applications: 104 }, { month: "Feb", applications: 132 }, { month: "Mar", applications: 148 }, { month: "Apr", applications: 182 }, { month: "May", applications: 216 }, { month: "Jun", applications: 244 }],
-  demand: [{ name: "Micro Finance", value: 420 }, { name: "Term Loan", value: 280 }, { name: "Education", value: 210 }, { name: "Other", value: 132 }],
-  status: [{ name: "Partner Review", value: 342 }, { name: "Matched", value: 408 }, { name: "Approved", value: 216 }, { name: "Other", value: 318 }],
-  partners: [{ name: "Enterprise Support", applications: 188 }, { name: "Gramin Bank", applications: 164 }, { name: "Udyam MFI", applications: 142 }, { name: "People's Finance", applications: 118 }],
-}));
+
+router.get("/admin/analytics", (_req, res) =>
+  res.status(503).json({
+    error: {
+      code: "NOT_IMPLEMENTED",
+      message: "Analytics are not yet available. Real data is required.",
+    },
+  }),
+);
 
 export default router;

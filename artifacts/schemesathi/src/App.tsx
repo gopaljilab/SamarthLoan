@@ -1,4 +1,4 @@
-﻿import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Toaster } from "@/components/ui/toaster";
@@ -85,160 +85,21 @@ import {
 
 const queryClient = new QueryClient();
 
-const schemesFallback: Scheme[] = [
-  {
-    id: "udyam-sakhi",
-    name: "Udyam Sakhi Starter Loan",
-    purpose:
-      "For women building a first enterprise or growing a home-based business.",
-    maxLoan: 150000,
-    interest: 6.5,
-    moratorium: 3,
-    tenure: 5,
-    applicantType: "Entrepreneur",
-    tags: ["Women-led", "Micro enterprise", "Starter"],
-    isPrototypeData: true,
-  },
-  {
-    id: "vidya-vikas",
-    name: "Vidya Vikas Education Support",
-    purpose:
-      "Flexible support for students investing in vocational or higher education.",
-    maxLoan: 250000,
-    interest: 4.5,
-    moratorium: 12,
-    tenure: 7,
-    applicantType: "Student",
-    tags: ["Students", "Education", "Low interest"],
-    isPrototypeData: true,
-  },
-  {
-    id: "kaushal-udyam",
-    name: "Kaushal Udyam Growth Credit",
-    purpose:
-      "Working capital for skilled trades, local services and small production units.",
-    maxLoan: 500000,
-    interest: 8.25,
-    moratorium: 6,
-    tenure: 6,
-    applicantType: "Entrepreneur",
-    tags: ["Skilled trade", "Working capital", "Growth"],
-    isPrototypeData: true,
-  },
-  {
-    id: "jan-aajeevika",
-    name: "Jan Aajeevika Livelihood Fund",
-    purpose:
-      "Patient capital for livelihood activities in rural and semi-urban communities.",
-    maxLoan: 300000,
-    interest: 7,
-    moratorium: 6,
-    tenure: 5,
-    applicantType: "Entrepreneur",
-    tags: ["Livelihood", "Rural", "Community"],
-    isPrototypeData: true,
-  },
-  {
-    id: "swasthya-seva",
-    name: "Swasthya Seva Enterprise Support",
-    purpose: "Capital for community health, care and wellness services.",
-    maxLoan: 750000,
-    interest: 7.75,
-    moratorium: 6,
-    tenure: 6,
-    applicantType: "Entrepreneur",
-    tags: ["Health services", "Enterprise"],
-    isPrototypeData: true,
-  },
-  {
-    id: "digital-disha",
-    name: "Digital Disha Business Credit",
-    purpose:
-      "Support for digital tools, devices and technology-led micro businesses.",
-    maxLoan: 400000,
-    interest: 8,
-    moratorium: 3,
-    tenure: 4,
-    applicantType: "Entrepreneur",
-    tags: ["Digital", "Technology", "Micro business"],
-    isPrototypeData: true,
-  },
-  {
-    id: "skill-shiksha",
-    name: "Skill Shiksha Course Support",
-    purpose:
-      "Education support for vocational training and job-ready certification.",
-    maxLoan: 350000,
-    interest: 5.5,
-    moratorium: 12,
-    tenure: 5,
-    applicantType: "Student",
-    tags: ["Skills", "Vocational", "Students"],
-    isPrototypeData: true,
-  },
-  {
-    id: "green-udyam",
-    name: "Green Udyam Equipment Fund",
-    purpose:
-      "Finance for energy-efficient tools and environmentally responsible enterprises.",
-    maxLoan: 1200000,
-    interest: 7.25,
-    moratorium: 6,
-    tenure: 7,
-    applicantType: "Entrepreneur",
-    tags: ["Green business", "Equipment"],
-    isPrototypeData: true,
-  },
-];
-
-const partnersFallback: Partner[] = [
-  {
-    id: "sahayata-hub",
-    name: "Sahayata Finance Hub",
-    type: "Community finance partner",
-    distance: 2.4,
-    supportedSchemes: ["udyam-sakhi", "jan-aajeevika"],
-    serviceArea: "Bengaluru Urban",
-    status: "Open for intake",
-    processingCapacity: 78,
-    fundingAvailability: 63,
-    address: "14, 2nd Cross, Jayanagar, Bengaluru",
-    latitude: 12.93,
-    longitude: 77.58,
-  },
-  {
-    id: "pragati-kendra",
-    name: "Pragati Seva Kendra",
-    type: "District facilitation centre",
-    distance: 5.8,
-    supportedSchemes: ["udyam-sakhi", "kaushal-udyam", "jan-aajeevika"],
-    serviceArea: "Bengaluru & Ramanagara",
-    status: "Open for intake",
-    processingCapacity: 61,
-    fundingAvailability: 82,
-    address: "Near Taluk Office, Kengeri, Bengaluru",
-    latitude: 12.91,
-    longitude: 77.48,
-  },
-  {
-    id: "vidya-setu",
-    name: "Vidya Setu Student Desk",
-    type: "Education finance desk",
-    distance: 3.1,
-    supportedSchemes: ["vidya-vikas"],
-    serviceArea: "Bengaluru Urban",
-    status: "Open for intake",
-    processingCapacity: 88,
-    fundingAvailability: 71,
-    address: "6, Residency Road, Bengaluru",
-    latitude: 12.97,
-    longitude: 77.6,
-  },
-];
-
 function getSchemeList(data: unknown): Scheme[] {
-  return Array.isArray(data) && data.every(isScheme) ? data : schemesFallback;
+  if (data && typeof data === "object" && "schemes" in data) {
+    const schemeList = (data as { schemes: unknown }).schemes;
+    if (Array.isArray(schemeList) && schemeList.every(isScheme)) {
+      return schemeList;
+    }
+  }
+  // If data is just an array (e.g. from an older cached response)
+  if (Array.isArray(data) && data.every(isScheme)) {
+    return data;
+  }
+  return [];
 }
+
+const partnersFallback: Partner[] = [];
 
 function getPartnerList(data: unknown): Partner[] {
   return Array.isArray(data) ? (data as Partner[]) : partnersFallback;
@@ -616,14 +477,7 @@ function PageTitle({
     </div>
   );
 }
-function PrototypeBadge() {
-  const { t } = useLanguage();
-  return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[hsl(var(--accent)/.45)] bg-[hsl(var(--accent)/.15)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[.12em] text-[hsl(var(--accent-foreground))]">
-      <Sparkles size={11} /> {t("prototype")}
-    </span>
-  );
-}
+
 function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
@@ -764,13 +618,19 @@ function Home() {
     recommend.mutate(
       { data: profile },
       {
-        onSuccess: (matches) => {
+        onSuccess: (response: any) => {
+          const matches = response.matches || [];
           store("ss_matches", matches);
           setLocation("/recommendations");
         },
-        onError: () => {
-          store("ss_matches", fallbackMatches(profile));
-          setLocation("/recommendations");
+        onError: (err: any) => {
+          if (err?.response?.status === 401) {
+             setLocation("/login?returnTo=/recommendations");
+          } else {
+             // Let the recommendations page show the specific error
+             store("ss_matches", { _error: true }); 
+             setLocation("/recommendations");
+          }
         },
       },
     );
@@ -1092,14 +952,18 @@ function Eligibility() {
       recommend.mutate(
         { data: profile },
         {
-          onSuccess: (matches) => {
+          onSuccess: (response: any) => {
+            const matches = response.matches || [];
             store("ss_matches", matches);
             setLocation("/recommendations");
           },
-          onError: () => {
-            const matches = fallbackMatches(profile);
-            store("ss_matches", matches);
-            setLocation("/recommendations");
+          onError: (err: any) => {
+            if (err?.response?.status === 401) {
+               setLocation("/login?returnTo=/recommendations");
+            } else {
+               store("ss_matches", { _error: true }); 
+               setLocation("/recommendations");
+            }
           },
         },
       );
@@ -1277,47 +1141,24 @@ function Eligibility() {
 }
 
 function fallbackMatches(profile: ApplicantProfile): SchemeMatch[] {
-  return schemesFallback
-    .map((scheme, i) => ({
-      ...scheme,
-      score:
-        scheme.applicantType === profile.applicantType
-          ? 92 - i * 8
-          : 61 - i * 5,
-      reasons: [
-        scheme.applicantType === profile.applicantType
-          ? `Designed for ${profile.applicantType.toLowerCase()} applicants`
-          : "May support your stated purpose",
-        profile.loanRequired <= scheme.maxLoan
-          ? "Requested amount is within the scheme limit"
-          : "Requested amount is above the illustrative limit",
-        `${scheme.interest}% illustrative interest keeps repayment visible`,
-      ],
-      breakdown: {
-        "Applicant type":
-          scheme.applicantType === profile.applicantType ? 40 : 19,
-        "Loan fit": profile.loanRequired <= scheme.maxLoan ? 32 : 12,
-        Purpose: 20,
-        Location: 8,
-      },
-    }))
-    .sort((a, b) => b.score - a.score);
+  // Phase 4C: Fake scheme fallbacks have been removed.
+  // The matcher will be wired to the backend in Phase 4D.
+  return [];
 }
 
 function Recommendations() {
   const { t } = useLanguage();
-  const [storedMatches, setStoredMatches] = useState<SchemeMatch[]>(
-    getStored("ss_matches", []),
-  );
+  // `getStored` could return an array or an object `{ _error: true }`
+  const storedValue = getStored("ss_matches", []);
+  const [storedMatches, setStoredMatches] = useState<any>(storedValue);
+  
   const profile = getStored("ss_profile", demoApplicant);
   const schemesQuery = useListSchemes();
-  const matches = storedMatches.length
-    ? storedMatches
-    : fallbackMatches(profile);
-  useEffect(() => {
-    if (schemesQuery.data && storedMatches.length === 0)
-      setStoredMatches(fallbackMatches(profile));
-  }, [schemesQuery.data]);
+  
+  // Cleanly separate error state from matches
+  const hasError = storedMatches && !Array.isArray(storedMatches) && storedMatches._error;
+  const matches = Array.isArray(storedMatches) ? storedMatches : [];
+
   return (
     <div className="mx-auto max-w-6xl px-5 py-10 lg:px-10 lg:py-14">
       <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
@@ -1341,17 +1182,26 @@ function Recommendations() {
         <span className="rounded-lg bg-[hsl(var(--secondary))] px-3 py-2 text-xs font-bold">
           {formatMoney(profile.loanRequired)} {t("neededLabel")}
         </span>
-        <PrototypeBadge />
       </div>
-      <div className="space-y-5">
-        {matches.map((match, index) => (
-          <MatchCard key={match.id} match={match} rank={index + 1} />
-        ))}
-      </div>
-      {!matches.length && (
+      
+      {hasError ? (
+        <div className="rounded-xl border border-[hsl(var(--destructive)/.3)] bg-[hsl(var(--destructive)/.1)] p-5">
+          <h3 className="font-bold text-[hsl(var(--destructive))]">We couldn't complete your scheme search right now.</h3>
+          <p className="mt-2 text-sm text-[hsl(var(--muted-foreground))]">Please try again.</p>
+          <Link href="/eligibility" className="mt-4 inline-block font-bold text-[hsl(var(--destructive))] hover:underline">
+             Retry
+          </Link>
+        </div>
+      ) : matches.length > 0 ? (
+        <div className="space-y-5">
+          {matches.map((match: any, index: number) => (
+            <MatchCard key={match.id} match={match} rank={index + 1} />
+          ))}
+        </div>
+      ) : (
         <EmptyState
-          title={t("noMatches")}
-          body={t("completeEligibility")}
+          title="No matching schemes found"
+          body="There are currently no verified schemes that match your exact criteria. Please adjust your answers or check back later."
           action={
             <Link
               href="/eligibility"
@@ -1405,19 +1255,7 @@ function MatchCard({ match, rank }: { match: SchemeMatch; rank: number }) {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-4 md:block md:text-right">
-          <div>
-            <span className="font-display text-3xl font-bold text-[hsl(var(--primary))]">
-              {Math.round(match.score)}
-            </span>
-            <span className="ml-1 text-xs text-[hsl(var(--muted-foreground))]">
-              / 100
-            </span>
-          </div>
-          <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
-            {t("fitScoreLabel")}
-          </span>
-        </div>
+
       </div>
       <div className="mt-5 grid gap-3 border-t border-[hsl(var(--border))] pt-5 sm:grid-cols-3">
         <div>
@@ -1504,36 +1342,66 @@ function Schemes() {
         title="Browse support, without the fine print fog."
         body={t("schemesLibraryBody")}
       />
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row">
-        <label className="relative flex-1">
-          <Search
-            size={17}
-            className="absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]"
-          />
-          <input
-            aria-label={t("searchSchemes")}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder={t("searchSchemes")}
-            className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] py-3 pl-10 pr-4 text-sm outline-none focus:border-[hsl(var(--primary))]"
-            data-testid="input-search-schemes"
-          />
-        </label>
-        <PrototypeBadge />
-      </div>
-      {query.isError && (
-        <p className="mb-5 rounded-xl border border-[hsl(var(--warning)/.35)] bg-[hsl(var(--warning)/.1)] px-4 py-3 text-sm text-[hsl(var(--warning-foreground))]">
-          Live scheme data is unavailable, so you are viewing the prototype
-          catalogue.
-        </p>
-      )}
-      <div className="grid gap-5 md:grid-cols-2">
-        {filtered.map((scheme) => (
-          <SchemeCard key={scheme.id} scheme={scheme} />
-        ))}
-      </div>
-      {!filtered.length && (
-        <EmptyState title={t("noMatches")} body={t("completeEligibility")} />
+      
+      {query.isError ? (
+        <div className="rounded-xl border border-[hsl(var(--destructive)/.2)] bg-[hsl(var(--destructive)/.05)] p-6 text-center">
+          <p className="text-sm font-semibold text-[hsl(var(--destructive))]">
+            We couldn't load schemes right now. Please try again in a moment.
+          </p>
+          <button
+            onClick={() => query.refetch()}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+          >
+            Retry
+          </button>
+        </div>
+      ) : query.isLoading ? (
+        <div className="grid gap-5 md:grid-cols-2">
+          <Skeleton className="h-48 w-full rounded-2xl" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
+          <Skeleton className="h-48 w-full rounded-2xl" />
+        </div>
+      ) : schemes.length === 0 ? (
+        <div className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-10 text-center">
+          <h3 className="font-display text-2xl font-bold">No schemes are available right now</h3>
+          <p className="mt-2 text-[hsl(var(--muted-foreground))]">
+            We're currently updating the verified scheme catalogue. Please check again later.
+          </p>
+          <button
+            onClick={() => query.refetch()}
+            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--secondary))] px-4 py-2 text-sm font-bold"
+          >
+            Refresh
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-8 flex flex-col gap-3 sm:flex-row">
+            <label className="relative flex-1">
+              <Search
+                size={17}
+                className="absolute left-3 top-3.5 text-[hsl(var(--muted-foreground))]"
+              />
+              <input
+                aria-label={t("searchSchemes")}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t("searchSchemes")}
+                className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] py-3 pl-10 pr-4 text-sm outline-none focus:border-[hsl(var(--primary))]"
+                data-testid="input-search-schemes"
+              />
+            </label>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {filtered.map((scheme) => (
+              <SchemeCard key={scheme.id} scheme={scheme} />
+            ))}
+          </div>
+          {!filtered.length && search.trim() !== "" && (
+            <EmptyState title={t("noMatches")} body={t("completeEligibility")} />
+          )}
+        </>
       )}
     </div>
   );
@@ -1550,7 +1418,6 @@ function SchemeCard({ scheme }: { scheme: Scheme }) {
         <span className="grid h-10 w-10 place-items-center rounded-xl bg-[hsl(var(--secondary))] text-[hsl(var(--primary))]">
           <HandCoins size={20} />
         </span>
-        {scheme.isPrototypeData && <PrototypeBadge />}
       </div>
       <p className="mt-6 text-xs font-bold uppercase tracking-[.14em] text-[hsl(var(--primary))]">
         {localized.applicantType}
@@ -1613,10 +1480,11 @@ function SchemeCard({ scheme }: { scheme: Scheme }) {
 function SchemeDetail() {
   const { id = "" } = useParams<{ id: string }>();
   const query = useGetScheme(id);
-  const scheme =
-    (isScheme(query.data) ? query.data : undefined) ||
-    schemesFallback.find((s) => s.id === id) ||
-    schemesFallback[0];
+  const scheme = isScheme(query.data) ? query.data : undefined;
+  
+  // Type predicate error handling
+  const isError = query.isError || (query.isSuccess && !scheme);
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14">
       {query.isLoading ? (
@@ -1624,6 +1492,30 @@ function SchemeDetail() {
           <Skeleton className="h-12 w-2/3" />
           <Skeleton className="mt-5 h-28 w-full" />
         </>
+      ) : isError || !scheme ? (
+        <div className="rounded-xl border border-[hsl(var(--destructive)/.2)] bg-[hsl(var(--destructive)/.05)] p-6 text-center">
+          <p className="text-lg font-bold text-[hsl(var(--destructive))]">
+            {query.error && (query.error as any).response?.status === 404
+              ? "Scheme not found"
+              : "We couldn't load this scheme right now."}
+          </p>
+          <div className="mt-6 flex justify-center gap-4">
+            <Link
+              href="/schemes"
+              className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--secondary))] px-4 py-2 text-sm font-bold"
+            >
+              <ChevronLeft size={16} /> All schemes
+            </Link>
+            {(!query.error || (query.error as any).response?.status !== 404) && (
+              <button
+                onClick={() => query.refetch()}
+                className="inline-flex items-center gap-2 rounded-lg bg-[hsl(var(--primary))] px-4 py-2 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+              >
+                Retry
+              </button>
+            )}
+          </div>
+        </div>
       ) : (
         <>
           <Link
@@ -1636,7 +1528,6 @@ function SchemeDetail() {
           <div className="grid gap-8 md:grid-cols-[1fr_280px]">
             <div>
               <div className="flex flex-wrap items-center gap-3">
-                <PrototypeBadge />
                 <span className="text-xs font-semibold text-[hsl(var(--muted-foreground))]">
                   {scheme.applicantType}
                 </span>
@@ -1648,7 +1539,7 @@ function SchemeDetail() {
                 {scheme.purpose}
               </p>
               <div className="mt-8 flex flex-wrap gap-2">
-                {scheme.tags.map((t) => (
+                {(scheme.tags || []).map((t) => (
                   <span
                     key={t}
                     className="rounded-md bg-[hsl(var(--secondary))] px-2.5 py-1.5 text-xs font-semibold"
@@ -1717,48 +1608,104 @@ function SchemeDetail() {
 
 function CalculatorPage() {
   const { t } = useLanguage();
+  const { user } = useAuth();
+  const search = useSearch();
+  const params = new URLSearchParams(search);
+  const schemeId = params.get("scheme");
   const [principal, setPrincipal] = useState(90000);
   const [rate, setRate] = useState(6.5);
   const [years, setYears] = useState(5);
   const [moratorium, setMoratorium] = useState(3);
   const [result, setResult] = useState<EmiResult | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [history, setHistory] = useState<any[]>([]);
+  const [historyError, setHistoryError] = useState<string | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const calc = useCalculateEmi();
-  const local = useMemo(() => {
-    const totalMonths = Math.max(1, years * 12);
-    const moratoriumMonths = Math.min(
-      Math.max(0, moratorium),
-      Math.max(totalMonths - 1, 1),
-    );
-    const repaymentMonths = Math.max(1, totalMonths - moratoriumMonths);
-    const r = rate / 1200;
-    const balanceAfterMoratorium =
-      r === 0 ? principal : principal * Math.pow(1 + r, moratoriumMonths);
-    const emi =
-      r === 0
-        ? balanceAfterMoratorium / repaymentMonths
-        : (balanceAfterMoratorium * r * Math.pow(1 + r, repaymentMonths)) /
-          (Math.pow(1 + r, repaymentMonths) - 1);
-    const totalRepayment = emi * repaymentMonths;
-    return {
-      emi: Math.round(emi),
-      principal,
-      totalInterest: Math.round(totalRepayment - principal),
-      totalRepayment: Math.round(totalRepayment),
-    };
-  }, [principal, rate, years, moratorium]);
-  const shown = result || local;
-  const run = () =>
+
+  // Validate inputs before running
+  const validate = () => {
+    if (!principal || principal <= 0) return "Loan amount must be greater than ₹0.";
+    if (rate < 0) return "Interest rate cannot be negative.";
+    if (years <= 0) return "Tenure must be greater than 0 years.";
+    if (moratorium >= years * 12) return "Moratorium months must be less than total tenure months.";
+    return null;
+  };
+
+  const run = () => {
+    const err = validate();
+    if (err) { setValidationError(err); return; }
+    setValidationError(null);
+    setSaveStatus("idle");
     calc.mutate(
-      {
-        data: {
-          principal,
-          annualRate: rate,
-          tenureYears: years,
-          moratoriumMonths: moratorium,
-        },
-      },
+      { data: { principal, annualRate: rate, tenureYears: years, moratoriumMonths: moratorium } },
       { onSuccess: setResult, onError: () => setResult(null) },
     );
+  };
+
+  const saveCalc = async () => {
+    if (!result) return;
+    setSaveStatus("saving");
+    try {
+      const res = await fetch("/api/calculator/emi/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ principal, annualRate: rate, tenureYears: years, moratoriumMonths: moratorium }),
+      });
+      if (res.status === 401) {
+        window.location.href = "/login?returnTo=/calculator";
+        return;
+      }
+      if (!res.ok) {
+        setSaveStatus("error");
+        return;
+      }
+      setSaveStatus("saved");
+      // Reload history
+      setHistoryLoaded(false);
+      loadHistory();
+    } catch {
+      setSaveStatus("error");
+    }
+  };
+
+  const loadHistory = async () => {
+    if (!user) return;
+    try {
+      const res = await fetch("/api/emi-calculations", { credentials: "include" });
+      if (res.status === 503) {
+        setHistoryError("Saved calculation history is not available without a database connection.");
+        setHistoryLoaded(true);
+        return;
+      }
+      if (res.status === 401) {
+        setHistoryLoaded(true);
+        return;
+      }
+      if (!res.ok) {
+        setHistoryError("Could not load history.");
+        setHistoryLoaded(true);
+        return;
+      }
+      const data = await res.json();
+      setHistory(Array.isArray(data) ? data : []);
+      setHistoryError(null);
+      setHistoryLoaded(true);
+    } catch {
+      setHistoryError("Could not load history.");
+      setHistoryLoaded(true);
+    }
+  };
+
+  useEffect(() => {
+    loadHistory();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const shown = result;
+
   return (
     <div className="mx-auto max-w-5xl px-5 py-10 lg:px-10 lg:py-14">
       <PageTitle
@@ -1767,17 +1714,25 @@ function CalculatorPage() {
         body={t("illustrativeEstimate")}
       />
       <div className="grid gap-6 md:grid-cols-[.8fr_1.2fr]">
+        {/* Input panel */}
         <div className="rounded-2xl border border-[hsl(var(--card-border))] bg-[hsl(var(--card))] p-6 card-shadow">
           <div className="space-y-6">
-            <Field
-              label={t("loanAmountLabel")}
-              type="number"
-              value={principal}
-              onChange={(v) => {
-                setPrincipal(Number(v));
-                setResult(null);
-              }}
-            />
+            <div>
+              <label className="block text-sm font-semibold" htmlFor="calc-principal">
+                {t("loanAmountLabel")}
+              </label>
+              <input
+                id="calc-principal"
+                type="number"
+                min="1"
+                step="1000"
+                value={principal}
+                onChange={(e) => { setPrincipal(Number(e.target.value)); setResult(null); setSaveStatus("idle"); }}
+                className="mt-2 w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm"
+                aria-label={t("loanAmountLabel")}
+                data-testid="input-principal"
+              />
+            </div>
             <label className="block text-sm font-semibold">
               <span className="mb-3 flex justify-between">
                 <span>{t("interestRateLabel")}</span>
@@ -1785,19 +1740,17 @@ function CalculatorPage() {
               </span>
               <input
                 type="range"
-                min="2"
+                min="0"
                 max="18"
                 step=".25"
                 value={rate}
-                onChange={(e) => {
-                  setRate(Number(e.target.value));
-                  setResult(null);
-                }}
+                onChange={(e) => { setRate(Number(e.target.value)); setResult(null); setSaveStatus("idle"); }}
                 className="w-full accent-[hsl(var(--primary))]"
+                aria-label={t("interestRateLabel")}
                 data-testid="input-interest-rate"
               />
               <span className="mt-2 flex justify-between text-[10px] font-normal text-[hsl(var(--muted-foreground))]">
-                <span>2%</span>
+                <span>0%</span>
                 <span>18%</span>
               </span>
             </label>
@@ -1812,11 +1765,9 @@ function CalculatorPage() {
                 max="10"
                 step="1"
                 value={years}
-                onChange={(e) => {
-                  setYears(Number(e.target.value));
-                  setResult(null);
-                }}
+                onChange={(e) => { setYears(Number(e.target.value)); setResult(null); setSaveStatus("idle"); }}
                 className="w-full accent-[hsl(var(--primary))]"
+                aria-label={t("tenureLabel")}
                 data-testid="input-tenure"
               />
             </label>
@@ -1824,11 +1775,9 @@ function CalculatorPage() {
               <span className="mb-2 block">{t("moratoriumLabel")}</span>
               <select
                 value={moratorium}
-                onChange={(e) => {
-                  setMoratorium(Number(e.target.value));
-                  setResult(null);
-                }}
+                onChange={(e) => { setMoratorium(Number(e.target.value)); setResult(null); setSaveStatus("idle"); }}
                 className="w-full rounded-xl border border-[hsl(var(--input))] bg-[hsl(var(--card))] px-3.5 py-3 text-sm"
+                aria-label={t("moratoriumLabel")}
                 data-testid="select-moratorium"
               >
                 <option value={0}>{t("noMoratorium")}</option>
@@ -1837,13 +1786,25 @@ function CalculatorPage() {
                 <option value={12}>12 {t("monthsShort")}</option>
               </select>
             </label>
+            {validationError && (
+              <p role="alert" className="rounded-lg bg-[hsl(var(--destructive)/.1)] px-3 py-2 text-xs font-semibold text-[hsl(var(--destructive))]">
+                {validationError}
+              </p>
+            )}
             <Button onClick={run} disabled={calc.isPending} className="w-full">
-              {calc.isPending ? t("finding") : t("calculateEmi")}{" "}
+              {calc.isPending ? "Calculating…" : t("calculateEmi")}{" "}
               <Calculator size={16} />
             </Button>
           </div>
         </div>
+
+        {/* Result panel */}
         <div className="rounded-2xl bg-[hsl(var(--primary))] p-6 text-[hsl(var(--primary-foreground))] md:p-8">
+          {calc.isError && (
+            <div className="mb-5 rounded-xl bg-[hsl(var(--primary-foreground)/.15)] p-4 text-sm">
+              We couldn't complete the calculation. Please check your inputs and try again.
+            </div>
+          )}
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold uppercase tracking-[.16em] opacity-70">
               {t("estimatedMonthlyEmi")}
@@ -1851,37 +1812,116 @@ function CalculatorPage() {
             <Banknote size={20} className="text-[hsl(var(--accent))]" />
           </div>
           <p className="mt-5 font-display text-5xl font-bold tracking-[-.06em]">
-            {formatMoney(shown.emi)}
+            {shown ? formatMoney(shown.emi) : "—"}
           </p>
           <p className="mt-2 text-sm opacity-70">
-            {t("installmentSchedule").replace("{count}", String(years * 12))}
+            {shown ? t("installmentSchedule").replace("{count}", String(years * 12)) : "Enter values and calculate"}
           </p>
-          <div className="mt-10 space-y-4 border-t border-[hsl(var(--primary-foreground)/.18)] pt-5">
-            <div className="flex justify-between text-sm">
-              <span className="opacity-70">{t("principalLabel")}</span>
-              <strong>{formatMoney(shown.principal)}</strong>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="opacity-70">{t("totalInterestLabel")}</span>
-              <strong>{formatMoney(shown.totalInterest)}</strong>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="opacity-70">{t("totalRepaymentLabel")}</span>
-              <strong>{formatMoney(shown.totalRepayment)}</strong>
-            </div>
-          </div>
+          {shown && (
+            <>
+              <div className="mt-10 space-y-4 border-t border-[hsl(var(--primary-foreground)/.18)] pt-5">
+                <div className="flex justify-between text-sm">
+                  <span className="opacity-70">{t("principalLabel")}</span>
+                  <strong>{formatMoney(shown.principal)}</strong>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="opacity-70">{t("totalInterestLabel")}</span>
+                  <strong>{formatMoney(shown.totalInterest)}</strong>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="opacity-70">{t("totalRepaymentLabel")}</span>
+                  <strong>{formatMoney(shown.totalRepayment)}</strong>
+                </div>
+              </div>
+              <div className="mt-6">
+                {user ? (
+                  <button
+                    onClick={saveCalc}
+                    disabled={saveStatus === "saving" || saveStatus === "saved"}
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-[hsl(var(--primary-foreground)/.3)] bg-[hsl(var(--primary-foreground)/.1)] px-4 py-3 text-sm font-bold transition-opacity hover:bg-[hsl(var(--primary-foreground)/.2)] disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label={t("saveCalculation")}
+                    data-testid="btn-save-calc"
+                  >
+                    {saveStatus === "saving" ? t("savingCalculation") :
+                     saveStatus === "saved" ? t("calculationSaved") :
+                     t("saveCalculation")}
+                  </button>
+                ) : (
+                  <Link
+                    href="/login?returnTo=/calculator"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-[hsl(var(--primary-foreground)/.3)] bg-[hsl(var(--primary-foreground)/.1)] px-4 py-3 text-sm font-bold"
+                  >
+                    {t("loginToSave")}
+                  </Link>
+                )}
+                {saveStatus === "error" && (
+                  <p role="alert" className="mt-2 text-center text-xs text-[hsl(var(--accent))]">
+                    {t("saveError")}
+                  </p>
+                )}
+              </div>
+            </>
+          )}
           <div className="mt-8 flex gap-3 rounded-xl bg-[hsl(var(--primary-foreground)/.1)] p-4 text-xs leading-5">
-            <CircleHelp
-              size={16}
-              className="shrink-0 text-[hsl(var(--accent))]"
-            />
+            <CircleHelp size={16} className="shrink-0 text-[hsl(var(--accent))]" />
             {t("interestScheduleNote")}
           </div>
         </div>
       </div>
+
+      {schemeId && shown && (
+        <div className="col-span-full mt-4 flex justify-end">
+          <Link
+            href={`/partners?scheme=${schemeId}`}
+            className="inline-flex items-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-6 py-3.5 text-sm font-bold text-[hsl(var(--primary-foreground))] shadow-md hover:opacity-90"
+          >
+            {t("findPartners")} <ArrowRight size={16} />
+          </Link>
+        </div>
+      )}
+
+      {/* Saved calculations history — only shown when authenticated */}
+      {user && (
+        <div className="mt-10">
+          <h2 className="font-display text-lg font-bold">{t("savedCalculations")}</h2>
+          <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{t("calcHistoryNote")}</p>
+          <div className="mt-5">
+            {!historyLoaded ? (
+              <Skeleton className="h-16 w-full" />
+            ) : historyError ? (
+              <div className="rounded-xl border border-[hsl(var(--destructive)/.2)] bg-[hsl(var(--destructive)/.05)] p-4 text-sm text-[hsl(var(--destructive))]">
+                {historyError}
+              </div>
+            ) : history.length === 0 ? (
+              <p className="rounded-xl border border-[hsl(var(--border))] p-4 text-sm text-[hsl(var(--muted-foreground))]">
+                {t("noSavedCalculations")}
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {history.map((h: any) => (
+                  <div key={h.id} className="rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-5 py-4 text-sm">
+                    <div className="flex flex-wrap justify-between gap-2">
+                      <span className="font-semibold">{formatMoney(Number(h.principalAmount))}</span>
+                      <span className="text-[hsl(var(--muted-foreground))]">
+                        {h.interestRate}% · {h.tenureMonths} {t("monthsShort")}
+                        {h.moratoriumMonths > 0 ? ` · ${h.moratoriumMonths}m moratorium` : ""}
+                      </span>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-4 text-[hsl(var(--muted-foreground))]">
+                      <span>EMI: <strong className="text-[hsl(var(--foreground))]">{formatMoney(Math.round(Number(h.monthlyEmi)))}</strong></span>
+                      <span>{t("totalRepaymentLabel")}: <strong className="text-[hsl(var(--foreground))]">{formatMoney(Math.round(Number(h.totalRepayment)))}</strong></span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 function LegacyPartnersOld() {
   const query = useListPartners();
@@ -2040,16 +2080,7 @@ function ApplicationPage() {
           store("ss_application", app);
           setLocation("/application/success");
         },
-        onError: () => {
-          const app: Application = {
-            ...payload,
-            id: `SS-${Date.now().toString().slice(-6)}`,
-            status: t("applicationReceived"),
-            createdAt: new Date().toISOString(),
-          };
-          store("ss_application", app);
-          setLocation("/application/success");
-        },
+        onError: (err) => { alert("Failed to submit application: " + (err.message || "Server error")); },
       },
     );
   };
@@ -2586,7 +2617,7 @@ function AdminTable({
     type === "partners"
       ? partnersFallback
       : type === "schemes"
-        ? schemesFallback
+        ? [] // Fallbacks removed; API integration pending for Admin.
         : [
             getStored<Application>("ss_application", {
               id: "SS-482913",
@@ -2656,7 +2687,7 @@ function AdminTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-[hsl(var(--border))]">
-            {data.map((item: any, i) => (
+            {data.map((item: any, i: number) => (
               <tr
                 key={item.id}
                 className="hover:bg-[hsl(var(--secondary)/.3)]"
@@ -2730,6 +2761,9 @@ function AdminTable({
   );
 }
 
+import { AuthProvider, useAuth } from "./hooks/use-auth";
+import { LoginPage, RegisterPage, ProtectedRoute } from "./components/auth-pages";
+
 function Router() {
   return (
     <ErrorBoundary resetKey={location.pathname}>
@@ -2737,6 +2771,8 @@ function Router() {
         <DocumentTitle />
         <Switch>
           <Route path="/" component={Home} />
+          <Route path="/login" component={LoginPage} />
+          <Route path="/register" component={RegisterPage} />
           <Route path="/eligibility" component={Eligibility} />
           <Route path="/recommendations" component={Recommendations} />
           <Route path="/schemes" component={Schemes} />
@@ -2744,10 +2780,10 @@ function Router() {
           <Route path="/calculator" component={CalculatorPage} />
           <Route path="/partners" component={LegacyPartners} />
           <Route path="/find-partner" component={LegacyPartners} />
-          <Route path="/application" component={ApplicationPage} />
-          <Route path="/application/success" component={Success} />
-          <Route path="/track" component={Track} />
-          <Route path="/dashboard" component={Dashboard} />
+          <Route path="/application" component={() => <ProtectedRoute component={ApplicationPage} />} />
+          <Route path="/application/success" component={() => <ProtectedRoute component={Success} />} />
+          <Route path="/track" component={() => <ProtectedRoute component={Track} />} />
+          <Route path="/dashboard" component={() => <ProtectedRoute component={Dashboard} />} />
           <Route path="/admin" component={() => <AdminOverview />} />
           <Route
             path="/admin/applications"
@@ -2777,9 +2813,11 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
-          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-            <Router />
-          </WouterRouter>
+          <AuthProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+          </AuthProvider>
           <Toaster />
         </LanguageProvider>
       </TooltipProvider>
