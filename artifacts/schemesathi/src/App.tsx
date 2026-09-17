@@ -237,11 +237,33 @@ const partnersFallback: Partner[] = [
 ];
 
 function getSchemeList(data: unknown): Scheme[] {
-  return Array.isArray(data) ? (data as Scheme[]) : schemesFallback;
+  return Array.isArray(data) && data.every(isScheme) ? data : schemesFallback;
 }
 
 function getPartnerList(data: unknown): Partner[] {
   return Array.isArray(data) ? (data as Partner[]) : partnersFallback;
+}
+
+/**
+ * Static deployments serve the app shell for unknown `/api/*` paths. The
+ * generated client will then receive HTML rather than the Scheme JSON it
+ * expects, so validate the response before using it in a detail page.
+ */
+function isScheme(data: unknown): data is Scheme {
+  if (!data || typeof data !== "object") return false;
+  const scheme = data as Partial<Scheme>;
+  return (
+    typeof scheme.id === "string" &&
+    typeof scheme.name === "string" &&
+    typeof scheme.purpose === "string" &&
+    typeof scheme.maxLoan === "number" &&
+    typeof scheme.interest === "number" &&
+    typeof scheme.moratorium === "number" &&
+    typeof scheme.tenure === "number" &&
+    typeof scheme.applicantType === "string" &&
+    Array.isArray(scheme.tags) &&
+    scheme.tags.every((tag) => typeof tag === "string")
+  );
 }
 
 const demoApplicant: ApplicantProfile = {
@@ -1592,7 +1614,7 @@ function SchemeDetail() {
   const { id = "" } = useParams<{ id: string }>();
   const query = useGetScheme(id);
   const scheme =
-    query.data ||
+    (isScheme(query.data) ? query.data : undefined) ||
     schemesFallback.find((s) => s.id === id) ||
     schemesFallback[0];
   return (
