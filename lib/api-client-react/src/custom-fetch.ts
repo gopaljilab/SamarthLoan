@@ -360,7 +360,15 @@ export async function customFetch<T = unknown>(
 
   const requestInfo = { method, url: resolveUrl(input) };
 
-  const response = await fetch(input, { ...init, method, headers });
+  // Browser sessions use httpOnly cookies. Include them for same-origin and
+  // explicitly configured cross-origin API calls; callers may still override
+  // this for a request that must not carry session state.
+  const response = await fetch(input, {
+    ...init,
+    method,
+    headers,
+    credentials: init.credentials ?? "include",
+  });
 
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);

@@ -5,11 +5,14 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema/index.ts"
+    "./schema": "./src/schema/index.ts",
+    "./postgres": "./src/postgres-client.ts"
   },
   "scripts": {
     "push": "drizzle-kit push --config ./drizzle.config.ts",
     "push-force": "drizzle-kit push --force --config ./drizzle.config.ts",
+    "generate:pg": "node --require ./scripts/drizzle-windows-cli-shim.cjs ./node_modules/drizzle-kit/bin.cjs generate --config ./drizzle.postgres.config.ts",
+    "migrate:pg": "node -e \"if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL is required for PostgreSQL migrations.')\" && node --require ./scripts/drizzle-windows-cli-shim.cjs ./node_modules/drizzle-kit/bin.cjs migrate --config ./drizzle.postgres.config.ts",
     "seed": "tsx ./src/seed.ts"
   },
   "dependencies": {

@@ -4,10 +4,12 @@ import schemeRouter from "./schemes";
 import applicationsRouter from "./applications";
 import profilesRouter from "./profiles";
 import dataRouter from "./data";
+import authRouter from "./auth";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+router.use(authRouter);
 router.use(schemeRouter);
 router.use(applicationsRouter);
 router.use(profilesRouter);
