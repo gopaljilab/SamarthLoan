@@ -383,15 +383,38 @@ router.get("/partners/eligible", async (req, res) => {
   }
 });
 
-router.post("/partners/recommend", async (req, res) => {
-  const { schemeId, location } = RecommendPartnersBody.parse(req.body);
-  const resolved = resolvePincode(location.replace(/\D/g, ""));
-  if (!resolved) {
-      return res.status(400).json({ error: "Location lookup is currently unavailable." });
+router.get("/partners/eligible", async (req, res) => {
+  const { schemeId, latitude, longitude, pincode } = req.query;
+  
+  if (!schemeId || typeof schemeId !== "string") {
+    return res.status(400).json({ error: "schemeId is required" });
   }
+
+  let location = null;
+
+  if (latitude && longitude) {
+    location = {
+      latitude: Number(latitude),
+      longitude: Number(longitude),
+      source: "browser" as const,
+    };
+  } else if (pincode && typeof pincode === "string") {
+    location = resolvePincode(pincode.replace(/\D/g, ""));
+  }
+
+  if (!location) {
+      return res.status(400).json({ error: "Valid latitude/longitude or pincode is required." });
+  }
+
   try {
-    const ranked = await getEligiblePartners(schemeId, resolved);
-    return res.json(ranked);
+    const ranked = await getEligiblePartners(schemeId, location);
+    // Construct the response according to EligiblePartnerResponse schema
+    return res.json({
+      userLocation: location,
+      schemeId,
+      recommendedPartnerId: ranked.length > 0 && ranked[0].eligible ? ranked[0].id : null,
+      partners: ranked
+    });
   } catch (error) {
     console.error("Error fetching recommended partners:", error);
     return res.status(500).json({ error: "Internal server error" });

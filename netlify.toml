@@ -1,5 +1,5 @@
 [build]
-  command = "pnpm --filter @workspace/samarthloan build"
+  command = "NODE_OPTIONS=--max_old_space_size=4096 pnpm --filter @workspace/samarthloan build"
   publish = "artifacts/schemesathi/dist/public"
 
 [[redirects]]
