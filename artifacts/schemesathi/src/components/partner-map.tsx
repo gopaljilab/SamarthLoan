@@ -6,7 +6,7 @@ type MapPartner = {
   name: string;
   latitude?: number;
   longitude?: number;
-  distanceKm?: number;
+  distanceKm?: number | null;
   status?: string;
 };
 
@@ -35,3 +35,5 @@ export function PartnerMap({ latitude, longitude, partners, selectedId, onSelect
     <p className="border-t border-[hsl(var(--border))] px-4 py-3 text-xs text-[hsl(var(--muted-foreground))]">{t('mapNote')}</p>
   </div>;
 }
+
+export default PartnerMap;

@@ -76,7 +76,7 @@ router.patch("/contact-enquiries/:id", loadAuthUser, requireAdmin, (req, res) =>
   const updated = db
     .update(contactEnquiries)
     .set({ status: req.body.status })
-    .where(eq(contactEnquiries.id, req.params.id))
+    .where(eq(contactEnquiries.id, req.params.id as string))
     .returning()
     .get();
   return updated
