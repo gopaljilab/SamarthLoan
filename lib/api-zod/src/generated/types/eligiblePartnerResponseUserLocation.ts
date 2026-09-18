@@ -6,9 +6,8 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface EmiResult {
-  emi: number;
-  principal: number;
-  totalInterest: number;
-  totalRepayment: number;
-}
+export type EligiblePartnerResponseUserLocation = {
+  latitude: number;
+  longitude: number;
+  source?: string;
+};

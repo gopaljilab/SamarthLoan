@@ -5,10 +5,9 @@
  * SamarthLoan prototype API for scheme matching and application routing
  * OpenAPI spec version: 0.1.0
  */
+import type { Error } from './error';
 
-export interface EmiResult {
-  emi: number;
-  principal: number;
-  totalInterest: number;
-  totalRepayment: number;
-}
+/**
+ * Invalid request
+ */
+export type BadRequestResponse = Error;

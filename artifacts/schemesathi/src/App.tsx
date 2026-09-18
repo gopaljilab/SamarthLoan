@@ -1601,8 +1601,135 @@ function SchemeDetail() {
               </div>
             </div>
           </div>
+          <div className="mt-12">
+            <Eyebrow>Find Nearby Access Points</Eyebrow>
+            <div className="rounded-2xl border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6">
+              <p className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
+                Find authorized channel partners near you to apply for this scheme.
+              </p>
+              <NearbyLocator schemeId={scheme.id!} />
+            </div>
+          </div>
         </>
       )}
+    </div>
+  );
+}
+
+function NearbyLocator({ schemeId }: { schemeId: string }) {
+  const [partners, setPartners] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pincode, setPincode] = useState("");
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const fetchNearby = async (lat?: number, lng?: number, pin?: string) => {
+    setLoading(true);
+    setError(null);
+    setHasSearched(true);
+    try {
+      const query = new URLSearchParams({ schemeId });
+      if (lat && lng) {
+        query.append("latitude", lat.toString());
+        query.append("longitude", lng.toString());
+      } else if (pin) {
+        query.append("pincode", pin);
+      }
+      const res = await fetch(`/api/partners/eligible?${query.toString()}`);
+      if (!res.ok) {
+        let msg = await res.text();
+        try { const j = JSON.parse(msg); if(j.error) msg = j.error; } catch(e) {}
+        throw new Error(msg);
+      }
+      const data = await res.json();
+      setPartners(data.partners || []);
+    } catch (err: any) {
+      setError(err.message || "Failed to find partners");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setError("Geolocation is not supported by your browser");
+      return;
+    }
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        fetchNearby(pos.coords.latitude, pos.coords.longitude);
+      },
+      (err) => {
+        setError(err.message);
+        setLoading(false);
+      },
+      { timeout: 10000 }
+    );
+  };
+
+  return (
+    <div>
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row">
+        <button
+          onClick={handleUseMyLocation}
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-[hsl(var(--primary))] px-4 text-sm font-bold text-[hsl(var(--primary-foreground))]"
+        >
+          <LocateFixed size={16} /> Use My Location
+        </button>
+        <div className="flex h-10 items-center justify-center text-sm text-[hsl(var(--muted-foreground))]">
+          <span>or</span>
+        </div>
+        <div className="flex h-10 flex-1 gap-2">
+          <input
+            type="text"
+            placeholder="Enter Pincode (e.g. 560001)"
+            value={pincode}
+            onChange={(e) => setPincode(e.target.value)}
+            className="h-full w-full rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--background))] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--primary))]"
+          />
+          <button
+            onClick={() => fetchNearby(undefined, undefined, pincode)}
+            className="inline-flex h-full items-center justify-center rounded-xl bg-[hsl(var(--secondary))] px-4 text-sm font-bold"
+          >
+            Search
+          </button>
+        </div>
+      </div>
+      
+      {error && <p className="mb-4 text-sm text-red-500">{error}</p>}
+      
+      {loading ? (
+        <div className="flex h-32 items-center justify-center text-[hsl(var(--muted-foreground))]">Loading partners...</div>
+      ) : partners.length > 0 ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {partners.map(p => (
+            <div key={p.id} className="rounded-xl border border-[hsl(var(--border))] p-4 shadow-sm">
+              <div className="flex items-start justify-between">
+                <h3 className="font-bold">{p.name}</h3>
+                {p.distanceKm !== null && (
+                  <span className="ml-2 whitespace-nowrap rounded-md bg-[hsl(var(--secondary))] px-2 py-1 text-xs font-semibold">
+                    {p.distanceKm} km
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-[hsl(var(--muted-foreground))]">{p.address}</p>
+              {p.eligible ? (
+                <Link
+                  href={`/application?scheme=${schemeId}&partner=${p.id}`}
+                  className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[hsl(var(--primary))]"
+                >
+                  Apply Here <ArrowRight size={14} />
+                </Link>
+              ) : (
+                <p className="mt-4 text-xs text-red-500">Not accepting applications</p>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : hasSearched && partners.length === 0 && !error ? (
+        <p className="text-sm text-[hsl(var(--muted-foreground))]">No eligible partners found nearby.</p>
+      ) : null}
     </div>
   );
 }
