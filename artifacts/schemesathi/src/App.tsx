@@ -69,6 +69,7 @@ import {
   Switch,
   useLocation,
   useParams,
+  useSearch,
   Router as WouterRouter,
 } from "wouter";
 import NotFound from "@/pages/not-found";

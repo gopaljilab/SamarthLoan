@@ -14,6 +14,8 @@ export type PartnerRecord = {
   district: string;
   state: string;
   pincode: string;
+  latitude?: number;
+  longitude?: number;
   distanceKm: number | null;
   schemeEligible: boolean;
   operationalStatus: "ELIGIBLE" | "UNAVAILABLE";
@@ -46,13 +48,8 @@ export default function PartnerLocator() {
     setLoading(true);
     setMessage("");
     try {
-      const response = await customFetch(`/api/partners/eligible?schemeId=${schemeId}&${query}`);
-      if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.error || "Partner search failed");
-      }
-      const result = (await response.json()) as LocatorResponse;
-      if (!Array.isArray(result.partners)) throw new Error("Partner search returned an invalid response");
+      const result = await customFetch<LocatorResponse>(`/api/partners/eligible?schemeId=${schemeId}&${query}`);
+      if (!Array.isArray(result?.partners)) throw new Error("Partner search returned an invalid response");
       setData(result);
       setSelectedId(result.recommendedPartnerId || undefined);
     } catch (err: any) {

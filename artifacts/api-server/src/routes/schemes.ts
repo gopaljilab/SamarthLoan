@@ -51,7 +51,7 @@ router.post("/schemes/recommend", loadAuthUser, requireAuth, async (req, res) =>
     const income = Number(input.income ?? 0);
     const applicantType = String(input.applicantType);
 
-    const matches = [];
+    const matches: any[] = [];
 
     for (const scheme of allSchemes) {
       const reasons: string[] = [];
@@ -339,7 +339,7 @@ router.get("/partners", async (_req, res) => {
       eq(partnerOperationalMetrics.partnerId, channelPartners.id)
     );
     
-  res.json(results.map(row => ({
+  return res.json(results.map(row => ({
     id: row.partner.id,
     name: row.partner.name,
     type: row.partner.partnerType,
@@ -391,7 +391,7 @@ router.post("/partners/recommend", async (req, res) => {
   }
   try {
     const ranked = await getEligiblePartners(schemeId, resolved);
-    res.json(ranked);
+    return res.json(ranked);
   } catch (error) {
     console.error("Error fetching recommended partners:", error);
     return res.status(500).json({ error: "Internal server error" });
